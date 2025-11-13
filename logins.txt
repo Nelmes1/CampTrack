@@ -1,0 +1,4 @@
+admin,admin,
+scout leader,leader1, 
+scout leader,leader2, 
+logistics coordinator,coordinator,
