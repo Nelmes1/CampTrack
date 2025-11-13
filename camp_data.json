@@ -1,0 +1,86 @@
+[
+    {
+        "name": "beach Scouts",
+        "location": "yellowwood National Park",
+        "camp_type": "Overnight",
+        "start_date": "2025-07-01",
+        "end_date": "2025-07-10",
+        "food_stock": 170,
+        "scout_leaders": [
+            "Leader John"
+        ],
+        "campers": [
+            "Alice",
+            "Ben",
+            "Charlie",
+            "Daisy"
+        ],
+        "activities": {
+            "2025-07-02": [
+                "Hiking"
+            ]
+        },
+        "daily_food_usage": {},
+        "daily_records": {
+            "2025-07-02": [
+                "Great hike, no incidents."
+            ]
+        }
+    },
+    {
+        "name": "beach Scouts",
+        "location": "yellowwood National Park",
+        "camp_type": "Overnight",
+        "start_date": "2025-07-01",
+        "end_date": "2025-07-10",
+        "food_stock": 170,
+        "scout_leaders": [
+            "Leader John"
+        ],
+        "campers": [
+            "Alice",
+            "Ben",
+            "Charlie",
+            "Daisy"
+        ],
+        "activities": {
+            "2025-07-02": [
+                "Hiking"
+            ]
+        },
+        "daily_food_usage": {},
+        "daily_records": {
+            "2025-07-02": [
+                "Great hike, no incidents."
+            ]
+        }
+    },
+    {
+        "name": "beach Scouts",
+        "location": "yellowwood National Park",
+        "camp_type": "Overnight",
+        "start_date": "2025-07-01",
+        "end_date": "2025-07-10",
+        "food_stock": 170,
+        "scout_leaders": [
+            "Leader John"
+        ],
+        "campers": [
+            "Alice",
+            "Ben",
+            "Charlie",
+            "Daisy"
+        ],
+        "activities": {
+            "2025-07-02": [
+                "Hiking"
+            ]
+        },
+        "daily_food_usage": {},
+        "daily_records": {
+            "2025-07-02": [
+                "Great hike, no incidents."
+            ]
+        }
+    }
+]
