@@ -1,3 +1,7 @@
+from datetime import datetime, timedelta
+import os
+import json
+
 print('╔═══════════════╗\n║   CampTrack   ║\n╚═══════════════╝')
 
 print('\nWelcome to CampTrack! Please select a user.')
@@ -289,6 +293,66 @@ def admin_menu():
 
         else: print('Invald input. Please try again.')
 
+def logistics_coordinator_menu():
+    while True:
+        print('\nLogisitics Coordiator Menu')
+        print('\nChoose [1] to Manage and Create Camps'
+            '\nChoose [2] to Manage Food Allocation'
+            "\nChoose [3] to View Camp Dashboard"
+            '\nChoose [4] to Visualise Camp Data'
+            '\nChoose [5] to Access Financial Settings'
+            '\nChoose [6] to Access Notifications'
+            '\nChoose [7] to Logout')
+    
+        choice = int(input('\nInput your option: '))
+        
+        if choice == 1:
+            print('\nCamp Management Menu')
+            print('\nChoose [1] to Create a Camp'
+                '\nChoose [2] to Edit Existing Camp'
+                '\nChoose [3] to Return to Main Menu')
+            choice = int(input('\nInput your option: '))
+
+            if choice == 1:
+                create_camp()
+
+            elif choice == 2:
+                #camp_manager()
+                continue
+
+            elif choice == 3:
+                logisitics_coordinator_menu()
+
+            else:
+                print('Invald input. Please try again.')
+                logistics_coordinator_menu()
+                
+        elif choice == 2:
+           continue
+            
+        elif choice == 3:
+           continue
+
+        elif choice == 4:
+           continue 
+
+        elif choice == 5:
+            continue 
+
+        elif choice == 6:
+           continue 
+
+        elif choice == 7:
+            print('╔═══════════════╗\n║   CampTrack   ║\n╚═══════════════╝')
+
+            print('\nWelcome to CampTrack! Please select a user.')
+            return
+
+        else:
+            print('Invald input. Please try again.')
+            logistics_coordinator_menu()
+
+
 
 def login_admin():
     login = True
@@ -337,9 +401,182 @@ def login_logisticscoordinator():
             return       
         if user['username'] == ask_username and user['password'] == ask_password:
             print('\nLogin successful! Welcome Logistics Coordinator.\n')
+            logistics_coordinator_menu() 
             login = False
         else:
             print('\nInvalid username or password.\n')
+
+class Camp():
+    
+    all_camps=[]
+    
+    def __init__(self, name, location, camp_type, start_date, end_date, initial_food_stock):
+        self.name = name
+        self.location = location
+        self.camp_type = camp_type
+        self.start_date = start_date
+        self.end_date = end_date
+        self.food_stock = initial_food_stock
+        self.scout_leaders = []           # List of assigned scout leaders
+        self.campers = []                 # List of campers
+        self.activities = {}              # Dict: {date: list of activities}
+        self.daily_food_usage = {}        # Dict: {date: food used}
+        self.daily_records = {}           # Dict: {date: notes}
+        
+        Camp.all_camps.append(self)
+
+    def assign_leader(self, leader_choice): # Function to assign leader to camp
+        if leader_choice not in self.scout_leaders:
+            self.scout_leaders.append(leader_choice)
+        else:
+            print("\nLeader:",leader_choice,"already assigned to this camp")
+
+    def assign_campers(self, camper_list): # Function to assign campers to camp
+        for camper in camper_list:
+            if camper not in self.campers:
+                self.campers.append(camper)
+            else:
+                print("\nCamper:",camper,"already assigned to this camp")
+
+    def assign_activity(self, activity_names, date): # Function to assign activies to dictionary with key 'Date'
+        if date not in self.activities:
+            self.activities[date] = []
+        self.activities[date].append(activity_names)
+
+    def calc_daily_food(self, food_per_camper): # Function to calculate total daily food usage and remaining supply 
+        pass
+
+    def allocate_extra_food(self, food_allocation): # Function to allocate extra food to a camp
+        self.food_stock += food_allocation
+
+    def note_daily_record(self, date, notes): #Function to add notes to dictionary with key 'Date'
+        if date not in self.daily_records:
+            self.daily_records[date] = []
+        self.daily_records[date].append(notes)
+
+    def summary(self):
+        print("\n ---Camp Summary---",
+              "\nName:",self.name,
+              "\nLocation:",self.location,
+              "\nCamp Type:",self.camp_type,
+              "\nStart Date:",self.start_date,
+              "\nEnd Date:",self.end_date,
+              "\nLeaders:",self.scout_leaders,
+              "\nNumber of Campers:",len(self.campers),
+              "\nCurrent Food Stock:",self.food_stock)
+
+def save_to_file():
+    data=[]
+    for camp in Camp.all_camps:
+        camp_data = {
+            "name": camp.name,
+            "location": camp.location,
+            "camp_type": camp.camp_type,
+            "start_date": camp.start_date,
+            "end_date": camp.end_date,
+            "food_stock": camp.food_stock,
+            "scout_leaders": camp.scout_leaders,
+            "campers": camp.campers,
+            "activities": camp.activities,
+            "daily_food_usage": camp.daily_food_usage,
+            "daily_records": camp.daily_records
+        }
+        data.append(camp_data)
+    
+    with open("camp_data.json","w") as file:
+        json.dump(data, file, indent=4)
+
+def read_from_file():
+    try:
+        if os.path.getsize("camp_data.json") == 0:
+            return []
+            pass
+        else:
+            with open("camp_data.json","r") as file:
+                data=json.load(file)
+                Camp.all_camps = []
+                for camp_data in data:
+                    camp = Camp(
+                        camp_data["name"],
+                        camp_data["location"],
+                        camp_data["camp_type"],
+                        camp_data["start_date"],
+                        camp_data["end_date"],
+                        camp_data["food_stock"]
+                    )
+                    camp.scout_leaders = camp_data["scout_leaders"]
+                    camp.campers = camp_data["campers"]
+                    camp.activities = camp_data["activities"]
+                    camp.daily_food_usage = camp_data["daily_food_usage"]
+                    camp.daily_records = camp_data["daily_records"]
+                return Camp.all_camps
+    except FileNotFoundError:
+        print('\ncamp_data.json not found')
+
+def create_camp():
+    print('\nCamp Creator')
+    
+    name = input('\nPlease enter the name of this camp: ')
+    
+    location = input('\nPlease enter the location of this camp: ')
+    
+    print('\nPlease enter the camp type:'
+        '\nSelect [1] for Day Camp'
+        '\nSelect [2] for Overnight'
+        '\nSelect [3] for Multiple Days')
+    camp_type = int(input('\nInput your choice: '))
+    start_date = input('\nPlease enter the start date (YYYY-MM-DD): ')
+    valid = False
+    while not valid:
+        try:
+            first_date = datetime.strptime(start_date, "%Y-%m-%d")
+            if camp_type == 1:
+                nights = 0
+                second_date = first_date + timedelta(days=nights)
+                valid = True
+            elif camp_type == 2:
+                nights = 1
+                second_date = first_date + timedelta(days=nights)
+                valid = True
+            elif camp_type == 3:
+                nights = int(input("\nHow many nights is the camp? "))
+                if nights < 1:
+                    print("A multi-day camp must be at least 1 night.")
+                    continue
+                second_date = first_date + timedelta(days=nights)
+                valid = True
+        except ValueError:
+            print('Invalid date format! Please use YYYY-MM-DD.')
+            start_date = input('\nPlease enter the start date (YYYY-MM-DD): ')
+    start_date = first_date.strftime("%Y-%m-%d")
+    end_date = second_date.strftime("%Y-%m-%d")
+            
+    initial_food_stock = int(input('\nPlease enter the amount of food allocated for this camp [units]: '))
+
+    print("\nYour Camp Details:")
+    print("Name:", name)
+    print("Location:", location)
+    print("Type:", camp_type)
+    print("Start Date:", start_date)
+    print("End Date:", end_date)
+    print("Daily Food Stock:", initial_food_stock)
+
+    confirm = input("\nConfirm camp creation? (Y/N): ").strip().lower()
+
+    if confirm == 'y':
+        new_camp = Camp(
+            name,
+            location,
+            camp_type,
+            start_date,
+            end_date,
+            initial_food_stock)
+        save_to_file()
+        print("\nCamp successfully created!")
+        
+    else:
+        print("\nCamp creation cancelled.")
+    logistics_coordinator_menu()
     
 
 while True:
