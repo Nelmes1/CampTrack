@@ -1,4 +1,3 @@
-from datetime import datetime, timedelta
 import os
 import json
 
@@ -8,7 +7,8 @@ from logistics_coordinator_features import (
     check_food_shortage,
     dashboard,
     plot_food_stock,
-    set_pay_rate
+    set_pay_rate,
+    get_dates
 )
 
 from camp_class import Camp, save_to_file, read_from_file
@@ -507,9 +507,15 @@ def edit_camp():
     # Update values
     camp.name = update_text("New Name", camp.name)
     camp.location = update_text("New Location", camp.location)
-    camp.camp_type = update_text("New Type", camp.camp_type)
-    camp.start_date = update_text("New Start Date", camp.start_date)
-    camp.end_date = update_text("New End Date", camp.end_date)
+    camp.camp_type = get_int(update_text('Please enter the new camp type:'
+          '\nSelect [1] for Day Camp'
+          '\nSelect [2] for Overnight'
+          '\nSelect [3] for Multiple Days', camp.camp_type) )
+    date_change = input("Update dates? (y/n): ").strip().lower()
+    if date_change == ("y"):                                           #updated to contain date checking function
+        new_start, new_end = get_dates(camp.camp_type)
+        camp.start_date = new_start
+        camp.end_date = new_end
     camp.food_stock = update_number("New Daily Food Stock", camp.food_stock)
     camp.pay_rate = update_number("New Pay Rate", camp.pay_rate)
 
@@ -528,33 +534,7 @@ def create_camp():
           '\nSelect [2] for Overnight'
           '\nSelect [3] for Multiple Days')
     camp_type = choice = get_int("Input your option: ", 1, 3)
-    start_date = input('\nPlease enter the start date (YYYY-MM-DD): ')
-
-    valid = False
-    while not valid:
-        try:
-            first_date = datetime.strptime(start_date, "%Y-%m-%d")
-            if camp_type == 1:
-                nights = 0
-                second_date = first_date + timedelta(days=nights)
-                valid = True
-            elif camp_type == 2:
-                nights = 1
-                second_date = first_date + timedelta(days=nights)
-                valid = True
-            elif camp_type == 3:
-                nights = int(input("\nHow many nights is the camp? "))
-                if nights < 1:
-                    print("A multi-day camp must be at least 1 night.")
-                    continue
-                second_date = first_date + timedelta(days=nights)
-                valid = True
-        except ValueError:
-            print('Invalid date format! Please use YYYY-MM-DD.')
-            start_date = input('\nPlease enter the start date (YYYY-MM-DD): ')
-
-    start_date = first_date.strftime("%Y-%m-%d")
-    end_date = second_date.strftime("%Y-%m-%d")
+    start_date,end_date=get_dates(camp_type)
 
     initial_food_stock = int(input('\nPlease enter the amount of food allocated for this camp [units]: '))
 
@@ -575,7 +555,13 @@ def create_camp():
             camp_type,
             start_date,
             end_date,
-            initial_food_stock
+            initial_food_stock,
+            [],
+            [],
+            {},
+            {},
+            {},
+            ""
         )
         save_to_file()
         print("\nCamp successfully created!")
@@ -603,3 +589,4 @@ while True:
         login_scoutleader()
     elif option == 3:
         login_logisticscoordinator()
+
