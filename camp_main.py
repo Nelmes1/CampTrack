@@ -490,7 +490,7 @@ def login_scoutleader():
             if user['username'] == ask_username and user['password'] == ask_password:
                 print('\nLogin successful! Welcome Scout Leader.\n')
                 login = False
-                scout_leader_menu()
+                scout_leader_menu(ask_username)
             else:
                 print('\nInvalid username or password.\n')
 
@@ -635,7 +635,133 @@ def create_camp():
 # SCOUT LEADER MENU
 # -------------------------------------------------
 
+def save_selected_camps(leader_username, selected_camp_names):
+    try:
+        with open('leader_camps.txt', 'r') as file:
+            lines = file.read().splitlines()
+    except FileNotFoundError:
+        return False
+    
+    new_lines = []
+    for line in lines:
+        if line.startswith(leader_username + ',') == False:
+            new_lines.append(line)
 
+    for camp_name in selected_camp_names:
+        new_lines.append(f"{leader_username},{camp_name}") 
+
+    with open('leader_camps.txt', 'w') as file:
+        for line in new_lines:
+            file.write(line + '\n')   
+
+def view_leader_camp_assignments():
+    try:
+        with open('leader_camps.txt','r') as file:
+            lines = file.read().splitlines()
+    except FileNotFoundError:
+        return False
+    
+    if len(lines) == 0:
+        print('\nNo leader has been assigned camps yet')
+        return
+    
+    print("\nLeaders and their camps:")
+    for line in lines:
+        parts = line.split(',')
+        if len(parts) < 2:
+            continue
+
+        leader_username = parts[0].strip()
+        camp_name = parts[1].strip()
+
+        print(f"{leader_username} is supervising {camp_name}")
+    
+    def camps_overlap(camp1, camp2):
+        pass
+
+
+def scout_leader_menu(leader_username):
+    while True:
+        print('\nScout Leader Menu')
+        print('\nChoose [1] to Select camps to supervise'
+              '\nChoose [2] to Bulk assign campers from CSV'
+              '\nChoose [3] to Assign food amount per camper per day'
+              '\nChoose [4] to Record daily activity outcomes / incidents'
+              '\nChoose [5] to View camp statistics and trends'
+              '\nChoose [6] to Logout')
+        choice = get_int('Input your option: ', 1, 6)
+
+        if choice == 1:
+            while True:
+                camps = read_from_file()
+                if camps == []:
+                    print('\nNo camps exist yet. Ask the logistics coordinator to create one.')
+                    continue
+
+                print('\nAvaliable Camps: ')
+                n = 0
+                for camp in camps:
+                    n += 1
+                    print(f"[{n}] {camp.name} | {camp.location} | {camp.start_date} -> {camp.end_date}")
+                
+                print("\nSelect the camps you wish to supervise. (Use commas to seperate numbers)")
+                selection = input("Input your option(s): ").strip()
+                if selection == "":
+                    print("\nNo camps selected.")
+                    break
+
+                try:
+                    chosen_numbers = [int(i) for i in selection.split(',')]
+                except ValueError:
+                    print("\nInvalid input. Please try again.")
+                    continue
+                
+                valid_indices = []
+                for n in chosen_numbers:
+                    if 1 <= n <= len(camps):
+                        valid_indices.append(n)
+                    else:
+                        print(f"Ignoring invalid camp number: {n}")
+                    
+                if valid_indices == False:
+                    print("\nNo valid camps selected. Try again")
+                    continue
+
+                print(f"{leader_username} has selected these camps to supervise:")
+                selected_camp_names = []
+                for n in valid_indices:
+                    camp = camps[n-1]
+                    selected_camp_names.append(camp.name)
+                    print(f"{camp.name} | {camp.location} | {camp.start_date} -> {camp.end_date}")
+                
+                save_selected_camps(leader_username, selected_camp_names)
+                print("\nYour camp selections have been saved")
+                break
+                    
+            
+        
+        elif choice == 2:
+            # TODO
+            print('\n[NOT IMPLENENTED YET]')
+
+        elif choice == 3 :
+             # TODO
+            print('\n[NOT IMPLENENTED YET]')
+
+        elif choice == 4:
+            # TODO
+            print('\n[NOT IMPLENENTED YET]')
+
+        elif choice == 5:
+            # TODO
+            print('\n[NOT IMPLENENTED YET]')
+
+        elif choice == 6:
+            break           
+
+
+
+    
 
 
 # -------------------------------------------------
