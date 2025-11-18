@@ -40,6 +40,7 @@ class Camp():
         if date not in self.activities:
             self.activities[date] = []
         self.activities[date].append(activity_names)
+        
 
     def calc_daily_food(self, food_per_camper): # Function to calculate total daily food usage and remaining supply 
         pass
@@ -89,7 +90,6 @@ def read_from_file():
     try:
         if os.path.getsize("camp_data.json") == 0:
             return []
-            pass
         else:
             Camp.all_camps = []
             with open("camp_data.json","r") as file:
