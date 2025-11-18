@@ -2,6 +2,18 @@ from camp_class import Camp, save_to_file, read_from_file
 from datetime import datetime, timedelta
 import pandas as pd
 import json
+import matplotlib.pyplot as plt
+
+
+def _engagement_score(camp):
+    """Simple engagement proxy based on recorded activities and daily reports."""
+    activity_events = sum(len(events) for events in camp.activities.values())
+    record_entries = sum(len(entries) for entries in camp.daily_records.values())
+    return activity_events + record_entries
+
+#The function :counts how many activities a camp has, counts how many notes a camp has,
+# adds them together, returns that number as an “engagement score”
+# It’s a quick indicator of how involved and active a camp is.
 
 
 #Tops up the food stock
@@ -37,31 +49,97 @@ def dashboard():
     camps = read_from_file()
     if not camps:
         print("No camps found.")
-        return
-    
-    data = [{
-        "Camp": camp.name,
-        "Location": camp.location,
-        "Type": camp.camp_type,
-        "Start Date": camp.start_date,
-        "End Date": camp.end_date,
-        "Leaders": len(camp.scout_leaders),
-        "Campers": len(camp.campers),
-        "Food Stock": camp.food_stock,
-        "Pay Rate": getattr(camp, "pay_rate", 0)
-    } for camp in camps]
+        return None
+
+    total_campers = sum(len(camp.campers) for camp in camps)
+    total_leaders = sum(len(camp.scout_leaders) for camp in camps)
+
+    data = []
+    for camp in camps:
+        campers = len(camp.campers)
+        leaders = len(camp.scout_leaders)
+        engagement = _engagement_score(camp)
+        camper_pct = round((campers / total_campers) * 100, 2) if total_campers else 0
+        leader_ratio = round(leaders / campers, 2) if campers else 0
+        data.append({
+            "Camp": camp.name,
+            "Location": camp.location,
+            "Type": camp.camp_type,
+            "Start Date": camp.start_date,
+            "End Date": camp.end_date,
+            "Leaders": leaders,
+            "Campers": campers,
+            "Camper %": camper_pct,
+            "Leader/Camper Ratio": leader_ratio,
+            "Engagement Score": engagement,
+            "Food Stock": camp.food_stock,
+            "Pay Rate": getattr(camp, "pay_rate", 0)
+        })
 
     df = pd.DataFrame(data)
     print("\n--- Camp Dashboard ---")
-    print(df)
-    return df   
+    print(df.to_string(index=False))
+
+    print("\n--- Summary ---")
+    summary = {
+        "Total Campers": total_campers,
+        "Total Leaders": total_leaders,
+        "Average Engagement": round(df["Engagement Score"].mean(), 2) if not df.empty else 0,
+        "Average Leader/Camper Ratio": round(df["Leader/Camper Ratio"].mean(), 2) if not df.empty else 0
+    }
+    for label, value in summary.items():
+        print(f"{label}: {value}")
+
+    return df
+
 
 # Visualisations
-import matplotlib.pyplot as plt
+def _ensure_dataframe(df):
+    if df is None:
+        print("No data available for visualisation.")
+        return None
+    if df.empty:
+        print("No data available for visualisation.")
+        return None
+    return df
 
-def plot_food_stock():
-    df = dashboard()
+
+def plot_food_stock(df=None):
+    df = _ensure_dataframe(df or dashboard())
+    if df is None:
+        return
     df.plot(kind="bar", x="Camp", y="Food Stock", title="Food Stock per Camp")
+    plt.ylabel("Units")
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_camper_distribution(df=None):
+    df = _ensure_dataframe(df or dashboard())
+    if df is None:
+        return
+    df.set_index("Camp")["Campers"].plot(kind="pie", autopct="%1.1f%%", title="Camper Distribution", ylabel="")
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_leaders_per_camp(df=None):
+    df = _ensure_dataframe(df or dashboard())
+    if df is None:
+        return
+    df.plot(kind="bar", x="Camp", y="Leaders", title="Leaders per Camp", color="orange")
+    plt.ylabel("Leaders")
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_engagement_scores(df=None):
+    df = _ensure_dataframe(df or dashboard())
+    if df is None:
+        return
+    df.plot(kind="bar", x="Camp", y="Engagement Score", title="Engagement Score per Camp", color="green")
+    plt.ylabel("Engagement Score")
+    plt.tight_layout()
     plt.show()
 
 #Shortage Notifications
