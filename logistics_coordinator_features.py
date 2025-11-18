@@ -6,6 +6,9 @@ import json
 
 #Tops up the food stock
 def top_up_food(camp_name, amount):
+    if not isinstance(amount, int) or amount < 0:
+        print("Top-up amount must be a non-negative whole number.")
+        return
     camps = read_from_file()
     for camp in camps:
         if camp.name == camp_name:
@@ -17,6 +20,9 @@ def top_up_food(camp_name, amount):
 
 #Sets the daily food stock 
 def set_food_stock(camp_name, new_stock):
+    if not isinstance(new_stock, int) or new_stock < 0:
+        print("Food stock must be a non-negative whole number.")
+        return
     camps = read_from_file()
     for camp in camps:
         if camp.name == camp_name:
@@ -59,16 +65,34 @@ def plot_food_stock():
     plt.show()
 
 #Shortage Notifications
-def check_food_shortage(camp_name, required_amount):
+def check_food_shortage(camp_name, food_per_camper):
+    if not isinstance(food_per_camper, int) or food_per_camper < 0:
+        print("Food per camper must be a non-negative whole number.")
+        return
     camps = read_from_file()
     for camp in camps:
         if camp.name == camp_name:
+            try:
+                start = datetime.strptime(camp.start_date, "%Y-%m-%d")
+                end = datetime.strptime(camp.end_date, "%Y-%m-%d")
+                camp_duration_days = max((end - start).days + 1, 1)
+            except (TypeError, ValueError):
+                camp_duration_days = 1
+
+            required_amount = len(camp.campers) * food_per_camper * camp_duration_days
+            print(f"{camp.name} requires {required_amount} units for {len(camp.campers)} campers over {camp_duration_days} day(s).")
             if camp.food_stock < required_amount:
-                notify(f"Food shortage at {camp_name}! Only {camp.food_stock} units left.")
+                notify(f"Food shortage at {camp_name}! Only {camp.food_stock} units left but {required_amount} needed.")
+            else:
+                print("Food stock is sufficient.")
             return
     print("Camp not found.")
-#Note - required ammount should be computed as campers * food_per_camper * camp_duration_days
- #Scout Leaders assign food required per camper per day and coordinator checks shortages
+#check_food_shortage takes food_per_camper, validates it, computes the total requirement (campers × per-day × duration), 
+# prints that forecast, and either logs a detailed shortage notification or confirms stock sufficiency. 
+# It also guards against malformed dates while calculating the duration. 
+# Also, adds +1 so a camp starting and ending on the same day = 1 day.  
+# and if dates are invalid camp_duration_days = 1. 
+# #Scout Leaders assign food required per camper per day and coordinator checks shortages
  #adjust this function later to calculate required amount automatically - once leader features are ready
 
 
@@ -88,6 +112,9 @@ def notify(message):
 
 #Sets Daily Pay Rate 
 def set_pay_rate(camp_name, rate):
+    if not isinstance(rate, int) or rate < 0:
+        print("Pay rate must be a non-negative whole number.")
+        return
     camps = read_from_file()
     for camp in camps:
         if camp.name == camp_name:
