@@ -598,9 +598,13 @@ def create_camp():
     print("End Date:", end_date)
     print("Daily Food Stock:", initial_food_stock)
 
-    confirm = input("\nConfirm camp creation? (Y/N): ").strip().lower()
+    while True:
+        confirm = input("\nConfirm camp creation? (Y/N): ").strip().lower()
+        if confirm in ('y', 'n'):
+            break
+        print("Please enter Y or N.")
 
-    if confirm.lower == 'y':
+    if confirm == 'y':
         Camp(
             name,
             location,
