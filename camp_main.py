@@ -7,6 +7,9 @@ from logistics_coordinator_features import (
     check_food_shortage,
     dashboard,
     plot_food_stock,
+    plot_camper_distribution,
+    plot_leaders_per_camp,
+    plot_engagement_scores,
     set_pay_rate,
     get_dates
 )
@@ -471,7 +474,25 @@ def logistics_coordinator_menu():
             dashboard()
 
         elif choice == 4:
-            plot_food_stock()
+            while True:
+                print("\nVisualisation Menu")
+                print("[1] Food Stock per Camp")
+                print("[2] Camper Distribution")
+                print("[3] Leaders per Camp")
+                print("[4] Engagement Overview")
+                print("[5] Return")
+                viz_choice = get_int("Choice: ", 1, 5)
+
+                if viz_choice == 1:
+                    plot_food_stock()
+                elif viz_choice == 2:
+                    plot_camper_distribution()
+                elif viz_choice == 3:
+                    plot_leaders_per_camp()
+                elif viz_choice == 4:
+                    plot_engagement_scores()
+                else:
+                    break
 
         elif choice == 5:
             camp = input("Camp name: ")
