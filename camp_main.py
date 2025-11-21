@@ -37,6 +37,7 @@ def get_int(prompt, min_val=None, max_val=None):
 
 
 
+
 print('╔═══════════════╗\n║   CampTrack   ║\n╚═══════════════╝')
 print('\nWelcome to CampTrack! Please select a user.')
 
@@ -938,8 +939,25 @@ def scout_leader_menu(leader_username):
             print('\n[NOT IMPLENENTED YET]')
 
         elif choice == 5:
-            # TODO
-            print('\n[NOT IMPLENENTED YET]')
+            print('\nChoose [1] to See Engagement Score'
+                  '\nChoose [2] to See Total Food Resources')
+            choice = get_int('Input your option: ', 1, 2)
+
+            if choice == 1: #displays engagement score graph
+                    #from logistics_coordinator_features import plot_engagement_scores
+
+                    #print(plot_engagement_scores())
+
+                    #the code below opens the whole json file
+                    def info_from_json():
+                        with open('camp_data.json','r') as file:
+                            data=json.load(file)
+                        for camp in data:
+                            if camp["location"] == "bloomsbury":
+                                print (camp)
+                    info_from_json()
+
+
 
         elif choice == 6:
             break           

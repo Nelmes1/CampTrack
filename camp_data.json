@@ -1,16 +1,16 @@
 [
     {
-        "name": "camp2",
-        "location": "spain",
-        "camp_type": "Overnight",
-        "start_date": "2029",
-        "end_date": "2027",
-        "food_stock": 100,
+        "name": "camp3",
+        "location": "bloomsbury",
+        "camp_type": 1,
+        "start_date": "2025-11-21",
+        "end_date": "2025-11-21",
+        "food_stock": 2,
         "scout_leaders": [],
         "campers": [],
         "activities": {},
         "daily_food_usage": {},
         "daily_records": {},
-        "pay_rate": 1
+        "pay_rate": ""
     }
 ]
