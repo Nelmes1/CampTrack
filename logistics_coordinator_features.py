@@ -143,7 +143,16 @@ def plot_engagement_scores(df=None):
     plt.show()
 
 #Shortage Notifications
-def check_food_shortage(camp_name, food_per_camper):
+def load_food_requirement(camp_name):
+    try:
+        with open("food_requirements.json", "r") as file:
+            data = json.load(file)
+        return data.get(camp_name)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return None
+
+def check_food_shortage(camp_name):
+    food_per_camper = load_food_requirement(camp_name)
     if not isinstance(food_per_camper, int) or food_per_camper < 0:
         print("Food per camper must be a non-negative whole number.")
         return
@@ -156,10 +165,25 @@ def check_food_shortage(camp_name, food_per_camper):
                 camp_duration_days = max((end - start).days + 1, 1)
             except (TypeError, ValueError):
                 camp_duration_days = 1
+            
+            camper_count = 0
+            try:
+                with open("campers_in_camp.txt", 'r') as file:
+                    for line in file:
+                        parts = line.strip().split(',')
+                        if len(parts) < 2:
+                            continue
+                        camp_in_file = parts[0].strip()
+                        if camp_in_file == camp_name:
+                            camper_count +=1
+            except FileNotFoundError:
+                camper_count = len(camp.campers)
 
-            required_amount = len(camp.campers) * food_per_camper * camp_duration_days
-            print(f"{camp.name} requires {required_amount} units for {len(camp.campers)} campers over {camp_duration_days} day(s).")
-            if camp.food_stock < required_amount:
+            total_available = camp.food_stock * camp_duration_days
+            required_amount = camper_count * food_per_camper * camp_duration_days
+            print(f"{camp.name} requires {required_amount} units for {camper_count} campers over {camp_duration_days} day(s).")
+            
+            if total_available < required_amount:
                 notify(f"Food shortage at {camp_name}! Only {camp.food_stock} units left but {required_amount} needed.")
             else:
                 print("Food stock is sufficient.")

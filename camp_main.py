@@ -458,16 +458,7 @@ def logistics_coordinator_menu():
 
             elif sub == 3:
                 camp = input("Camp name: ")
-                while True:
-                    try:
-                        food_per_camper = int(input("Daily food required per camper: "))
-                        if food_per_camper < 0:
-                            print("Please enter a non-negative whole number!")
-                            continue
-                        break
-                    except ValueError:
-                        print("Please enter a valid whole number!")
-                check_food_shortage(camp, food_per_camper)
+                check_food_shortage(camp)
 
             else:
                 continue
@@ -792,6 +783,35 @@ def save_campers(camp_name, campers):
             activities = ";".join(info['activities'])
             file.write(f"{camp_name},{name},{info['age']},{activities}\n")
 
+def get_campers_count_per_camp():
+    campers_by_camp = {}
+
+    try:
+        with open("campers_in_camp.txt", "r") as file:
+            for line in file:
+                parts = line.strip().split(',')
+                if len(parts)<2:
+                    continue
+                camp_name = parts[0]
+                camper_name = parts[1]
+
+                campers_by_camp.setdefault(camp_name, []).append(camper_name)
+    except FileNotFoundError:
+        pass
+
+    return campers_by_camp
+
+def save_food_requirement(camp_name, food_per_camper):
+    try:
+        with open("food_requirements.json","r") as file:
+            data = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        data = {}
+    
+    data[camp_name] = food_per_camper
+
+    with open("food_requirements.json", 'w') as file:
+        json.dump(data, file, indent=4)
 
 
 
@@ -930,37 +950,70 @@ def scout_leader_menu(leader_username):
 
 
         elif choice == 3 :
-             # TODO
-             # this function takes the number of food assigned per camp, the number of campers in the
-             script_dir = os.path.dirname(os.path.abspath(__file__)) #this gets the folder where the script is
+            while True:
+                camps = read_from_file()
+                if camps == []:
+                    print('\nNo camps exist yet. Ask the logistics coordinator to create one.')
+                    break
+                supervised = []
+                try:
+                    with open("leader_camps.txt", 'r') as file:
+                        for line in file:
+                            parts = line.strip().split(',')
+                            user = parts[0].strip()
+                            camp_name = parts[1].strip()
+                            if user == leader_username:
+                                supervised.append(camp_name)
+                except FileNotFoundError:
+                    break
 
-             file_path = os.path.join(script_dir, "campers", "campers_1.csv") #This builds the path to campers_1.csv which is inside campers rn.
+                if not supervised:
+                    print("\nYou are not supervising any camps.")
+                    continue
+            
+                campers_by_camp = get_campers_count_per_camp() 
 
-             def assign_food_per_camper():
-                 with open(file_path, newline='') as csvfile:
-                     readFile =  csv.DictReader(csvfile)
+                print("\nYour Camps and Food Info:\n")
+                n = 0
+                for camp_name in supervised : 
+                    supervised_camp = None
+                    for c in camps:
+                        if c.name == camp_name:
+                            supervised_camp = c
+                            break
+                    if supervised_camp is None:
+                        print(f"{camp_name} not found in camp records.")
+                        continue
+                    
+                    campers_list = campers_by_camp.get(camp_name, [])
+                    camper_count = len(campers_list)
+                    
+                    try:
+                        start = datetime.strptime(supervised_camp.start_date, "%Y-%m-%d")
+                        end = datetime.strptime(supervised_camp.end_date, "%Y-%m-%d")
+                        camp_duration_days = max((end - start).days + 1, 1)
+                    except (TypeError, ValueError):
+                        camp_duration_days = 1
+                                        
+                    n += 1
+                    print(f"[{n}] {supervised_camp.name} | {supervised_camp.location} | {supervised_camp.start_date} -> {supervised_camp.end_date}")
+                    print(f"Stock (units per day): {supervised_camp.food_stock}")
+                    print(f"Total food in camp duration : {supervised_camp.food_stock * camp_duration_days}")
+                    print(f"Campers: {camper_count}")
+                    
+                    if camper_count == 0:
+                        print("No campers assigned yet. Skipping food assignment")
+                        continue
+                    
+                    food_per_camper = get_int("Enter food amount per camper per day (units): ", min_val= 0)
+                    total_required = food_per_camper * camper_count * camp_duration_days
+                    print(f"Total daily food required for this camp: {total_required}")
 
-                     number_of_rows = 0
+                    save_food_requirement(supervised_camp.name, food_per_camper)
+                    
 
-                     for row in readFile:
-                         number_of_rows += 1
+                break
 
-                     if number_of_rows == 0:
-                         print("There are currently no campers in you camp. Please upload campers.")
-                     else:
-                         print (f"There are {number_of_rows} campers in your camp.") #we need to edit this so that it reads through all the csv folders per camp
-
-                 with open("camp_data.json", "r") as file:
-                     data = json.load(file)
-
-                 for camp in data:
-                     print(f"The current units of food assigned to this camp is: {camp["food_stock"]}.")
-
-                 food_per_camper = camp["food_stock"] / number_of_rows
-                 print(f"The food assigned per camper is {food_per_camper}")
-             assign_food_per_camper()
-
-        #print('\n[NOT IMPLENENTED YET]')
 
         elif choice == 4:
             # TODO
