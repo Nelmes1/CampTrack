@@ -37,7 +37,6 @@ def get_int(prompt, min_val=None, max_val=None):
 
 
 
-
 print('╔═══════════════╗\n║   CampTrack   ║\n╚═══════════════╝')
 print('\nWelcome to CampTrack! Please select a user.')
 
@@ -85,7 +84,7 @@ def enable_login(username):
 
             if username in disabled_usernames:
                 disabled_usernames.remove(username)
-                
+
                 with open('disabled_logins.txt', 'w') as file:
                     if disabled_usernames:
                         file.write(','.join(disabled_usernames) +',')
@@ -366,7 +365,7 @@ def admin_menu():
                             disabled_usernames.extend(disabled_login.split(','))
                 except FileNotFoundError:
                     pass
-            
+
                 if disabled_usernames == []:
                     print("\nThere are no disabled users.")
                     break
@@ -376,7 +375,7 @@ def admin_menu():
                 for disabled_username in disabled_usernames:
                     n += 1
                     print(f"[{n}] {disabled_username}")
-            
+
                 option = int(input("\nInput your option: "))
                 if 1 <= option <= len(disabled_usernames):
                     username_to_enable = disabled_usernames[option-1]
@@ -707,18 +706,18 @@ def save_selected_camps(leader_username, selected_camp_names):
             lines = file.read().splitlines()
     except FileNotFoundError:
         lines = []
-    
+
     new_lines = []
     for line in lines:
         if line.startswith(leader_username + ',') == False:
             new_lines.append(line)
 
     for camp_name in selected_camp_names:
-        new_lines.append(f"{leader_username},{camp_name}") 
+        new_lines.append(f"{leader_username},{camp_name}")
 
     with open('leader_camps.txt', 'w') as file:
         for line in new_lines:
-            file.write(line + '\n')   
+            file.write(line + '\n')
 
 def view_leader_camp_assignments():
     try:
@@ -727,11 +726,11 @@ def view_leader_camp_assignments():
     except FileNotFoundError:
         print("\nNo assignments found.")
         return
-    
+
     if len(lines) == 0:
         print('\nNo leader has been assigned camps yet')
         return
-    
+
     camp_and_leaders = {}
 
     for line in lines:
@@ -749,7 +748,7 @@ def view_leader_camp_assignments():
 
     for camp, leaders in camp_and_leaders.items():
         print(f"{camp}: {','.join(leaders)}")
-    
+
 def camps_overlap(camp1, camp2):
     s1 = datetime.strptime(camp1.start_date, "%Y-%m-%d")
     e1 = datetime.strptime(camp1.end_date, "%Y-%m-%d")
@@ -784,7 +783,7 @@ def load_campers_csv(filepath):
                 }
     except FileNotFoundError:
         print("\nCSV file not found.")
-    
+
     return campers
 
 def save_campers(camp_name, campers):
@@ -819,7 +818,7 @@ def scout_leader_menu(leader_username):
                 for camp in camps:
                     n += 1
                     print(f"[{n}] {camp.name} | {camp.location} | {camp.start_date} -> {camp.end_date}")
-                
+
                 print("\nCurrent Camp Assignments:")
                 view_leader_camp_assignments()
 
@@ -834,14 +833,14 @@ def scout_leader_menu(leader_username):
                 except ValueError:
                     print("\nInvalid input. Please try again.")
                     continue
-                
+
                 valid_indices = []
                 for n in chosen_numbers:
                     if 1 <= n <= len(camps):
                         valid_indices.append(n)
                     else:
                         print(f"Ignoring invalid camp number: {n}")
-                    
+
                 if not valid_indices:
                     print("\nNo valid camps selected. Try again")
                     continue
@@ -857,13 +856,13 @@ def scout_leader_menu(leader_username):
                     camp = camps[n-1]
                     selected_camp_names.append(camp.name)
                     print(f"{camp.name} | {camp.location} | {camp.start_date} -> {camp.end_date}")
-                
+
                 save_selected_camps(leader_username, selected_camp_names)
                 print("\nYour camp selections have been saved")
                 break
-                    
-            
-        
+
+
+
         elif choice == 2:
             while True:
                 camps = read_from_file()
@@ -875,9 +874,9 @@ def scout_leader_menu(leader_username):
                 for camp in camps:
                     n += 1
                     print(f"[{n}] {camp.name} | {camp.location} | {camp.start_date} -> {camp.end_date}")
-                
+
                 print("\nSelect a camp to assign campers to: ")
-                
+
                 try:
                     choice= int(input("Input your option: "))
                     if not (1 <= choice <= len(camps)):
@@ -890,7 +889,7 @@ def scout_leader_menu(leader_username):
                 selected_camp = camps[choice - 1]
                 base_dir = os.path.dirname(os.path.abspath(__file__))
                 csv_folder = os.path.join(base_dir, "campers")
-                
+
                 if not os.path.exists(csv_folder):
                     print("\nCSV folder not found")
                     break
@@ -907,7 +906,7 @@ def scout_leader_menu(leader_username):
                 for f in files:
                     n+=1
                     print(f"[{n}] {f}")
-                
+
                 try:
                     file_choice = int(input("\nSelect a CSV file to import: "))
                     if not (1<= file_choice <= len(files)):
@@ -928,43 +927,56 @@ def scout_leader_menu(leader_username):
                 save_campers(selected_camp.name, campers)
                 print(f"\nSuccessfully assigned {len(campers)} campers to {selected_camp}!")
                 break
-                
+
 
         elif choice == 3 :
              # TODO
-            print('\n[NOT IMPLENENTED YET]')
+             #This function reads and updates the CSV file that has the list of campers in. It sets a default amount to 3 units per day but each data point can be edited by the scout leader.
+             script_dir = os.path.dirname(os.path.abspath(__file__)) #this gets the folder where the script is
+
+             file_path = os.path.join(script_dir, "campers", "campers_1.csv") #This builds the path to campers_1.csv which is inside campers rn.
+
+             def assign_food_per_camper():
+                 with open(file_path, newline='') as csvfile:
+                     readFile =  csv.DictReader(csvfile)
+
+                     number_of_rows = 0
+
+                     for row in readFile:
+                         number_of_rows += 1
+
+                     if number_of_rows == 0:
+                         print("There are currently no campers in you camp. Please upload campers.")
+                     else:
+                         print (f"There are {number_of_rows} campers in your camp.") #we need to edit this so that it reads through all the csv folders per camp
+
+                 with open("camp_data.json", "r") as file:
+                     data = json.load(file)
+
+                 for camp in data:
+                     print(f"The current units of food assigned to this camp is: {camp["food_stock"]}.")
+
+                 food_per_camper = camp["food_stock"] / number_of_rows
+                 print(f"The food assigned per camper is {food_per_camper}")
+
+             assign_food_per_camper()
+
+        #print('\n[NOT IMPLENENTED YET]')
 
         elif choice == 4:
             # TODO
             print('\n[NOT IMPLENENTED YET]')
 
         elif choice == 5:
-            print('\nChoose [1] to See Engagement Score'
-                  '\nChoose [2] to See Total Food Resources')
-            choice = get_int('Input your option: ', 1, 2)
-
-            if choice == 1: #displays engagement score graph
-                    #from logistics_coordinator_features import plot_engagement_scores
-
-                    #print(plot_engagement_scores())
-
-                    #the code below opens the whole json file
-                    def info_from_json():
-                        with open('camp_data.json','r') as file:
-                            data=json.load(file)
-                        for camp in data:
-                            if camp["location"] == "bloomsbury":
-                                print (camp)
-                    info_from_json()
-
-
+            # TODO
+            print('\n[NOT IMPLENENTED YET]')
 
         elif choice == 6:
-            break           
+            break
 
 
 
-    
+
 
 
 # -------------------------------------------------
@@ -985,3 +997,6 @@ while True:
         login_scoutleader()
     elif option == 3:
         login_logisticscoordinator()
+
+
+#testing
