@@ -3,6 +3,7 @@ import json
 import csv
 from datetime import datetime
 from messaging import messaging_menu
+from notifications import load_notifications
 
 
 from logistics_coordinator_features import (
@@ -411,13 +412,12 @@ def logistics_coordinator_menu():
             set_pay_rate(camp, rate)
 
         elif choice == 6:
-            try:
-                with open("notifications.json", "r") as f:
-                    notes = json.load(f)
+            notes = load_notifications()
+            if notes:
                 print("\n--- Notifications ---")
                 for n in notes:
                     print("-", n)
-            except:
+            else:
                 print("No notifications found.")
         elif choice == 7:
             messaging_menu("logistics", users)
