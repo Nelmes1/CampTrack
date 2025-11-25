@@ -3,8 +3,9 @@
 import json
 import os
 from datetime import datetime
+from utils import data_path
 
-MESSAGES_FILE = "messages.json"
+MESSAGES_FILE = data_path("messages.json")
 
 
 # ---------- helpers to load/save ----------

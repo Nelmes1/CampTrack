@@ -1,11 +1,12 @@
 from datetime import datetime, timedelta
 import json
+import os
 import pandas as pd
 import matplotlib.pyplot as plt
 from camp_ops import create_camp, edit_camp, delete_camp, get_dates
 from camp_class import Camp, save_to_file, read_from_file
 from features.notifications import add_notification
-from utils import get_int
+from utils import get_int, data_path
 
 
 def _engagement_score(camp):
@@ -45,7 +46,7 @@ def set_food_stock(camp_name, new_stock):
 #Shortage Notifications
 def load_food_requirement(camp_name):
     try:
-        with open("food_requirements.json", "r") as file:
+        with open(data_path("food_requirements.json"), "r") as file:
             data = json.load(file)
         return data.get(camp_name)
     except (FileNotFoundError, json.JSONDecodeError):

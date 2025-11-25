@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import json
 import os
+from utils import data_path
 
 class Camp:
     all_camps = []
@@ -85,20 +86,20 @@ def save_to_file():
             "pay_rate": camp.pay_rate
         })
 
-    with open("camp_data.json", "w") as file:
+    with open(data_path("camp_data.json"), "w") as file:
         json.dump(data, file, indent=4)
 
 
 def read_from_file():
-    if not os.path.exists("camp_data.json"):
+    if not os.path.exists(data_path("camp_data.json")):
         print("\ncamp_data.json not found")
         return []
 
-    if os.path.getsize("camp_data.json") == 0:
+    if os.path.getsize(data_path("camp_data.json")) == 0:
         return []
 
     try:
-        with open("camp_data.json", "r") as file:
+        with open(data_path("camp_data.json"), "r") as file:
             data = json.load(file)
     except json.JSONDecodeError:
         print("\nError reading camp_data.json — file is corrupted.")

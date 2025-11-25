@@ -4,7 +4,7 @@ import csv
 from datetime import datetime
 
 from camp_class import Camp, save_to_file, read_from_file
-from utils import get_int
+from utils import get_int, data_path
 
 
 def camps_overlap(camp1, camp2):
@@ -91,14 +91,14 @@ def save_campers(camp_name, campers):
 
 def save_food_requirement(camp_name, food_per_camper):
     try:
-        with open("food_requirements.json", "r") as file:
+        with open(data_path("food_requirements.json"), "r") as file:
             data = json.load(file)
     except (FileNotFoundError, json.JSONDecodeError):
         data = {}
 
     data[camp_name] = food_per_camper
 
-    with open("food_requirements.json", 'w') as file:
+    with open(data_path("food_requirements.json"), 'w') as file:
         json.dump(data, file, indent=4)
 
 
@@ -120,7 +120,7 @@ def assign_food_amount():
             else:
                 print(f"There are {number_of_rows} campers in your camp.")
 
-        with open("camp_data.json", "r") as file:
+        with open(data_path("camp_data.json"), "r") as file:
             data = json.load(file)
 
         for camp in data:
@@ -183,7 +183,7 @@ def print_engagement_score():
 
 
 def info_from_json():
-    with open('camp_data.json', 'r') as file:
+    with open(data_path('camp_data.json'), 'r') as file:
         data = json.load(file)
         for camp in data:
             print(camp)
