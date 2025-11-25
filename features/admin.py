@@ -18,12 +18,16 @@ def add_user():
     while True:
         new_role_option = get_int('\nChoose [1] for Scout Leader'
                                   '\nChoose [2] for Logistics Coordinator'
-                                  '\nInput your option: ', 1, 2)
+                                  '\nChoose [3] for Admin'
+                                  '\nInput your option: ', 1, 3)
         if new_role_option == 1:
             new_role = 'scout leader'
             break
         if new_role_option == 2:
             new_role = 'logistics coordinator'
+            break
+        if new_role_option == 3:
+            new_role = 'admin'
             break
         else:
             print('Invalid input. Please try again.')
@@ -31,8 +35,11 @@ def add_user():
     new_username = input('Enter username: ')
     new_password = input('Enter password: ')
 
-    users[new_role].append({'username': new_username, 'password': new_password})
-    print(f"\nUser {new_username} added successfully!")
+    if new_role == 'admin':
+        users['admin'] = {'username': new_username, 'password': new_password}
+    else:
+        users[new_role].append({'username': new_username, 'password': new_password})
+    print(f"\nUser {new_username} added successfully as {new_role}!")
     save_logins()
 
 
