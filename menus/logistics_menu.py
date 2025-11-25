@@ -12,6 +12,7 @@ from features.logistics import (
     set_pay_rate,
 )
 from features.notifications import load_notifications
+from camp_class import read_from_file
 from utils import get_int
 
 
@@ -50,6 +51,7 @@ def run(users):
 
         elif choice == 2:
             print("\nFood Allocation Menu")
+            print("(Leave camp name blank to cancel.)")
             print("[1] Set Daily Food Stock")
             print("[2] Top-Up Food Stock")
             print("[3] Check Food Shortage")
@@ -57,7 +59,10 @@ def run(users):
             sub = get_int("Choice: ", 1, 4)
 
             if sub == 1:
-                camp = input("Camp name: ")
+                camp = input("Camp name: ").strip()
+                if camp == "":
+                    print("Cancelled.")
+                    continue
                 while True:
                     try:
                         new_stock = int(input("New daily stock: "))
@@ -67,7 +72,10 @@ def run(users):
                 set_food_stock(camp, new_stock)
 
             elif sub == 2:
-                camp = input("Camp name: ")
+                camp = input("Camp name: ").strip()
+                if camp == "":
+                    print("Cancelled.")
+                    continue
                 while True:
                     try:
                         amount = int(input("Amount to add: "))
@@ -77,7 +85,10 @@ def run(users):
                 top_up_food(camp, amount)
 
             elif sub == 3:
-                camp = input("Camp name: ")
+                camp = input("Camp name: ").strip()
+                if camp == "":
+                    print("Cancelled.")
+                    continue
                 while True:
                     try:
                         food_per_camper = int(input("Daily food required per camper: "))
@@ -117,13 +128,25 @@ def run(users):
                     break
 
         elif choice == 5:
-            camp = input("Camp name: ")
-            while True:
-                try:
-                    rate = int(input("Daily pay rate: "))
-                    break
-                except ValueError:
-                    print("Please enter a valid whole number!")
+            camps = read_from_file()
+            if not camps:
+                print("\nNo camps exist yet.")
+                continue
+
+            print("\n--- Existing Camps ---")
+            for i, camp in enumerate(camps, start=1):
+                print(f"[{i}] {camp.name} ({camp.location})")
+
+            sel = input("\nSelect a camp to set pay rate (or press Enter to cancel): ").strip()
+            if sel == "":
+                print("Cancelled.")
+                continue
+            if not sel.isdigit() or not (1 <= int(sel) <= len(camps)):
+                print("Invalid selection.")
+                continue
+            camp = camps[int(sel) - 1].name
+
+            rate = get_int("Daily pay rate: ", 0)
             set_pay_rate(camp, rate)
 
         elif choice == 6:

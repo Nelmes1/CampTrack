@@ -18,20 +18,35 @@ def edit_camp():
     for i, camp in enumerate(camps, start=1):
         print(f"[{i}] {camp.name} ({camp.location})")
 
-    choice = get_int("\nSelect a camp to edit: ", 1, len(camps))
-    camp = camps[choice - 1]
+    sel = input("\nSelect a camp to edit (or press Enter to cancel): ").strip()
+    if sel == "":
+        print("Edit cancelled.")
+        return
+    if not sel.isdigit():
+        print("Invalid selection.")
+        return
+    idx = int(sel)
+    if not (1 <= idx <= len(camps)):
+        print("Invalid selection.")
+        return
+    camp = camps[idx - 1]
 
     print(f"\nEditing Camp: {camp.name}")
     print("Press ENTER or type 'same' to keep the current value.\n")
+    print("Leave fields blank to keep current values; type 'q' to cancel editing.")
 
     def update_text(prompt, current_value):
         value = input(f"{prompt} [{current_value}]: ").strip()
+        if value.lower() == "q":
+            return None
         if value.lower() in ("", "same"):
             return current_value
         return value
 
     def update_number(prompt, current_value):
         value = input(f"{prompt} [{current_value}]: ").strip()
+        if value.lower() == "q":
+            return None
         if value.lower() in ("", "same"):
             return current_value
         if value.isdigit():
@@ -39,19 +54,42 @@ def edit_camp():
         print("Invalid number. Keeping current value.")
         return current_value
 
-    camp.name = update_text("New Name", camp.name)
-    camp.location = update_text("New Location", camp.location)
-    camp.camp_type = get_int(update_text('Please enter the new camp type:'
+    new_name = update_text("New Name", camp.name)
+    if new_name is None:
+        print("Edit cancelled.")
+        return
+    camp.name = new_name
+
+    new_loc = update_text("New Location", camp.location)
+    if new_loc is None:
+        print("Edit cancelled.")
+        return
+    camp.location = new_loc
+
+    new_type_raw = update_text('Please enter the new camp type:'
           '\nSelect [1] for Day Camp'
           '\nSelect [2] for Overnight'
-          '\nSelect [3] for Multiple Days', camp.camp_type) )
+          '\nSelect [3] for Multiple Days', camp.camp_type)
+    if new_type_raw is None:
+        print("Edit cancelled.")
+        return
+    camp.camp_type = get_int(str(new_type_raw), 1, 3)
+
     date_change = input("Update dates? (y/n): ").strip().lower()
     if date_change == ("y"):
         new_start, new_end = get_dates(camp.camp_type)
         camp.start_date = new_start
         camp.end_date = new_end
-    camp.food_stock = update_number("New Daily Food Stock", camp.food_stock)
-    camp.pay_rate = update_number("New Pay Rate", camp.pay_rate)
+    new_food = update_number("New Daily Food Stock", camp.food_stock)
+    if new_food is None:
+        print("Edit cancelled.")
+        return
+    camp.food_stock = new_food
+    new_pay = update_number("New Pay Rate", camp.pay_rate)
+    if new_pay is None:
+        print("Edit cancelled.")
+        return
+    camp.pay_rate = new_pay
 
     save_to_file()
     print("\nCamp updated successfully!")
@@ -68,8 +106,14 @@ def delete_camp():
     for i, camp in enumerate(camps, start=1):
         print(f"[{i}] {camp.name} ({camp.location})")
 
-    choice = get_int("\nSelect a camp to delete: ", 1, len(camps))
-    camp = camps[choice - 1]
+    sel = input("\nSelect a camp to delete (or press Enter to cancel): ").strip()
+    if sel == "":
+        print("Deletion cancelled.")
+        return
+    if not sel.isdigit() or not (1 <= int(sel) <= len(camps)):
+        print("Invalid selection.")
+        return
+    camp = camps[int(sel) - 1]
 
     confirm = input(f"\nAre you sure you want to delete '{camp.name}'? (Y/N): ").strip().lower()
     if confirm != "y":
@@ -85,9 +129,16 @@ def delete_camp():
 
 def create_camp():
     print('\nCamp Creator')
+    print('(Leave name/location blank to cancel.)')
 
     name = input('\nPlease enter the name of this camp: ')
+    if name.strip() == "":
+        print("Camp creation cancelled (blank name).")
+        return
     location = input('\nPlease enter the location of this camp: ')
+    if location.strip() == "":
+        print("Camp creation cancelled (blank location).")
+        return
 
     print('\nPlease enter the camp type:'
           '\nSelect [1] for Day Camp'
