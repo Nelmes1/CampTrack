@@ -33,15 +33,21 @@ def get_all_usernames(users_dict):
     names = []
 
     # admin
-    names.append(users_dict["admin"]["username"])
+    admin = users_dict.get("admin")
+    if isinstance(admin, dict) and "username" in admin:
+        names.append(admin["username"])
+    elif isinstance(admin, str):
+        names.append(admin)
 
     # scout leaders
-    for u in users_dict["scout leader"]:
-        names.append(u["username"])
+    for u in users_dict.get("scout leader", []):
+        if isinstance(u, dict) and "username" in u:
+            names.append(u["username"])
 
     # logistics coordinators
-    for u in users_dict["logistics coordinator"]:
-        names.append(u["username"])
+    for u in users_dict.get("logistics coordinator", []):
+        if isinstance(u, dict) and "username" in u:
+            names.append(u["username"])
 
     return names
 
