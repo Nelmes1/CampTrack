@@ -203,11 +203,11 @@ def disable_user():
 
             option5 = get_int('\nInput your option: ', 1, len(scout_leader_user_list))
             if option5 <= len(scout_leader_user_list):
-                user_to_disable = users['scout leader'][option5 - 1]
-                disabled_logins(user_to_disable['username'])
-                print('\nUser disabled successfully')
-                save_logins()
-                break
+                        user_to_disable = users['scout leader'][option5 - 1]
+                        disabled_logins(user_to_disable['username'])
+                        print('\nUser disabled successfully')
+                        save_logins()
+                        break
             else:
                 print('\nInvalid input. Please try again.')
 
@@ -225,11 +225,11 @@ def disable_user():
 
             option6 = get_int('\nInput your option: ', 1, len(logistics_coordinator_user_list))
             if option6 <= len(logistics_coordinator_user_list):
-                user_to_disable = users['logistics coordinator'][option6 - 1]
-                disabled_logins(user_to_disable['username'])
-                print('\nUser disabled successfully')
-                save_logins()
-                break
+                        user_to_disable = users['logistics coordinator'][option6 - 1]
+                        disabled_logins(user_to_disable['username'])
+                        print('\nUser disabled successfully')
+                        save_logins()
+                        break
             else:
                 print('\nInvalid input. Please try again.')
 
@@ -258,6 +258,14 @@ def enable_user():
         option = int(input("\nInput your option: "))
         if 1 <= option <= len(disabled_usernames):
             username_to_enable = disabled_usernames[option-1]
+            # verify the username still exists in users
+            existing_names = set()
+            existing_names.add(users['admin']['username'])
+            existing_names.update(u['username'] for u in users['scout leader'])
+            existing_names.update(u['username'] for u in users['logistics coordinator'])
+            if username_to_enable not in existing_names:
+                print(f"\nUser '{username_to_enable}' no longer exists in users; cannot enable.")
+                continue
             enable_login(username_to_enable)
             print(f"\n User '{username_to_enable}' enabled successfully!")
             break
