@@ -353,7 +353,7 @@ def bulk_assign_campers():
         csv_folder = os.path.join(os.path.dirname(base_dir), "campers")
 
         if not os.path.exists(csv_folder):
-            print("\nCSV folder not found")
+            print("\nCSV folder not found. Create a 'campers' folder in the project root and add CSV files before bulk assigning.")
             break
         files = []
         for f in os.listdir(csv_folder):

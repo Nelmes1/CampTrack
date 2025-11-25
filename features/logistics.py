@@ -55,6 +55,9 @@ def load_food_requirement(camp_name):
 
 def check_food_shortage(camp_name):
     food_per_camper = load_food_requirement(camp_name)
+    if food_per_camper is None:
+        print("No food requirement set for this camp. Ask the scout leader to set daily food per camper.")
+        return
     if not isinstance(food_per_camper, int) or food_per_camper < 0:
         print("Food per camper must be a non-negative whole number.")
         return
