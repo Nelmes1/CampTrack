@@ -103,33 +103,26 @@ def save_food_requirement(camp_name, food_per_camper):
 
 
 def assign_food_amount():
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.join(os.path.dirname(script_dir), "campers", "campers_1.csv")
+    camps = read_from_file()
+    if not camps:
+        print("\nNo camps exist yet. Ask the logistics coordinator to create one.")
+        return
 
-    def assign_food_per_camper():
-        with open(file_path, newline='') as csvfile:
-            readFile = csv.DictReader(csvfile)
+    print('\nAvailable Camps: ')
+    for idx, camp in enumerate(camps, start=1):
+        print(f"[{idx}] {camp.name} | {camp.location} | {camp.start_date} -> {camp.end_date} | Campers: {len(camp.campers)}")
 
-            number_of_rows = 0
+    choice = get_int("\nSelect a camp to assign food per camper: ", 1, len(camps))
+    camp = camps[choice - 1]
 
-            for row in readFile:
-                number_of_rows += 1
+    camper_count = len(camp.campers)
+    if camper_count == 0:
+        print(f"\n{camp.name} has no campers assigned yet. Add campers before assigning food per camper.")
+        return
 
-            if number_of_rows == 0:
-                print("There are currently no campers in you camp. Please upload campers.")
-            else:
-                print(f"There are {number_of_rows} campers in your camp.")
-
-        with open(data_path("camp_data.json"), "r") as file:
-            data = json.load(file)
-
-        for camp in data:
-            print(f"The current units of food assigned to this camp is: {camp['food_stock']}.")
-
-        food_per_camper = camp["food_stock"] / number_of_rows
-        print(f"The food assigned per camper is {food_per_camper}")
-
-    assign_food_per_camper()
+    food_per_camper = get_int("Enter daily food units per camper: ", min_val=0)
+    save_food_requirement(camp.name, food_per_camper)
+    print(f"\nSaved requirement: {food_per_camper} unit(s) per camper per day for {camp.name}.")
 
 
 def record_daily_activity():
