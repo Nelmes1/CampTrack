@@ -11,15 +11,18 @@ def login_admin():
         print('Please login.')
         ask_username = str(input('\nUsername: '))
         ask_password = str(input('Password: '))
-        user = users['admin']
         if check_disabled_logins(ask_username):
             print("This account has been disabled.")
             return
-        if user['username'] == ask_username and user['password'] == ask_password:
-            print('\nLogin successful! Welcome Application Administrator.\n')
-            login = False
-            admin_menu()
-        else:
+        matched = False
+        for admin in users['admin']:
+            if admin['username'] == ask_username and admin['password'] == ask_password:
+                print('\nLogin successful! Welcome Application Administrator.\n')
+                matched = True
+                login = False
+                admin_menu()
+                break
+        if not matched:
             print('\nInvalid username or password.\n')
 
 

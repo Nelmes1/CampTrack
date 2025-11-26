@@ -1,8 +1,5 @@
 users = {
-    'admin': {
-        'username': 'admin',
-        'password': '',
-    },
+    'admin': [],
     'scout leader': [],
     'logistics coordinator': []
 }
@@ -48,7 +45,8 @@ def enable_login(username):
 
 def save_logins():
     with open('logins.txt', 'w') as file:
-        file.write(f"admin,{users['admin']['username']},{users['admin']['password']}\n")
+        for admin in users['admin']:
+            file.write(f"admin,{admin['username']},{admin['password']}\n")
         for leader in users['scout leader']:
             file.write(f"scout leader,{leader['username']},{leader['password']}\n")
         for coordinator in users['logistics coordinator']:
@@ -61,7 +59,7 @@ def load_logins():
             lines = file.readlines()
             users.clear()
             users.update({
-                'admin': {'username': 'admin', 'password': ''},
+                'admin': [],
                 'scout leader': [],
                 'logistics coordinator': []
             })
@@ -76,11 +74,13 @@ def load_logins():
                 role, username, password = parts[:3]
 
                 if role == 'admin':
-                    users['admin'] = {'username': username, 'password': password}
+                    users['admin'].append({'username': username, 'password': password})
                 elif role == 'scout leader':
                     users['scout leader'].append({'username': username, 'password': password})
                 elif role == 'logistics coordinator':
                     users['logistics coordinator'].append({'username': username, 'password': password})
+            if not users['admin']:
+                users['admin'].append({'username': 'admin', 'password': ''})
 
     except FileNotFoundError:
         print('\n logins.txt not found')

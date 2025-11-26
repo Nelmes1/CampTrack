@@ -4,12 +4,11 @@ from utils import get_int
 
 def list_users():
     print('\n--- All Users ---')
-    for role, role_info in users.items():
-        if role == 'admin':
-            print(f"Role: {role}, Username: {role_info['username']}, Password: {role_info['password']}")
-        else:
-            for user in role_info:
-                print(f"Role: {role}, Username: {user['username']}, Password: {user['password']}")
+    for admin in users['admin']:
+        print(f"Role: admin, Username: {admin['username']}, Password: {admin['password']}")
+    for role in ['scout leader', 'logistics coordinator']:
+        for user in users[role]:
+            print(f"Role: {role}, Username: {user['username']}, Password: {user['password']}")
 
 
 def add_user():
@@ -39,7 +38,7 @@ def add_user():
             continue
         # check duplicates
         existing_names = []
-        existing_names.append(users['admin']['username'])
+        existing_names.extend(u['username'] for u in users['admin'])
         existing_names.extend(u['username'] for u in users['scout leader'])
         existing_names.extend(u['username'] for u in users['logistics coordinator'])
         if new_username in existing_names:
@@ -57,7 +56,7 @@ def add_user():
         break
 
     if new_role == 'admin':
-        users['admin'] = {'username': new_username, 'password': new_password}
+        users['admin'].append({'username': new_username, 'password': new_password})
     else:
         users[new_role].append({'username': new_username, 'password': new_password})
     print(f"\nUser {new_username} added successfully as {new_role}!")
@@ -74,16 +73,19 @@ def edit_user_password():
         option = get_int('Input your option: ', 1, 3)
 
         if option == 1:
-            print(f"Select which user to change password:\n[1] {users['admin']['username']}")
-            option2 = get_int('Input your option: ', 1, 1)
-            if option2 == 1:
-                new_admin_password = str(input(f"Enter a new password for {users['admin']['username']} "))
-                users['admin']['password'] = new_admin_password
-                print("\nPassword updated successfully")
-                save_logins()
-                break
-            else:
-                print('Invalid input. Please try again.')
+            if not users['admin']:
+                print("\nNo admin users found.")
+                continue
+            print("Select which admin to change password:")
+            for idx, admin in enumerate(users['admin'], start=1):
+                print(f"[{idx}] {admin['username']}")
+            option2 = get_int('Input your option: ', 1, len(users['admin']))
+            chosen_admin = users['admin'][option2 - 1]
+            new_admin_password = str(input(f"Enter a new password for {chosen_admin['username']}: "))
+            chosen_admin['password'] = new_admin_password
+            print("\nPassword updated successfully")
+            save_logins()
+            break
 
         elif option == 2:
             n = 0
@@ -259,7 +261,7 @@ def enable_user():
         username_to_enable = disabled_usernames[option-1]
         # verify the username still exists in users
         existing_names = set()
-        existing_names.add(users['admin']['username'])
+        existing_names.update(u['username'] for u in users['admin'])
         existing_names.update(u['username'] for u in users['scout leader'])
         existing_names.update(u['username'] for u in users['logistics coordinator'])
         if username_to_enable not in existing_names:

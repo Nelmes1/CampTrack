@@ -49,13 +49,16 @@ class LoginWindow(tk.Frame):
             messagebox.showerror("Login failed", "This account has been disabled.")
             return
         role = None
-        if users["admin"]["username"] == uname and users["admin"]["password"] == pwd:
-            role = "admin"
-        else:
+        for u in users["admin"]:
+            if u["username"] == uname and u["password"] == pwd:
+                role = "admin"
+                break
+        if role is None:
             for u in users["scout leader"]:
                 if u["username"] == uname and u["password"] == pwd:
                     role = "scout leader"
                     break
+        if role is None:
             for u in users["logistics coordinator"]:
                 if u["username"] == uname and u["password"] == pwd:
                     role = "logistics coordinator"
@@ -89,12 +92,11 @@ class AdminWindow(tk.Frame):
 
     def list_users_ui(self):
         lines = []
-        for role, role_info in users.items():
-            if role == 'admin':
-                lines.append(f"Role: {role}, Username: {role_info['username']}, Password: {role_info['password']}")
-            else:
-                for user in role_info:
-                    lines.append(f"Role: {role}, Username: {user['username']}, Password: {user['password']}")
+        for admin in users['admin']:
+            lines.append(f"Role: admin, Username: {admin['username']}, Password: {admin['password']}")
+        for role in ['scout leader', 'logistics coordinator']:
+            for user in users[role]:
+                lines.append(f"Role: {role}, Username: {user['username']}, Password: {user['password']}")
         messagebox.showinfo("Users", "\n".join(lines) if lines else "No users found.")
 
     def prompt_role(self, allow_admin=False):
@@ -119,7 +121,7 @@ class AdminWindow(tk.Frame):
             if username == "":
                 messagebox.showerror("Error", "Username cannot be blank.")
                 continue
-            existing = [users['admin']['username']]
+            existing = [u['username'] for u in users['admin']]
             existing += [u['username'] for u in users['scout leader']]
             existing += [u['username'] for u in users['logistics coordinator']]
             if username in existing:
@@ -130,7 +132,7 @@ class AdminWindow(tk.Frame):
         if pwd is None:
             return
         if role == "admin":
-            users['admin'] = {'username': username, 'password': pwd}
+            users['admin'].append({'username': username, 'password': pwd})
         else:
             users[role].append({'username': username, 'password': pwd})
         save_logins()
@@ -141,7 +143,14 @@ class AdminWindow(tk.Frame):
         if not role:
             return
         if role == "admin":
-            target_user = users['admin']['username']
+            names = [u['username'] for u in users['admin']]
+            if not names:
+                messagebox.showinfo("Info", "No admin users found.")
+                return
+            target_user = simple_prompt(f"Enter admin username to edit ({', '.join(names)}):")
+            if target_user not in names:
+                messagebox.showerror("Error", "User not found.")
+                return
         else:
             names = [u['username'] for u in users[role]]
             if not names:
@@ -155,7 +164,10 @@ class AdminWindow(tk.Frame):
         if new_pwd is None:
             return
         if role == "admin":
-            users['admin']['password'] = new_pwd
+            for u in users['admin']:
+                if u['username'] == target_user:
+                    u['password'] = new_pwd
+                    break
         else:
             for u in users[role]:
                 if u['username'] == target_user:
@@ -181,7 +193,7 @@ class AdminWindow(tk.Frame):
         messagebox.showinfo("Success", f"Deleted {target_user}.")
 
     def disable_user_ui(self):
-        names = [users['admin']['username']]
+        names = [u['username'] for u in users['admin']]
         names += [u['username'] for u in users['scout leader']]
         names += [u['username'] for u in users['logistics coordinator']]
         target_user = simple_prompt(f"Enter username to disable ({', '.join(names)}):")
@@ -209,7 +221,7 @@ class AdminWindow(tk.Frame):
             messagebox.showerror("Error", "User not found in disabled list.")
             return
         # ensure user still exists
-        existing = [users['admin']['username']]
+        existing = [u['username'] for u in users['admin']]
         existing += [u['username'] for u in users['scout leader']]
         existing += [u['username'] for u in users['logistics coordinator']]
         if target_user not in existing:

@@ -34,7 +34,11 @@ def get_all_usernames(users_dict):
 
     # admin
     admin = users_dict.get("admin")
-    if isinstance(admin, dict) and "username" in admin:
+    if isinstance(admin, list):
+        for a in admin:
+            if isinstance(a, dict) and "username" in a:
+                names.append(a["username"])
+    elif isinstance(admin, dict) and "username" in admin:
         names.append(admin["username"])
     elif isinstance(admin, str):
         names.append(admin)
@@ -227,5 +231,4 @@ def open_chat(current_user, other):
             return
         else:
             print("Invalid choice.")
-
 
