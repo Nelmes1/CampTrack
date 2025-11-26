@@ -524,11 +524,12 @@ class ScoutWindow(tk.Frame):
         super().__init__(master)
         self.username = username
         self.pack(padx=10, pady=10, fill="both", expand=True)
-        tk.Button(self, text="Select Camps to Supervise", command=self.select_camps_ui).pack(fill="x")
-        tk.Button(self, text="Bulk Assign Campers from CSV", command=self.bulk_assign_ui).pack(fill="x")
-        tk.Button(self, text="Assign Food per Camper per Day", command=self.food_req_ui).pack(fill="x")
-        tk.Button(self, text="Record Activity", command=self.record_activity_ui).pack(fill="x")
-        tk.Button(self, text="View Stats", command=self.stats_ui).pack(fill="x")
+        tk.Label(self, text="Scout Leader Menu", font=("Arial", 14, "bold")).pack(pady=5)
+        tk.Button(self, text="Select camps to supervise", command=self.select_camps_ui).pack(fill="x")
+        tk.Button(self, text="Bulk assign campers from CSV", command=self.bulk_assign_ui).pack(fill="x")
+        tk.Button(self, text="Assign food amount per camper per day", command=self.food_req_ui).pack(fill="x")
+        tk.Button(self, text="Record daily activity outcomes / incidents", command=self.record_activity_ui).pack(fill="x")
+        tk.Button(self, text="View camp statistics and trends", command=self.stats_ui).pack(fill="x")
         tk.Button(self, text="Messaging", command=self.messaging_ui).pack(fill="x")
         tk.Button(self, text="Logout", command=self.logout).pack(fill="x", pady=5)
 
