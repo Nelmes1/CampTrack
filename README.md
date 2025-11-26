@@ -17,13 +17,18 @@ pip install -r requirements.txt
 
 ## Running
 
-Start the app:
+CLI:
 ```bash
 python app.py
 ```
 
+GUI (Tkinter):
+```bash
+python gui.py
+```
+
 Default accounts (empty passwords):
-- admin: `admin`
+- admins: `admin`
 - logistics coordinator: `coordinator`
 - scout leaders: `leader1`, `leader2`, `leader3`, `leader4`
 
@@ -36,3 +41,5 @@ Runtime data is stored under `data/`:
 - `food_requirements.json` – per-camp food requirements
 
 User/login data remains in `logins.txt` and `disabled_logins.txt` at the project root.
+
+CSV bulk import expects `campers/` (sibling to `data/`) with CSV files containing `Name,Age,Activities` columns.
