@@ -737,6 +737,8 @@ def select_camp_dialog(title, camps, allow_multiple=False, allow_cancel=False):
     """Return list of selected indices from camps via a listbox dialog."""
     top = tk.Toplevel()
     top.title(title)
+    center_window(top, width=520, height=380)
+    top.minsize(400, 260)
     selectmode = "extended" if allow_multiple else "browse"
     listbox = tk.Listbox(top, selectmode=selectmode, width=60)
     for camp in camps:
@@ -766,12 +768,28 @@ def select_camp_dialog(title, camps, allow_multiple=False, allow_cancel=False):
     return result["indices"]
 
 
+def center_window(win, width=500, height=400):
+    """Center a window on the screen with optional default size."""
+    try:
+        win.update_idletasks()
+        screen_width = win.winfo_screenwidth()
+        screen_height = win.winfo_screenheight()
+        x = int((screen_width - width) / 2)
+        y = int((screen_height - height) / 2)
+        win.geometry(f"{width}x{height}+{x}+{y}")
+    except Exception:
+        pass
+
+
+def launch_login():
+    root = tk.Tk()
+    root.title("CampTrack Login")
+    root.minsize(360, 200)
+    center_window(root, width=420, height=260)
+    LoginWindow(root)
+    root.mainloop()
+
+
 if __name__ == "__main__":
     load_logins()
-    def launch_login():
-        root = tk.Tk()
-        root.title("CampTrack Login")
-        LoginWindow(root)
-        root.mainloop()
-
     launch_login()
