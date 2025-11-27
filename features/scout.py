@@ -273,28 +273,60 @@ def record_daily_activity():
     print(f"\nAdding activities/notes for: {camp.name}")
 
     while True:
+
+        date_today = datetime.today().date()
         new_date = input("Enter the date (YYYY-MM-DD) or type n to exit: ").strip()
         if new_date.lower() == "n":
             break
 
-        activity_name = input("Activity name (optional, press enter to skip): ").strip()
-        activity_time = input("Time (optional, e.g. 14:00): ").strip()
-        notes = input("Enter notes/outcomes/incidents for this entry: ").strip()
+        try:
+            new_date = datetime.strptime(new_date, "%Y-%m-%d").date()
 
-        # optional food used for this activity
-        food_used = input("Food units used for this activity (optional number): ").strip()
-        food_units = None
-        if food_used.isdigit():
-            food_units = int(food_used)
+            if new_date > date_today:
+                print("Invalid date. You entered a date in the future.")
+            else:
+                activity_name = input("Activity name (optional, press enter to skip): ").strip()
+                activity_time = input("Time (optional, e.g. 14:00): ").strip()
+                notes = input("Enter notes/outcomes/incidents for this entry: ").strip()
 
-        record_daily_activity_data(camp, new_date, activity_name, activity_time, notes, food_units)
+                # optional food used for this activity
+                food_used = input("Food units used for this activity (optional number): ").strip()
+                food_units = None
+                if food_used.isdigit():
+                    food_units = int(food_used)
 
-        view_choice = input("Entry added. View today's entries? (y/n): ").strip().lower()
-        if view_choice == "y":
-            print(camp.activities.get(new_date, []))
-        else:
-            continue
+                entry = {
+                    "activity": activity_name or "unspecified",
+                    "time": activity_time,
+                    "notes": notes,
+                }
+                if food_units is not None:
+                    entry["food_used"] = food_units
 
+                new_date = str(new_date)
+                # store under activities by date
+                if new_date not in camp.activities:
+                    camp.activities[new_date] = []
+                camp.activities[new_date].append(entry)
+
+                # also keep a simple daily record note
+                camp.note_daily_record(new_date, notes)
+
+                # track food usage per day if provided
+                if food_units is not None:
+                    if new_date not in camp.daily_food_usage:
+                        camp.daily_food_usage[new_date] = 0
+                    camp.daily_food_usage[new_date] += food_units
+
+                save_to_file()
+
+                view_choice = input("Entry added. View today's entries? (y/n): ").strip().lower()
+                if view_choice == "y":
+                    print(camp.activities.get(new_date, []))
+                else:
+                    continue
+        except ValueError:
+            print("Invalid entry. Please try again.")
 
 def add_activity_entry(camp, date, activity_name, activity_time, notes, food_units=None):
     """Pure helper to add an activity entry to a camp."""
