@@ -42,20 +42,6 @@
                     "notes": "Basics",
                     "food_used": 1
                 }
-            ],
-            "2026-11-26": [
-                {
-                    "activity": "unspecified",
-                    "time": "",
-                    "notes": ""
-                }
-            ],
-            "2025-11-26": [
-                {
-                    "activity": "unspecified",
-                    "time": "",
-                    "notes": "testing"
-                }
             ]
         },
         "daily_food_usage": {
@@ -68,12 +54,6 @@
             ],
             "2025-06-11": [
                 "Learned map skills and first aid."
-            ],
-            "2026-11-26": [
-                ""
-            ],
-            "2025-11-26": [
-                "testing"
             ]
         },
         "pay_rate": 100

@@ -78,7 +78,7 @@ def save_campers(camp_name, campers):
                 value = False
                 for other_camp in camps:
                     if other_camp.name != camp_name and name in other_camp.campers:
-                        print(f"{name} already assigned to another camp.")
+                        # camper already assigned elsewhere
                         value = True
                         break
                 if value is False:
@@ -86,7 +86,113 @@ def save_campers(camp_name, campers):
                         camp.campers.append(name)
             break
     save_to_file()
-    print(f"\nAssigned campers to {camp_name}.")
+    return {"status": "ok", "camp": camp_name, "added": list(campers.keys())}
+
+
+def find_camp_by_name(camp_name):
+    camps = read_from_file()
+    for camp in camps:
+        if camp.name == camp_name:
+            return camp
+    return None
+
+
+def bulk_assign_campers_data(selected_camp, campers):
+    """Assign campers dict to the given Camp instance; returns status dict."""
+    if selected_camp is None:
+        return {"status": "no_camp"}
+    # prevent duplicates across camps
+    camps = read_from_file()
+    for name in list(campers.keys()):
+        for other_camp in camps:
+            if other_camp.name != selected_camp.name and name in other_camp.campers:
+                # remove camper already assigned elsewhere
+                campers.pop(name, None)
+                break
+    return save_campers(selected_camp.name, campers)
+
+
+def bulk_assign_campers_from_csv(camp_name, filepath):
+    """Pure helper: assign campers from a CSV to a named camp."""
+    if not os.path.exists(filepath):
+        return {"status": "file_not_found"}
+    selected_camp = find_camp_by_name(camp_name)
+    if selected_camp is None:
+        return {"status": "camp_not_found"}
+    campers = load_campers_csv(filepath)
+    if not campers:
+        return {"status": "no_campers"}
+    return bulk_assign_campers_data(selected_camp, campers)
+
+
+def assign_camps_to_leader(camps, leader_username, selected_indices):
+    """Pure helper to assign a leader to selected camps and remove from others."""
+    if not selected_indices:
+        return {"status": "no_selection"}
+    selected_camp_names = []
+    for idx in selected_indices:
+        if idx < 0 or idx >= len(camps):
+            return {"status": "invalid_index"}
+        selected_camp_names.append(camps[idx].name)
+    # check conflicts
+    selected_camps = [camps[i] for i in selected_indices]
+    if camps_conflict(selected_camps):
+        return {"status": "overlap"}
+    # apply assignments
+    for camp in camps:
+        if camp.name in selected_camp_names:
+            camp.assign_leader(leader_username)
+        else:
+            if leader_username in camp.scout_leaders:
+                camp.scout_leaders.remove(leader_username)
+    save_to_file()
+    return {"status": "ok", "selected": selected_camp_names}
+
+
+def assign_camps_to_leader_ui(leader_username):
+    camps = read_from_file()
+    if not camps:
+        print('\nNo camps exist yet. Ask the logistics coordinator to create one.')
+        return
+
+    print('\nAvaliable Camps: ')
+    for idx, camp in enumerate(camps, start=1):
+        print(f"[{idx}] {camp.name} | {camp.location} | {camp.start_date} -> {camp.end_date}")
+
+    print("\nCurrent Camp Assignments:")
+    view_leader_camp_assignments()
+
+    print("\nSelect the camps you wish to supervise. (Use commas to seperate numbers)")
+    selection = input("Input your option(s): ").strip()
+    if selection == "":
+        print("\nNo camps selected.")
+        return
+
+    try:
+        chosen_numbers = [int(i) for i in selection.split(',')]
+    except ValueError:
+        print("\nInvalid input. Please try again.")
+        return
+
+    valid_indices = []
+    for n in chosen_numbers:
+        if 1 <= n <= len(camps):
+            valid_indices.append(n - 1)
+        else:
+            print(f"Ignoring invalid camp number: {n}")
+
+    res = assign_camps_to_leader(camps, leader_username, valid_indices)
+    if res["status"] == "no_selection":
+        print("\nNo valid camps selected. Try again")
+    elif res["status"] == "invalid_index":
+        print("\nInvalid camp selection.")
+    elif res["status"] == "overlap":
+        print("You camps you have selected overlap.\nPlease choose camps that do not overlap.")
+    elif res["status"] == "ok":
+        print(f"{leader_username} has selected these camps to supervise:")
+        for name in res["selected"]:
+            print(name)
+        print("\nYour camp selections have been saved")
 
 
 def save_food_requirement(camp_name, food_per_camper):
@@ -100,9 +206,11 @@ def save_food_requirement(camp_name, food_per_camper):
 
     with open(data_path("food_requirements.json"), 'w') as file:
         json.dump(data, file, indent=4)
+    return {"status": "ok", "camp": camp_name, "food_per_camper": food_per_camper}
 
 
 def assign_food_amount():
+    """UI wrapper to assign food per camper for a camp."""
     camps = read_from_file()
     if not camps:
         print("\nNo camps exist yet. Ask the logistics coordinator to create one.")
@@ -122,8 +230,36 @@ def assign_food_amount():
     print(f"\n{camp.name} has {camper_count} campers assigned.")
 
     food_per_camper = get_int("Enter daily food units per camper: ", min_val=0)
-    save_food_requirement(camp.name, food_per_camper)
-    print(f"\nSaved requirement: {food_per_camper} unit(s) per camper per day for {camp.name}.")
+    res = assign_food_amount_data(camp, food_per_camper)
+    if res.get("status") == "ok":
+        print(f"\nSaved requirement: {food_per_camper} unit(s) per camper per day for {camp.name}.")
+
+
+def assign_food_amount_data(camp, food_per_camper):
+    """Pure helper to save food requirement for a camp."""
+    if camp is None:
+        return {"status": "no_camp"}
+    return save_food_requirement(camp.name, food_per_camper)
+
+
+def assign_food_amount_pure(camp_name, food_per_camper):
+    camp = find_camp_by_name(camp_name)
+    return assign_food_amount_data(camp, food_per_camper)
+
+
+def record_daily_activity_data(camp, date, activity_name, activity_time, notes, food_units=None):
+    """Pure helper to add an activity entry to a camp; returns status and entry."""
+    if camp is None:
+        return {"status": "no_camp"}
+    entry = add_activity_entry(camp, date, activity_name, activity_time, notes, food_units)
+    return {"status": "ok", "entry": entry}
+
+
+def record_activity_entry_data(camp_name, date, activity_name, activity_time, notes, food_units=None):
+    camp = find_camp_by_name(camp_name)
+    if camp is None:
+        return {"status": "camp_not_found"}
+    return record_daily_activity_data(camp, date, activity_name, activity_time, notes, food_units)
 
 
 def record_daily_activity():
@@ -137,61 +273,51 @@ def record_daily_activity():
     print(f"\nAdding activities/notes for: {camp.name}")
 
     while True:
-
-        date_today = datetime.today().date()
         new_date = input("Enter the date (YYYY-MM-DD) or type n to exit: ").strip()
         if new_date.lower() == "n":
             break
 
-        try:
-            new_date = datetime.strptime(new_date, "%Y-%m-%d").date()
+        activity_name = input("Activity name (optional, press enter to skip): ").strip()
+        activity_time = input("Time (optional, e.g. 14:00): ").strip()
+        notes = input("Enter notes/outcomes/incidents for this entry: ").strip()
 
-            if new_date > date_today:
-                print("Invalid date. You entered a date in the future.")
-            else:
-                activity_name = input("Activity name (optional, press enter to skip): ").strip()
-                activity_time = input("Time (optional, e.g. 14:00): ").strip()
-                notes = input("Enter notes/outcomes/incidents for this entry: ").strip()
+        # optional food used for this activity
+        food_used = input("Food units used for this activity (optional number): ").strip()
+        food_units = None
+        if food_used.isdigit():
+            food_units = int(food_used)
 
-                # optional food used for this activity
-                food_used = input("Food units used for this activity (optional number): ").strip()
-                food_units = None
-                if food_used.isdigit():
-                    food_units = int(food_used)
+        record_daily_activity_data(camp, new_date, activity_name, activity_time, notes, food_units)
 
-                entry = {
-                    "activity": activity_name or "unspecified",
-                    "time": activity_time,
-                    "notes": notes,
-                }
-                if food_units is not None:
-                    entry["food_used"] = food_units
+        view_choice = input("Entry added. View today's entries? (y/n): ").strip().lower()
+        if view_choice == "y":
+            print(camp.activities.get(new_date, []))
+        else:
+            continue
 
-                new_date = str(new_date)
-                # store under activities by date
-                if new_date not in camp.activities:
-                    camp.activities[new_date] = []
-                camp.activities[new_date].append(entry)
 
-                # also keep a simple daily record note
-                camp.note_daily_record(new_date, notes)
+def add_activity_entry(camp, date, activity_name, activity_time, notes, food_units=None):
+    """Pure helper to add an activity entry to a camp."""
+    entry = {
+        "activity": activity_name or "unspecified",
+        "time": activity_time,
+        "notes": notes,
+    }
+    if food_units is not None:
+        entry["food_used"] = food_units
 
-                # track food usage per day if provided
-                if food_units is not None:
-                    if new_date not in camp.daily_food_usage:
-                        camp.daily_food_usage[new_date] = 0
-                    camp.daily_food_usage[new_date] += food_units
+    if date not in camp.activities:
+        camp.activities[date] = []
+    camp.activities[date].append(entry)
 
-                save_to_file()
+    camp.note_daily_record(date, notes)
 
-                view_choice = input("Entry added. View today's entries? (y/n): ").strip().lower()
-                if view_choice == "y":
-                    print(camp.activities.get(new_date, []))
-                else:
-                    continue
-        except ValueError:
-            print("Invalid entry. Please try again.")
-
+    if food_units is not None:
+        if date not in camp.daily_food_usage:
+            camp.daily_food_usage[date] = 0
+        camp.daily_food_usage[date] += food_units
+    save_to_file()
+    return entry
 
 
 def view_activity_stats():
@@ -206,16 +332,16 @@ def view_activity_stats():
     choice = get_int("\nSelect a camp to view activity stats: ", 1, len(camps))
     camp = camps[choice - 1]
 
-    if not camp.activities:
+    stats = activity_stats_data(camp)
+    if stats["status"] != "ok":
         print(f"\nNo activities recorded for {camp.name}.")
         return
 
-    total_entries = sum(len(entries) for entries in camp.activities.values())
     print(f"\nActivity summary for {camp.name}:")
-    print(f"Total activity entries: {total_entries}")
-    for date, entries in sorted(camp.activities.items()):
-        print(f"{date}: {len(entries)} activit(ies)")
-        for entry in entries:
+    print(f"Total activity entries: {stats['total_entries']}")
+    for date_info in stats["per_date"]:
+        print(f"{date_info['date']}: {date_info['count']} activit(ies)")
+        for entry in date_info["entries"]:
             desc = entry.get('activity', 'unspecified')
             time = entry.get('time')
             notes = entry.get('notes', '')
@@ -228,32 +354,18 @@ def view_activity_stats():
             extra_txt = f" ({', '.join(extra)})" if extra else ""
             print(f"  - {desc}{extra_txt}: {notes}")
 
-    if camp.daily_food_usage:
-        total_food = sum(camp.daily_food_usage.values())
-        print(f"\nTotal food used across recorded activities: {total_food} units")
+    if stats["total_food_used"] is not None:
+        print(f"\nTotal food used across recorded activities: {stats['total_food_used']} units")
 
 
 def print_engagement_score():
-    from features.logistics import _engagement_score
-    read_from_file()
-
-    print("\n--- Existing Camps ---")
-    for i, camp in enumerate(Camp.all_camps, start=1):
-        print(f"{i}. {camp.name}")
-
-    try:
-        choice = int(input("\nEnter the camp number that you want to see the Engagement Score of: "))
-        if choice < 1 or choice > len(Camp.all_camps):
-            print("Invalid selection of camp.")
-            return
-    except ValueError:
-        print("Please enter a valid number.")
+    scores = engagement_scores_data()
+    if not scores:
+        print("\nNo camps found.")
         return
-
-    camp = Camp.all_camps[choice - 1]
-    eng_score = _engagement_score(camp)
-
-    print(f"\nEngagement Score for {camp.name}: {eng_score}")
+    print("\n--- Existing Camps ---")
+    for i, (name, score) in enumerate(scores, start=1):
+        print(f"{i}. {name} (Engagement: {score})")
 
 
 def info_from_json():
@@ -264,80 +376,76 @@ def info_from_json():
 
 
 def money_earned_per_camp():
-    read_from_file()
-    print("\n--- Existing Camps ---")
-    for i, camp in enumerate(Camp.all_camps, start=1):
-        print(f"{i}. {camp.name}")
-    choice = get_int("\nEnter the camp number that you want to see the money earned of: ", 1, len(Camp.all_camps))
-    camp = Camp.all_camps[choice - 1]
-    print(f"\nMoney earned by {camp.name}: ${camp.pay_rate * len(camp.campers)}")
+    data = money_earned_per_camp_data()
+    if not data:
+        print("\nNo camps found.")
+        return
+    print("\n--- Money Earned Per Camp ---")
+    for name, earned in data:
+        print(f"{name}: ${earned}")
 
 
 def total_money_earned():
-    read_from_file()
-    total = 0
-    for camp in Camp.all_camps:
-        total += camp.pay_rate * len(camp.campers)
+    total = total_money_earned_value()
     print(f"\nTotal money earned: ${total}")
 
 
-def assign_camp_to_supervise(leader_username):
-    while True:
-        camps = read_from_file()
-        if camps == []:
-            print('\nNo camps exist yet. Ask the logistics coordinator to create one.')
-            return
+# UI wrappers (print) for stats, calling data helpers
+def show_engagement_scores():
+    scores = engagement_scores_data()
+    if not scores:
+        print("\nNo camps found.")
+        return
+    print("\n--- Existing Camps ---")
+    for i, (name, score) in enumerate(scores, start=1):
+        print(f"{i}. {name} (Engagement: {score})")
 
-        print('\nAvaliable Camps: ')
-        n = 0
-        for camp in camps:
-            n += 1
-            print(f"[{n}] {camp.name} | {camp.location} | {camp.start_date} -> {camp.end_date}")
 
-        print("\nCurrent Camp Assignments:")
-        view_leader_camp_assignments()
+def show_money_per_camp():
+    money_earned_per_camp()
 
-        print("\nSelect the camps you wish to supervise. (Use commas to seperate numbers)")
-        selection = input("Input your option(s): ").strip()
-        if selection == "":
-            print("\nNo camps selected.")
-            break
 
-        try:
-            chosen_numbers = [int(i) for i in selection.split(',')]
-        except ValueError:
-            print("\nInvalid input. Please try again.")
-            continue
+def show_total_money():
+    total_money_earned()
 
-        valid_indices = []
-        for n in chosen_numbers:
-            if 1 <= n <= len(camps):
-                valid_indices.append(n)
-            else:
-                print(f"Ignoring invalid camp number: {n}")
 
-        if not valid_indices:
-            print("\nNo valid camps selected. Try again")
-            continue
+def engagement_scores_data():
+    read_from_file()
+    return [(camp.name, _engagement_score(camp)) for camp in Camp.all_camps]
 
-        selected_camps = [camps[i-1] for i in valid_indices]
-        if camps_conflict(selected_camps):
-            print("You camps you have selected overlap.\nPlease choose camps that do not overlap.")
-            continue
 
-        print(f"{leader_username} has selected these camps to supervise:")
-        selected_camp_names = []
-        for n in valid_indices:
-            camp = camps[n-1]
-            selected_camp_names.append(camp.name)
-            print(f"{camp.name} | {camp.location} | {camp.start_date} -> {camp.end_date}")
+def money_earned_per_camp_data():
+    read_from_file()
+    return [(camp.name, camp.pay_rate * len(camp.campers)) for camp in Camp.all_camps]
 
-        save_selected_camps(leader_username, selected_camp_names)
-        print("\nYour camp selections have been saved")
-        break
+
+def total_money_earned_value():
+    read_from_file()
+    return sum(camp.pay_rate * len(camp.campers) for camp in Camp.all_camps)
+
+
+def activity_stats_data(camp):
+    if not camp.activities:
+        return {"status": "no_activities"}
+    per_date = []
+    for date, entries in sorted(camp.activities.items()):
+        per_date.append({
+            "date": date,
+            "count": len(entries),
+            "entries": entries,
+        })
+    total_entries = sum(item["count"] for item in per_date)
+    total_food = sum(camp.daily_food_usage.values()) if camp.daily_food_usage else None
+    return {
+        "status": "ok",
+        "total_entries": total_entries,
+        "per_date": per_date,
+        "total_food_used": total_food,
+    }
 
 
 def bulk_assign_campers():
+    """UI flow for bulk assigning campers from CSV."""
     while True:
         camps = read_from_file()
         if camps == []:
@@ -390,7 +498,7 @@ def bulk_assign_campers():
             print("Invalid output. Please try again.")
             continue
 
-        selected_file = files[file_choice - 1 ]
+        selected_file = files[file_choice - 1]
         filepath = os.path.join(csv_folder, selected_file)
 
         campers = load_campers_csv(filepath)
@@ -398,6 +506,40 @@ def bulk_assign_campers():
             print("\nCSV contained no campers.")
             continue
 
-        save_campers(selected_camp.name, campers)
-        print(f"\nSuccessfully assigned {len(campers)} campers to {selected_camp}!")
+        res = bulk_assign_campers_data(selected_camp, campers)
+        if res and res.get("status") == "ok":
+            print(f"\nSuccessfully assigned {len(campers)} campers to {selected_camp.name}!")
+        else:
+            print("\nNo campers were assigned.")
         break
+
+
+# UI helpers for stats
+def show_engagement_scores():
+    scores = engagement_scores_data()
+    if not scores:
+        print("\nNo camps found.")
+        return
+    print("\n--- Existing Camps ---")
+    for i, (name, score) in enumerate(scores, start=1):
+        print(f"{i}. {name} (Engagement: {score})")
+
+
+def show_money_per_camp():
+    data = money_earned_per_camp_data()
+    if not data:
+        print("\nNo camps found.")
+        return
+    print("\n--- Money Earned Per Camp ---")
+    for name, earned in data:
+        print(f"{name}: ${earned}")
+
+
+def show_total_money():
+    total = total_money_earned_value()
+    print(f"\nTotal money earned: ${total}")
+
+
+def bulk_assign_campers_ui(leader_username):
+    """Alias to keep menu clear; uses bulk_assign_campers for prompts."""
+    return bulk_assign_campers()
