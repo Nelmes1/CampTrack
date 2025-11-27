@@ -77,16 +77,37 @@ class LoginWindow(ttk.Frame):
         ttk.Separator(card, orient="horizontal").grid(row=row, column=0, sticky="ew", pady=(0, 8))
         row += 1
 
-        ttk.Label(card, text="Username", style="FieldLabel.TLabel").grid(row=row, column=0, sticky="w", padx=8, pady=(0, 4))
+        ttk.Label(card, text="Username", style="FieldLabel.TLabel").grid(row=row, column=0, sticky="w", padx=8)
         row += 1
-        self.username = ttk.Entry(card, width=36, style="App.TEntry")
-        self.username.grid(row=row, column=0, sticky="ew", padx=8, pady=(0, 10))
+        self.username = tk.Entry(
+            card,
+            width=32,
+            bg="#0b1729",
+            fg=THEME_FG,
+            insertbackground=THEME_FG,
+            relief="flat",
+            highlightthickness=0,
+            borderwidth=0,
+            font=("Helvetica", 11),
+        )
+        self.username.grid(row=row, column=0, sticky="ew", pady=(0, 10), ipady=6, padx=8)
         row += 1
 
-        ttk.Label(card, text="Password", style="FieldLabel.TLabel").grid(row=row, column=0, sticky="w", padx=8, pady=(0, 4))
+        ttk.Label(card, text="Password", style="FieldLabel.TLabel").grid(row=row, column=0, sticky="w", padx=8)
         row += 1
-        self.password = ttk.Entry(card, show="*", width=36, style="App.TEntry")
-        self.password.grid(row=row, column=0, sticky="ew", padx=8, pady=(0, 12))
+        self.password = tk.Entry(
+            card,
+            show="*",
+            width=32,
+            bg="#0b1729",
+            fg=THEME_FG,
+            insertbackground=THEME_FG,
+            relief="flat",
+            highlightthickness=0,
+            borderwidth=0,
+            font=("Helvetica", 11),
+        )
+        self.password.grid(row=row, column=0, sticky="ew", pady=(0, 4), ipady=6, padx=8)
         row += 1
 
         ttk.Button(
@@ -94,7 +115,7 @@ class LoginWindow(ttk.Frame):
             text="Login",
             command=self.attempt_login,
             style="Primary.TButton",
-        ).grid(row=row, column=0, pady=(16, 0), sticky="ew", padx=8)
+        ).grid(row=row, column=0, pady=(16, 0), sticky="ew")
 
     def attempt_login(self):
         state_info = capture_window_state(self.master)
@@ -897,6 +918,7 @@ def apply_window_state(win, state_info, min_w, min_h):
 
 def init_style(root):
     style = ttk.Style(root)
+    style.theme_use("clam")
     try:
         style.theme_use("clam")
     except Exception:
