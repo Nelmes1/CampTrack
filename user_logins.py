@@ -14,8 +14,8 @@ def check_disabled_logins(username):
     try:
         with open('disabled_logins.txt', 'r') as file:
             disabled = file.read()
-            disabled_usernames = disabled.split(',')
-            if username in disabled_usernames:
+            disabled_usernames = [u for u in disabled.split(',') if u]
+            if username and username in disabled_usernames:
                 return True
     except FileNotFoundError:
         return False
