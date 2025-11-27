@@ -4,6 +4,7 @@ import json
 import os
 from datetime import datetime
 from utils import data_path
+from camp_class import read_from_file, save_to_file
 
 MESSAGES_FILE = data_path("messages.json")
 
@@ -138,6 +139,12 @@ def get_conversation(username, other):
 def messaging_menu(current_user, users_dict):
     """WhatsApp-style CLI chat for a single logged-in user."""
 
+    user_role = None
+    for role, users in users_dict.items():
+        if any(u['username'] == current_user for u in users):
+            user_role = role
+            break
+
     while True:
         unread_total = count_unread_messages(current_user,other=None)
 
@@ -145,7 +152,11 @@ def messaging_menu(current_user, users_dict):
         print(f"You have {unread_total} unread message(s).")
         print("[1] View conversations")
         print("[2] Start new chat")
-        print("[3] Back")
+        if user_role == 'scout leader':  
+            print("[3] View camp group chats")
+            print("[4] Back")
+        else:
+            print("[3] Back")
 
         choice = input("Choose an option: ").strip()
 
@@ -189,13 +200,22 @@ def messaging_menu(current_user, users_dict):
             if recipient not in all_users or recipient == current_user:
                 print("Invalid recipient.")
                 continue
-
-
+            
             open_chat(current_user, recipient)
 
-        elif choice == "3":
-            return
+        elif choice == "3" and user_role == 'scout leader':  
+            assigned_camps = []
+            camps = read_from_file() 
+            for camp in camps:
+                if current_user in camp.scout_leaders:  
+                    assigned_camps.append(camp)
+            if not assigned_camps:
+                print(f"{current_user} is not assigned to any camps.")
+                continue
+            open_group_chat(current_user, assigned_camps)
 
+        elif choice == "3" and user_role != "scout leader" or choice == "4" and user_role == "scout leader":
+            break
         else:
             print("Invalid choice. Please try again.")
 
@@ -232,3 +252,48 @@ def open_chat(current_user, other):
         else:
             print("Invalid choice.")
 
+
+def open_group_chat(current_user, assigned_camps):
+    """Display group chats for assigned camps and allow sending messages."""
+    while True:
+        print("\n--- Group Chats ---")
+        for idx, camp in enumerate(assigned_camps, start=1):
+            print(f"[{idx}] {camp.name} (Group Chat)")
+
+        sel = input("Select a camp to view the group chat (or press Enter to cancel): ").strip()
+        if not sel.isdigit():
+            return  
+
+        idx = int(sel)
+        if 1 <= idx <= len(assigned_camps):
+            selected_camp = assigned_camps[idx - 1]
+            
+            while True:  
+                print(f"\n--- Group Chat for {selected_camp.name} ---")
+                
+                group_chat = selected_camp.get_group_chat()
+                if not group_chat:
+                    print("(No messages in the group chat yet.)")
+                else:
+                    for msg in group_chat:
+                        print(f"{msg['timestamp']} - {msg['from']}: {msg['text']}")
+                
+                print("\nOptions:")
+                print("[1] Send a message")
+                print("[2] Refresh")
+                print("[3] Back to camp selection")
+
+                choice = input("Choose an option: ").strip()
+
+                if choice == "1":
+                    message = input("Message: ").strip()
+                    if message:
+                        selected_camp.message_group_chat(current_user, message)
+                elif choice == "2":
+                    continue
+                elif choice == "3":
+                    break  
+                else:
+                    print("Invalid choice. Please try again.")
+        else:
+            print("Invalid choice. Please select a valid camp.")
