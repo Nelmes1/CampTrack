@@ -357,28 +357,38 @@ class AdminWindow(ttk.Frame):
         ttk.Separator(frame).pack(fill="x", pady=(0, 10))
 
         # load disabled usernames
-        columns = ("Role", "Username", "Password", "Status", "Created")
+        columns = ("Role", "Username", "Password", "Status")
         tree = ttk.Treeview(frame, columns=columns, show="headings", height=12)
         for col in columns:
             anchor = "center" if col != "Username" else "w"
             tree.heading(col, text=col)
-            tree.column(col, anchor=anchor, width=140 if col != "Username" else 180, stretch=True)
+            tree.column(col, anchor=anchor, width=160 if col != "Username" else 200, stretch=True)
 
-        vsb = ttk.Scrollbar(frame, orient="vertical", command=tree.yview)
-        tree.configure(yscrollcommand=vsb.set)
+        vsb = None
         tree.pack(fill="both", expand=True, pady=(0, 4))
 
         def refresh_scrollbar(*_):
             # show scrollbar only if rows exceed visible area
-            visible = max(int(tree.winfo_height() / 20), 1)
+            nonlocal vsb
+            h = tree.winfo_height()
+            if h <= 5:
+                return  # defer until layout is ready
+            visible = max(int(h / 20), 1)
             if len(tree.get_children()) > visible:
+                if vsb is None or not vsb.winfo_exists():
+                    vsb = ttk.Scrollbar(frame, orient="vertical", command=tree.yview)
+                tree.configure(yscrollcommand=vsb.set)
                 if not vsb.winfo_ismapped():
                     vsb.pack(fill="y", side="right")
             else:
-                if vsb.winfo_ismapped():
+                tree.configure(yscrollcommand=None)
+                if vsb is not None and vsb.winfo_exists() and vsb.winfo_ismapped():
                     vsb.pack_forget()
+                # do not show a hidden scrollbar
+                vsb = vsb
 
         tree.bind("<Configure>", refresh_scrollbar)
+        tree.after_idle(refresh_scrollbar)
 
         def load_disabled_set():
             s = set()
@@ -397,7 +407,7 @@ class AdminWindow(ttk.Frame):
 
         def add_row(role, user, ds):
             status = "Disabled" if user['username'] in ds else "Active"
-            tree.insert("", "end", values=(role, user['username'], user['password'], status, "N/A"))
+            tree.insert("", "end", values=(role, user['username'], user['password'], status))
 
         def refresh_tree():
             for child in tree.get_children():
@@ -409,8 +419,9 @@ class AdminWindow(ttk.Frame):
                 for user in users[role]:
                     add_row(role.title(), user, ds)
             if len(tree.get_children()) == 0:
-                tree.insert("", "end", values=("—", "No users found.", "", "", ""))
+                tree.insert("", "end", values=("—", "No users found.", "", ""))
             refresh_scrollbar()
+            tree.after_idle(refresh_scrollbar)
 
         def get_selected():
             sel = tree.selection()
@@ -433,16 +444,33 @@ class AdminWindow(ttk.Frame):
             sel = get_selected()
             if not sel:
                 return
-            new_pwd = simpledialog.askstring("Edit Password", f"New password for {sel['username']}:", show="*")
-            if new_pwd is None:
-                return
-            role_key = sel['role'].lower()
-            for u in users[role_key]:
-                if u['username'] == sel['username']:
-                    u['password'] = new_pwd
-                    break
-            save_logins()
-            refresh_tree()
+            dlg = tk.Toplevel(self)
+            dlg.title("Edit Password")
+            dlg.configure(bg=THEME_BG)
+            frame = ttk.Frame(dlg, padding=14, style="Card.TFrame")
+            frame.pack(fill="both", expand=True, padx=12, pady=12)
+            ttk.Label(frame, text=f"Edit password for {sel['username']}", style="Header.TLabel").pack(anchor="w", pady=(0, 6))
+            ttk.Separator(frame).pack(fill="x", pady=(0, 8))
+            ttk.Label(frame, text="New password", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
+            pwd_entry = ttk.Entry(frame, style="App.TEntry", show="*")
+            pwd_entry.pack(fill="x", pady=(0, 10))
+
+            def submit():
+                new_pwd = pwd_entry.get()
+                role_key = sel['role'].lower()
+                for u in users[role_key]:
+                    if u['username'] == sel['username']:
+                        u['password'] = new_pwd
+                        break
+                save_logins()
+                refresh_tree()
+                dlg.destroy()
+
+            btns = ttk.Frame(frame, style="Card.TFrame")
+            btns.pack(fill="x")
+            ttk.Button(btns, text="Save", command=submit, style="Primary.TButton").pack(side="left", padx=4, pady=4)
+            ttk.Button(btns, text="Cancel", command=dlg.destroy).pack(side="left", padx=4, pady=4)
+            dlg.grab_set()
 
         def delete_user():
             sel = get_selected()
@@ -480,29 +508,45 @@ class AdminWindow(ttk.Frame):
             sel = get_selected()
             if not sel:
                 return
-            new_name = simpledialog.askstring("Change Username", f"New username for {sel['username']}:")
-            if not new_name:
-                return
-            new_name = new_name.strip()
-            if not new_name:
-                show_error_toast(self.master, "Error", "Username cannot be blank.")
-                return
-            if not ensure_unique_username(new_name):
-                show_error_toast(self.master, "Error", "Username already exists.")
-                return
-            role_key = sel['role'].lower()
-            for u in users[role_key]:
-                if u['username'] == sel['username']:
-                    u['username'] = new_name
-                    break
-            # update disabled list if present
-            ds = load_disabled_set()
-            if sel['username'] in ds:
-                ds.remove(sel['username'])
-                ds.add(new_name)
-                save_disabled_set(ds)
-            save_logins()
-            refresh_tree()
+            dlg = tk.Toplevel(self)
+            dlg.title("Change Username")
+            dlg.configure(bg=THEME_BG)
+            frame = ttk.Frame(dlg, padding=14, style="Card.TFrame")
+            frame.pack(fill="both", expand=True, padx=12, pady=12)
+            ttk.Label(frame, text=f"Change username for {sel['username']}", style="Header.TLabel").pack(anchor="w", pady=(0, 6))
+            ttk.Separator(frame).pack(fill="x", pady=(0, 8))
+            ttk.Label(frame, text="New username", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
+            name_entry = ttk.Entry(frame, style="App.TEntry")
+            name_entry.insert(0, sel['username'])
+            name_entry.pack(fill="x", pady=(0, 10))
+
+            def submit():
+                new_name = name_entry.get().strip()
+                if not new_name:
+                    show_error_toast(self.master, "Error", "Username cannot be blank.")
+                    return
+                if not ensure_unique_username(new_name):
+                    show_error_toast(self.master, "Error", "Username already exists.")
+                    return
+                role_key = sel['role'].lower()
+                for u in users[role_key]:
+                    if u['username'] == sel['username']:
+                        u['username'] = new_name
+                        break
+                ds = load_disabled_set()
+                if sel['username'] in ds:
+                    ds.remove(sel['username'])
+                    ds.add(new_name)
+                    save_disabled_set(ds)
+                save_logins()
+                refresh_tree()
+                dlg.destroy()
+
+            btns = ttk.Frame(frame, style="Card.TFrame")
+            btns.pack(fill="x")
+            ttk.Button(btns, text="Save", command=submit, style="Primary.TButton").pack(side="left", padx=4, pady=4)
+            ttk.Button(btns, text="Cancel", command=dlg.destroy).pack(side="left", padx=4, pady=4)
+            dlg.grab_set()
 
         def change_role():
             sel = get_selected()
@@ -510,29 +554,42 @@ class AdminWindow(ttk.Frame):
                 return
             current = sel['role'].lower()
             roles = ["admin", "scout leader", "logistics coordinator"]
-            choice = simpledialog.askstring("Change Role", f"Enter new role {roles}:", initialvalue=current)
-            if not choice:
-                return
-            choice = choice.strip().lower()
-            if choice not in roles:
-                show_error_toast(self.master, "Error", "Invalid role.")
-                return
-            if choice == current:
-                return
-            if not ensure_unique_username(sel['username']):
-                show_error_toast(self.master, "Error", "Username already exists in target role.")
-                return
-            # move user
-            user_rec = None
-            for u in users[current]:
-                if u['username'] == sel['username']:
-                    user_rec = u
-                    break
-            if user_rec:
-                users[current] = [u for u in users[current] if u['username'] != sel['username']]
-                users[choice].append(user_rec)
-                save_logins()
-                refresh_tree()
+            dlg = tk.Toplevel(self)
+            dlg.title("Change Role")
+            dlg.configure(bg=THEME_BG)
+            frame = ttk.Frame(dlg, padding=14, style="Card.TFrame")
+            frame.pack(fill="both", expand=True, padx=12, pady=12)
+            ttk.Label(frame, text=f"Change role for {sel['username']}", style="Header.TLabel").pack(anchor="w", pady=(0, 6))
+            ttk.Separator(frame).pack(fill="x", pady=(0, 8))
+            ttk.Label(frame, text="New role", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
+            role_var = tk.StringVar(value=current)
+            ttk.OptionMenu(frame, role_var, current, *roles).pack(fill="x", pady=(0, 10))
+
+            def submit():
+                choice = role_var.get()
+                if choice == current:
+                    dlg.destroy()
+                    return
+                if any(u['username'] == sel['username'] for u in users[choice]):
+                    show_error_toast(self.master, "Error", "Username already exists in target role.")
+                    return
+                user_rec = None
+                for u in users[current]:
+                    if u['username'] == sel['username']:
+                        user_rec = u
+                        break
+                if user_rec:
+                    users[current] = [u for u in users[current] if u['username'] != sel['username']]
+                    users[choice].append(user_rec)
+                    save_logins()
+                    refresh_tree()
+                dlg.destroy()
+
+            btns = ttk.Frame(frame, style="Card.TFrame")
+            btns.pack(fill="x")
+            ttk.Button(btns, text="Save", command=submit, style="Primary.TButton").pack(side="left", padx=4, pady=4)
+            ttk.Button(btns, text="Cancel", command=dlg.destroy).pack(side="left", padx=4, pady=4)
+            dlg.grab_set()
 
         # action buttons
         btn_frame = ttk.Frame(frame, style="Card.TFrame")
