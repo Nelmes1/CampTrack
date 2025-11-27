@@ -924,10 +924,10 @@ def launch_login():
     root = tk.Tk()
     root.withdraw()
     root.title("CampTrack Login")
-    root.minsize(480, 360)
+    root.minsize(760, 600)
     init_style(root)
     LoginWindow(root)
-    center_window(root, width=520, height=400)
+    center_window(root, width=820, height=660)
     root.deiconify()
     root.mainloop()
 
