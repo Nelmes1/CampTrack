@@ -32,13 +32,14 @@ from features.scout import (
 )
 from messaging import get_conversations_for_user, get_conversation, send_message
 
-THEME_BG = "#0b1f36"          # outer background (window)
-THEME_CARD = "#12263f"        # inner card (like screenshot)
-THEME_FG = "#e6f1ff"          # main text
-THEME_MUTED = "#cbd5f5"       # subtle/secondary text
-THEME_ACCENT = "#38bdf8"      # primary accent (buttons)
-THEME_ACCENT_ACTIVE = "#0ea5e9"
-THEME_ACCENT_PRESSED = "#0284c7"
+LOGO_GREEN = "#487C56"       # match logo green
+THEME_BG = "#0b1f36"         # window background
+THEME_CARD = "#12263f"       # card background
+THEME_FG = "#e6f1ff"         # main text
+THEME_MUTED = "#cbd5f5"      # subtle/secondary text
+THEME_ACCENT = LOGO_GREEN    # primary accent now matches logo
+THEME_ACCENT_ACTIVE = "#43a047"
+THEME_ACCENT_PRESSED = "#388e3c"
 
 class LoginWindow(ttk.Frame):
     def __init__(self, master):
@@ -88,7 +89,12 @@ class LoginWindow(ttk.Frame):
         self.password.grid(row=row, column=0, sticky="ew", padx=8, pady=(0, 12))
         row += 1
 
-        ttk.Button(card, text="Login", command=self.attempt_login, style="Primary.TButton").grid(row=row, column=0, sticky="ew", padx=8, pady=(0, 4))
+        ttk.Button(
+            card,
+            text="Login",
+            command=self.attempt_login,
+            style="Primary.TButton",
+        ).grid(row=row, column=0, pady=(16, 0), sticky="ew", padx=8)
 
     def attempt_login(self):
         state_info = capture_window_state(self.master)
@@ -993,7 +999,7 @@ def init_style(root):
     # Primary button (e.g. login)
     style.configure(
         "Primary.TButton",
-        padding=9,
+        padding=8,
         background=THEME_ACCENT,
         foreground=THEME_FG,
         font=("Helvetica", 11, "bold"),
