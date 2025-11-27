@@ -107,6 +107,37 @@ def _attach_gif_background(container, gif_name="campfire.gif", delay=100, start_
         container.after(start_delay, animate)
 
 
+def show_error_toast(master, title, message, duration=2000):
+    """Non-blocking error popup so animations keep running."""
+    top = tk.Toplevel(master)
+    top.overrideredirect(True)
+    top.wm_attributes("-topmost", True)
+    top.configure(bg=THEME_BG)
+
+    outer = tk.Frame(top, bg=THEME_BG, bd=0)
+    outer.pack(fill="both", expand=True, padx=6, pady=6)
+
+    card = ttk.Frame(outer, padding=14, style="Card.TFrame")
+    card.pack(fill="both", expand=True)
+
+    # accent bar and icon for a more polished look
+    bar = tk.Frame(card, bg="#dc2626", height=3, bd=0, highlightthickness=0)
+    bar.pack(fill="x", side="top", pady=(0, 10))
+
+    header_row = tk.Frame(card, bg=THEME_CARD, bd=0, highlightthickness=0)
+    header_row.pack(fill="x", pady=(0, 6))
+    tk.Label(header_row, text="⚠", bg=THEME_CARD, fg="#fca5a5", font=("Helvetica", 14, "bold")).pack(side="left", padx=(0, 8))
+    ttk.Label(header_row, text=title, style="Header.TLabel").pack(side="left")
+
+    ttk.Label(card, text=message, style="Subtitle.TLabel", wraplength=340, justify="left").pack(anchor="w")
+
+    top.update_idletasks()
+    x = master.winfo_rootx() + (master.winfo_width() // 2) - (top.winfo_width() // 2)
+    y = master.winfo_rooty() + 80
+    top.geometry(f"+{x}+{y}")
+    top.after(duration, top.destroy)
+
+
 def load_logo(max_px=260):
     logo_path = os.path.join(os.path.dirname(__file__), "image.png")
     if not os.path.exists(logo_path):
@@ -237,7 +268,7 @@ class LoginWindow(ttk.Frame):
         pwd = self.password.get()
         load_logins()
         if check_disabled_logins(uname):
-            messagebox.showerror("Login failed", "This account has been disabled.")
+            show_error_toast(self.master, "Login failed", "This account has been disabled.")
             return
         role = None
         for u in users["admin"]:
@@ -269,7 +300,7 @@ class LoginWindow(ttk.Frame):
             elif role == "logistics coordinator":
                 LogisticsWindow(root, uname)
         else:
-            messagebox.showerror("Login failed", "Invalid username or password.")
+            show_error_toast(self.master, "Login Failed", "Invalid username or password.")
 
 
 class AdminWindow(ttk.Frame):
@@ -313,13 +344,51 @@ class AdminWindow(ttk.Frame):
         ttk.Button(misc_frame, text="Logout", command=self.logout, style="Danger.TButton").pack(fill="x", pady=2)
 
     def list_users_ui(self):
-        lines = []
+        top = tk.Toplevel(self)
+        top.title("All Users")
+        top.configure(bg=THEME_BG)
+        frame = ttk.Frame(top, padding=16, style="Card.TFrame")
+        frame.pack(fill="both", expand=True, padx=16, pady=16)
+
+        header = ttk.Frame(frame, style="Card.TFrame")
+        header.pack(fill="x", pady=(0, 10))
+        ttk.Label(header, text="All Users", style="Header.TLabel").pack(anchor="w")
+        ttk.Label(header, text="Admin, Scout Leader, Logistics Coordinator", style="Subtitle.TLabel").pack(anchor="w")
+        ttk.Separator(frame).pack(fill="x", pady=(0, 10))
+
+        # load disabled usernames
+        disabled_set = set()
+        try:
+            with open('disabled_logins.txt', 'r') as file:
+                disabled_login = file.read().strip(',')
+                if disabled_login:
+                    disabled_set = {x for x in disabled_login.split(',') if x}
+        except FileNotFoundError:
+            pass
+
+        columns = ("Role", "Username", "Password", "Status", "Created")
+        tree = ttk.Treeview(frame, columns=columns, show="headings", height=12)
+        for col in columns:
+            anchor = "center" if col != "Username" else "w"
+            tree.heading(col, text=col)
+            tree.column(col, anchor=anchor, width=140 if col != "Username" else 180, stretch=True)
+
+        vsb = ttk.Scrollbar(frame, orient="vertical", command=tree.yview)
+        tree.configure(yscrollcommand=vsb.set)
+        tree.pack(fill="both", expand=True, pady=(0, 4))
+        vsb.pack(fill="y", side="right")
+
+        def add_row(role, user):
+            status = "Disabled" if user['username'] in disabled_set else "Active"
+            tree.insert("", "end", values=(role, user['username'], user['password'], status, "N/A"))
+
         for admin in users['admin']:
-            lines.append(f"Role: admin, Username: {admin['username']}, Password: {admin['password']}")
+            add_row("Admin", admin)
         for role in ['scout leader', 'logistics coordinator']:
             for user in users[role]:
-                lines.append(f"Role: {role}, Username: {user['username']}, Password: {user['password']}")
-        messagebox.showinfo("Users", "\n".join(lines) if lines else "No users found.")
+                add_row(role.title(), user)
+        if len(tree.get_children()) == 0:
+            tree.insert("", "end", values=("—", "No users found.", "", "", ""))
 
     def add_user_ui(self):
         top = tk.Toplevel(self)
@@ -347,13 +416,13 @@ class AdminWindow(ttk.Frame):
             role = role_var.get()
             username = user_entry.get().strip()
             if not username:
-                messagebox.showerror("Error", "Username cannot be blank.")
+                show_error_toast(self.master, "Error", "Username cannot be blank.")
                 return
             existing = [u['username'] for u in users['admin']]
             existing += [u['username'] for u in users['scout leader']]
             existing += [u['username'] for u in users['logistics coordinator']]
             if username in existing:
-                messagebox.showerror("Error", "Username already exists.")
+                show_error_toast(self.master, "Error", "Username already exists.")
                 return
             pwd = pwd_entry.get()
             target_list = users['admin'] if role == "admin" else users[role]
@@ -406,7 +475,7 @@ class AdminWindow(ttk.Frame):
             role = role_var.get()
             target_user = user_var.get()
             if not target_user:
-                messagebox.showerror("Error", "No users for this role.")
+                show_error_toast(self.master, "Error", "No users for this role.")
                 return
             new_pwd = pwd_entry.get()
             for u in users[role]:
@@ -457,7 +526,7 @@ class AdminWindow(ttk.Frame):
             role = role_var.get()
             target_user = user_var.get()
             if not target_user:
-                messagebox.showerror("Error", "No users for this role.")
+                show_error_toast(self.master, "Error", "No users for this role.")
                 return
             users[role] = [u for u in users[role] if u['username'] != target_user]
             save_logins()
@@ -522,7 +591,7 @@ class AdminWindow(ttk.Frame):
             existing += [u['username'] for u in users['scout leader']]
             existing += [u['username'] for u in users['logistics coordinator']]
             if target_user not in existing:
-                messagebox.showerror("Error", "User no longer exists.")
+                show_error_toast(self.master, "Error", "User no longer exists.")
                 return
             enable_login(target_user)
             messagebox.showinfo("Success", f"Enabled {target_user}.")
@@ -682,7 +751,7 @@ class LogisticsWindow(ttk.Frame):
             def next_step():
                 sel = listbox.curselection()
                 if not sel:
-                    messagebox.showerror("Error", "Please select a camp.")
+                    show_error_toast(self.master, "Error", "Please select a camp.")
                     return
                 camp_name = listbox.get(sel[0])
                 top.destroy()
@@ -707,7 +776,7 @@ class LogisticsWindow(ttk.Frame):
                 try:
                     val = int(stock_entry.get().strip())
                 except ValueError:
-                    messagebox.showerror("Error", "Please enter a whole number.")
+                    show_error_toast(self.master, "Error", "Please enter a whole number.")
                     return
                 res = set_food_stock_data(camp, val)
                 messagebox.showinfo("Result", res.get("status"))
@@ -753,7 +822,7 @@ class LogisticsWindow(ttk.Frame):
             def next_step():
                 sel = listbox.curselection()
                 if not sel:
-                    messagebox.showerror("Error", "Please select a camp.")
+                    show_error_toast(self.master, "Error", "Please select a camp.")
                     return
                 camp_name = listbox.get(sel[0])
                 top.destroy()
@@ -778,7 +847,7 @@ class LogisticsWindow(ttk.Frame):
                 try:
                     val = int(amt_entry.get().strip())
                 except ValueError:
-                    messagebox.showerror("Error", "Please enter a whole number.")
+                    show_error_toast(self.master, "Error", "Please enter a whole number.")
                     return
                 res = top_up_food_data(camp, val)
                 messagebox.showinfo("Result", res.get("status"))
@@ -808,7 +877,7 @@ class LogisticsWindow(ttk.Frame):
             try:
                 val = int(rate_entry.get().strip())
             except ValueError:
-                messagebox.showerror("Error", "Please enter a whole number.")
+                show_error_toast(self.master, "Error", "Please enter a whole number.")
                 return
             res = set_pay_rate_data(camp, val)
             messagebox.showinfo("Result", res.get("status"))
@@ -900,14 +969,14 @@ class LogisticsWindow(ttk.Frame):
             name = name_entry.get().strip()
             location = location_entry.get().strip()
             if not name or not location:
-                messagebox.showerror("Error", "Name and location are required.")
+                show_error_toast(self.master, "Error", "Name and location are required.")
                 return
             try:
                 camp_type = int(camp_type_entry.get().strip())
                 if camp_type not in (1, 2, 3):
                     raise ValueError
             except ValueError:
-                messagebox.showerror("Error", "Camp type must be 1, 2, or 3.")
+                show_error_toast(self.master, "Error", "Camp type must be 1, 2, or 3.")
                 return
             start_date = start_entry.get().strip()
             end_date = end_entry.get().strip()
@@ -915,14 +984,14 @@ class LogisticsWindow(ttk.Frame):
                 try:
                     datetime.strptime(d, "%Y-%m-%d")
                 except Exception:
-                    messagebox.showerror("Error", "Invalid date format.")
+                    show_error_toast(self.master, "Error", "Invalid date format.")
                     return
             try:
                 food_stock = int(food_entry.get().strip())
                 if food_stock < 0:
                     raise ValueError
             except ValueError:
-                messagebox.showerror("Error", "Food stock must be a non-negative integer.")
+                show_error_toast(self.master, "Error", "Food stock must be a non-negative integer.")
                 return
 
             read_from_file()
@@ -995,21 +1064,21 @@ class LogisticsWindow(ttk.Frame):
                 if ct not in (1, 2, 3):
                     raise ValueError
             except ValueError:
-                messagebox.showerror("Error", "Camp type must be 1, 2, or 3.")
+                show_error_toast(self.master, "Error", "Camp type must be 1, 2, or 3.")
                 return
             try:
                 nf = int(food_entry.get().strip())
                 if nf < 0:
                     raise ValueError
             except ValueError:
-                messagebox.showerror("Error", "Invalid food stock.")
+                show_error_toast(self.master, "Error", "Invalid food stock.")
                 return
             try:
                 pr = int(pay_entry.get().strip())
                 if pr < 0:
                     raise ValueError
             except ValueError:
-                messagebox.showerror("Error", "Invalid pay rate.")
+                show_error_toast(self.master, "Error", "Invalid pay rate.")
                 return
             new_start = start_entry.get().strip()
             new_end = end_entry.get().strip()
@@ -1017,7 +1086,7 @@ class LogisticsWindow(ttk.Frame):
                 try:
                     datetime.strptime(d, "%Y-%m-%d")
                 except Exception:
-                    messagebox.showerror("Error", "Invalid date format.")
+                    show_error_toast(self.master, "Error", "Invalid date format.")
                     return
 
             camp_obj.name = name_entry.get().strip() or camp_obj.name
@@ -1219,11 +1288,11 @@ class ScoutWindow(ttk.Frame):
         if status == "ok":
             messagebox.showinfo("Success", f"Assigned: {', '.join(res.get('selected', []))}")
         elif status == "overlap":
-            messagebox.showerror("Error", "Selected camps overlap in dates. Please choose non-conflicting camps.")
+            show_error_toast(self.master, "Error", "Selected camps overlap in dates. Please choose non-conflicting camps.")
         elif status == "invalid_index":
-            messagebox.showerror("Error", "Invalid selection.")
+            show_error_toast(self.master, "Error", "Invalid selection.")
         else:
-            messagebox.showerror("Error", status or "Unknown error")
+            show_error_toast(self.master, "Error", status or "Unknown error")
 
     def bulk_assign_ui(self):
         camps = read_from_file()
@@ -1276,11 +1345,11 @@ class ScoutWindow(ttk.Frame):
         def submit():
             sel = camp_list.curselection()
             if not sel:
-                messagebox.showerror("Error", "Please select a camp.")
+                show_error_toast(self.master, "Error", "Please select a camp.")
                 return
             filepath = path_var.get().strip()
             if not filepath:
-                messagebox.showerror("Error", "Please choose a CSV file.")
+                show_error_toast(self.master, "Error", "Please choose a CSV file.")
                 return
             camp = camps[sel[0]]
             res = bulk_assign_campers_from_csv(camp.name, filepath)
@@ -1290,13 +1359,13 @@ class ScoutWindow(ttk.Frame):
                 messagebox.showinfo("Success", f"Assigned {len(added)} campers to {camp.name}.")
                 top.destroy()
             elif status == "file_not_found":
-                messagebox.showerror("Error", "CSV file not found.")
+                show_error_toast(self.master, "Error", "CSV file not found.")
             elif status == "camp_not_found":
-                messagebox.showerror("Error", "Camp not found.")
+                show_error_toast(self.master, "Error", "Camp not found.")
             elif status == "no_campers":
                 messagebox.showinfo("Result", "No campers in CSV.")
             else:
-                messagebox.showerror("Error", status or "Unknown error")
+                show_error_toast(self.master, "Error", status or "Unknown error")
 
         ttk.Button(frame, text="Import", command=submit, style="Primary.TButton").pack(fill="x", pady=(4, 0))
 
@@ -1360,7 +1429,7 @@ class ScoutWindow(ttk.Frame):
             camp = camp_var.get()
             date = date_entry.get().strip()
             if not date:
-                messagebox.showerror("Error", "Date is required.")
+                show_error_toast(self.master, "Error", "Date is required.")
                 return
             activity_name = activity_entry.get().strip()
             activity_time = time_entry.get().strip()
@@ -1371,7 +1440,7 @@ class ScoutWindow(ttk.Frame):
                 try:
                     food_units = int(food_val)
                 except ValueError:
-                    messagebox.showerror("Error", "Food units must be a whole number.")
+                    show_error_toast(self.master, "Error", "Food units must be a whole number.")
                     return
             res = record_activity_entry_data(camp, date, activity_name, activity_time, notes, food_units)
             status = res.get("status")
@@ -1379,7 +1448,7 @@ class ScoutWindow(ttk.Frame):
                 messagebox.showinfo("Success", f"Entry recorded for {camp} on {date}.")
                 top.destroy()
             else:
-                messagebox.showerror("Error", status or "Unknown error")
+                show_error_toast(self.master, "Error", status or "Unknown error")
 
         ttk.Button(frame, text="Save Entry", command=submit, style="Primary.TButton").pack(fill="x", pady=(4, 0))
 
