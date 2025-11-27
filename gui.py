@@ -31,20 +31,36 @@ from features.scout import (
 )
 from messaging import get_conversations_for_user, get_conversation, send_message
 
+THEME_BG = "#0f172a"
+THEME_CARD = "#1f2937"
+THEME_FG = "#e2e8f0"
+THEME_ACCENT = "#2563eb"
+THEME_ACCENT_ACTIVE = "#1d4ed8"
+THEME_ACCENT_PRESSED = "#1e40af"
 
 class LoginWindow(ttk.Frame):
     def __init__(self, master):
-        super().__init__(master, padding=12)
+        super().__init__(master, padding=12, style="App.TFrame")
         self.master = master
         self.pack(fill="both", expand=True)
-        ttk.Label(self, text="Username").grid(row=0, column=0, sticky="e", padx=4, pady=4)
-        ttk.Label(self, text="Password").grid(row=1, column=0, sticky="e", padx=4, pady=4)
-        self.username = ttk.Entry(self, width=28)
-        self.password = ttk.Entry(self, show="*", width=28)
-        self.username.grid(row=0, column=1, sticky="ew", padx=4, pady=4)
-        self.password.grid(row=1, column=1, sticky="ew", padx=4, pady=4)
-        ttk.Button(self, text="Login", command=self.attempt_login).grid(row=2, column=0, columnspan=2, pady=8, sticky="ew")
-        self.columnconfigure(1, weight=1)
+        # center the login form in a padded, fixed-width container
+        card = ttk.Frame(self, padding=24, width=420, style="Card.TFrame")
+        card.pack(expand=True)
+        card.pack_propagate(False)
+        card.columnconfigure(0, weight=1)
+        card.columnconfigure(1, weight=1)
+
+        ttk.Label(card, text="CampTrack", style="Header.TLabel").grid(row=0, column=0, columnspan=2, pady=(0, 4))
+        ttk.Label(card, text="Welcome! Please log in below.").grid(row=1, column=0, columnspan=2, pady=(0, 14))
+
+        ttk.Label(card, text="Username").grid(row=2, column=0, sticky="e", padx=8, pady=8)
+        ttk.Label(card, text="Password").grid(row=3, column=0, sticky="e", padx=8, pady=8)
+        self.username = ttk.Entry(card, width=32)
+        self.password = ttk.Entry(card, show="*", width=32)
+        self.username.grid(row=2, column=1, sticky="ew", padx=8, pady=8)
+        self.password.grid(row=3, column=1, sticky="ew", padx=8, pady=8)
+
+        ttk.Button(card, text="Login", command=self.attempt_login).grid(row=4, column=0, columnspan=2, pady=14, padx=8, sticky="ew")
 
     def attempt_login(self):
         uname = self.username.get().strip()
@@ -72,6 +88,9 @@ class LoginWindow(ttk.Frame):
             self.master.destroy()
             app = tk.Tk()
             app.title(f"CampTrack - {role}")
+            init_style(app)
+            app.minsize(720, 560)
+            center_window(app, width=760, height=580)
             if role == "admin":
                 AdminWindow(app, uname)
             elif role == "scout leader":
@@ -85,12 +104,15 @@ class LoginWindow(ttk.Frame):
 
 class AdminWindow(ttk.Frame):
     def __init__(self, master, username):
-        super().__init__(master, padding=12)
+        super().__init__(master, padding=16, style="App.TFrame")
         self.username = username
         self.pack(fill="both", expand=True)
-        ttk.Label(self, text="Administrator Menu", style="Header.TLabel").pack(pady=(0, 10))
+        wrapper = ttk.Frame(self, padding=16, style="Card.TFrame", width=720)
+        wrapper.pack(expand=True, pady=8)
 
-        user_frame = ttk.LabelFrame(self, text="User Management", padding=10)
+        ttk.Label(wrapper, text="Administrator Menu", style="Header.TLabel").pack(pady=(0, 10))
+
+        user_frame = ttk.LabelFrame(wrapper, text="User Management", padding=10)
         user_frame.pack(fill="both", expand=True, pady=(0, 8))
         for text, cmd in [
             ("View all users", self.list_users_ui),
@@ -102,7 +124,7 @@ class AdminWindow(ttk.Frame):
         ]:
             ttk.Button(user_frame, text=text, command=cmd).pack(fill="x", pady=2)
 
-        misc_frame = ttk.LabelFrame(self, text="Other", padding=10)
+        misc_frame = ttk.LabelFrame(wrapper, text="Other", padding=10)
         misc_frame.pack(fill="both", expand=True)
         ttk.Button(misc_frame, text="Messaging", command=self.messaging_ui).pack(fill="x", pady=2)
         ttk.Button(misc_frame, text="Logout", command=self.logout).pack(fill="x", pady=2)
@@ -250,18 +272,21 @@ class AdminWindow(ttk.Frame):
     def messaging_ui(self):
         convo_win = tk.Toplevel(self)
         convo_win.title("Messaging")
-        tk.Label(convo_win, text="Conversations").pack()
-        listbox = tk.Listbox(convo_win)
-        listbox.pack(fill="both", expand=True)
+        convo_win.configure(bg=THEME_BG)
+        frame = ttk.Frame(convo_win, padding=12, style="Card.TFrame")
+        frame.pack(fill="both", expand=True)
+        ttk.Label(frame, text="Conversations").pack()
+        listbox = tk.Listbox(frame)
+        listbox.pack(fill="both", expand=True, pady=6)
         partners = get_conversations_for_user(self.username)
         for p in partners:
             listbox.insert("end", p)
-        tk.Label(convo_win, text="Recipient:").pack()
-        recipient_entry = tk.Entry(convo_win)
-        recipient_entry.pack()
-        tk.Label(convo_win, text="Message:").pack()
-        message_entry = tk.Entry(convo_win, width=50)
-        message_entry.pack()
+        ttk.Label(frame, text="Recipient:").pack()
+        recipient_entry = ttk.Entry(frame)
+        recipient_entry.pack(fill="x", pady=2)
+        ttk.Label(frame, text="Message:").pack()
+        message_entry = ttk.Entry(frame, width=50)
+        message_entry.pack(fill="x", pady=2)
 
         def send():
             to = recipient_entry.get().strip()
@@ -269,7 +294,7 @@ class AdminWindow(ttk.Frame):
             if to and msg:
                 send_message(self.username, to, msg)
                 messagebox.showinfo("Sent", f"Message sent to {to}")
-        tk.Button(convo_win, text="Send", command=send).pack(pady=5)
+        ttk.Button(frame, text="Send", command=send).pack(pady=8, fill="x")
 
     def logout(self):
         self.master.destroy()
@@ -278,11 +303,15 @@ class AdminWindow(ttk.Frame):
 
 class LogisticsWindow(ttk.Frame):
     def __init__(self, master, username):
-        super().__init__(master, padding=12)
+        super().__init__(master, padding=16, style="App.TFrame")
         self.username = username
         self.pack(fill="both", expand=True)
-        ttk.Label(self, text="Logisitics Coordiator Menu", style="Header.TLabel").pack(pady=(0, 10))
-        camp_frame = ttk.LabelFrame(self, text="Camps", padding=10)
+        wrapper = ttk.Frame(self, padding=16, style="Card.TFrame", width=720)
+        wrapper.pack(expand=True, pady=8)
+
+        ttk.Label(wrapper, text="Logisitics Coordiator Menu", style="Header.TLabel").pack(pady=(0, 10))
+
+        camp_frame = ttk.LabelFrame(wrapper, text="Camps", padding=10)
         camp_frame.pack(fill="both", expand=True, pady=(0, 8))
         for text, cmd in [
             ("Manage and Create Camps", self.manage_camps_menu),
@@ -291,7 +320,7 @@ class LogisticsWindow(ttk.Frame):
         ]:
             ttk.Button(camp_frame, text=text, command=cmd).pack(fill="x", pady=2)
 
-        viz_frame = ttk.LabelFrame(self, text="Insight & Notifications", padding=10)
+        viz_frame = ttk.LabelFrame(wrapper, text="Insight & Notifications", padding=10)
         viz_frame.pack(fill="both", expand=True, pady=(0, 8))
         for text, cmd in [
             ("View Camp Dashboard", self.dashboard_ui),
@@ -301,12 +330,13 @@ class LogisticsWindow(ttk.Frame):
         ]:
             ttk.Button(viz_frame, text=text, command=cmd).pack(fill="x", pady=2)
 
-        ttk.Button(self, text="Logout", command=self.logout).pack(fill="x", pady=2)
+        ttk.Button(wrapper, text="Logout", command=self.logout).pack(fill="x", pady=2)
 
     def manage_camps_menu(self):
         top = tk.Toplevel(self)
         top.title("Manage and Create Camps")
-        frame = ttk.Frame(top, padding=10)
+        top.configure(bg=THEME_BG)
+        frame = ttk.Frame(top, padding=10, style="Card.TFrame")
         frame.pack(fill="both", expand=True)
         ttk.Button(frame, text="Create Camp", command=self.create_camp_ui).pack(fill="x", pady=2)
         ttk.Button(frame, text="Edit Camp", command=self.edit_camp_ui).pack(fill="x", pady=2)
@@ -315,7 +345,8 @@ class LogisticsWindow(ttk.Frame):
     def food_allocation_menu(self):
         top = tk.Toplevel(self)
         top.title("Manage Food Allocation")
-        frame = ttk.Frame(top, padding=10)
+        top.configure(bg=THEME_BG)
+        frame = ttk.Frame(top, padding=10, style="Card.TFrame")
         frame.pack(fill="both", expand=True)
         ttk.Button(frame, text="Set Daily Food Stock", command=self.set_food_stock_ui).pack(fill="x", pady=2)
         ttk.Button(frame, text="Top-Up Food Stock", command=self.top_up_food_ui).pack(fill="x", pady=2)
@@ -547,12 +578,15 @@ class LogisticsWindow(ttk.Frame):
 
 class ScoutWindow(ttk.Frame):
     def __init__(self, master, username):
-        super().__init__(master, padding=12)
+        super().__init__(master, padding=16, style="App.TFrame")
         self.username = username
         self.pack(fill="both", expand=True)
-        ttk.Label(self, text="Scout Leader Menu", style="Header.TLabel").pack(pady=(0, 10))
+        wrapper = ttk.Frame(self, padding=16, style="Card.TFrame", width=720)
+        wrapper.pack(expand=True, pady=8)
 
-        actions = ttk.LabelFrame(self, text="Camp Actions", padding=10)
+        ttk.Label(wrapper, text="Scout Leader Menu", style="Header.TLabel").pack(pady=(0, 10))
+
+        actions = ttk.LabelFrame(wrapper, text="Camp Actions", padding=10)
         actions.pack(fill="both", expand=True, pady=(0, 8))
         for text, cmd in [
             ("Select camps to supervise", self.select_camps_ui),
@@ -562,7 +596,7 @@ class ScoutWindow(ttk.Frame):
         ]:
             ttk.Button(actions, text=text, command=cmd).pack(fill="x", pady=2)
 
-        stats_frame = ttk.LabelFrame(self, text="Insights & Messaging", padding=10)
+        stats_frame = ttk.LabelFrame(wrapper, text="Insights & Messaging", padding=10)
         stats_frame.pack(fill="both", expand=True)
         for text, cmd in [
             ("View camp statistics and trends", self.stats_ui),
@@ -739,8 +773,12 @@ def select_camp_dialog(title, camps, allow_multiple=False, allow_cancel=False):
     top.title(title)
     center_window(top, width=520, height=380)
     top.minsize(400, 260)
+    top.configure(bg=THEME_BG)
+    wrapper = ttk.Frame(top, padding=12, style="Card.TFrame")
+    wrapper.pack(fill="both", expand=True)
+
     selectmode = "extended" if allow_multiple else "browse"
-    listbox = tk.Listbox(top, selectmode=selectmode, width=60)
+    listbox = tk.Listbox(wrapper, selectmode=selectmode, width=60)
     for camp in camps:
         listbox.insert("end", f"{camp.name} ({camp.location}) {camp.start_date}->{camp.end_date}")
     listbox.pack(fill="both", expand=True, padx=10, pady=10)
@@ -768,6 +806,26 @@ def select_camp_dialog(title, camps, allow_multiple=False, allow_cancel=False):
     return result["indices"]
 
 
+def init_style(root):
+    style = ttk.Style(root)
+    try:
+        style.theme_use("clam")
+    except Exception:
+        pass
+    root.configure(bg=THEME_BG)
+    style.configure("TFrame", background=THEME_BG, padding=2)
+    style.configure("App.TFrame", background=THEME_BG, padding=12)
+    style.configure("Card.TFrame", background=THEME_CARD, padding=12)
+    style.configure("TLabel", padding=2, background=THEME_CARD, foreground=THEME_FG, font=("Helvetica", 11))
+    style.configure("Header.TLabel", font=("Helvetica", 16, "bold"), background=THEME_CARD, foreground=THEME_FG)
+    style.configure("TButton", padding=8, background=THEME_ACCENT, foreground=THEME_FG, font=("Helvetica", 11))
+    style.map("TButton",
+              background=[("active", THEME_ACCENT_ACTIVE), ("pressed", THEME_ACCENT_PRESSED)],
+              foreground=[("disabled", "#9ca3af")])
+    style.configure("TLabelframe", background=THEME_CARD, foreground=THEME_FG, padding=6)
+    style.configure("TLabelframe.Label", background=THEME_CARD, foreground=THEME_FG, font=("Helvetica", 11, "bold"))
+
+
 def center_window(win, width=500, height=400):
     """Center a window on the screen with optional default size."""
     try:
@@ -784,8 +842,9 @@ def center_window(win, width=500, height=400):
 def launch_login():
     root = tk.Tk()
     root.title("CampTrack Login")
-    root.minsize(360, 200)
-    center_window(root, width=420, height=260)
+    root.minsize(480, 360)
+    init_style(root)
+    center_window(root, width=520, height=400)
     LoginWindow(root)
     root.mainloop()
 
