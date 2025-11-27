@@ -63,6 +63,8 @@ class LoginWindow(ttk.Frame):
         ttk.Button(card, text="Login", command=self.attempt_login).grid(row=4, column=0, columnspan=2, pady=14, padx=8, sticky="ew")
 
     def attempt_login(self):
+        state_info = capture_window_state(self.master)
+
         uname = self.username.get().strip()
         pwd = self.password.get()
         load_logins()
@@ -85,19 +87,18 @@ class LoginWindow(ttk.Frame):
                     role = "logistics coordinator"
                     break
         if role:
-            self.master.destroy()
-            app = tk.Tk()
-            app.title(f"CampTrack - {role}")
-            init_style(app)
-            app.minsize(720, 560)
-            center_window(app, width=760, height=580)
+            root = self.master
+            for child in list(root.winfo_children()):
+                child.destroy()
+            root.title(f"CampTrack - {role}")
+            init_style(root)
+            apply_window_state(root, state_info, min_w=760, min_h=600)
             if role == "admin":
-                AdminWindow(app, uname)
+                AdminWindow(root, uname)
             elif role == "scout leader":
-                ScoutWindow(app, uname)
+                ScoutWindow(root, uname)
             elif role == "logistics coordinator":
-                LogisticsWindow(app, uname)
-            app.mainloop()
+                LogisticsWindow(root, uname)
         else:
             messagebox.showerror("Login failed", "Invalid username or password.")
 
@@ -127,7 +128,7 @@ class AdminWindow(ttk.Frame):
         misc_frame = ttk.LabelFrame(wrapper, text="Other", padding=10)
         misc_frame.pack(fill="both", expand=True)
         ttk.Button(misc_frame, text="Messaging", command=self.messaging_ui).pack(fill="x", pady=2)
-        ttk.Button(misc_frame, text="Logout", command=self.logout).pack(fill="x", pady=2)
+        ttk.Button(misc_frame, text="Logout", command=self.logout, style="Danger.TButton").pack(fill="x", pady=2)
 
     def list_users_ui(self):
         lines = []
@@ -297,8 +298,14 @@ class AdminWindow(ttk.Frame):
         ttk.Button(frame, text="Send", command=send).pack(pady=8, fill="x")
 
     def logout(self):
-        self.master.destroy()
-        launch_login()
+        state_info = capture_window_state(self.master)
+        root = self.master
+        for child in list(root.winfo_children()):
+            child.destroy()
+        root.title("CampTrack Login")
+        init_style(root)
+        apply_window_state(root, state_info, min_w=480, min_h=360)
+        LoginWindow(root)
 
 
 class LogisticsWindow(ttk.Frame):
@@ -330,7 +337,7 @@ class LogisticsWindow(ttk.Frame):
         ]:
             ttk.Button(viz_frame, text=text, command=cmd).pack(fill="x", pady=2)
 
-        ttk.Button(wrapper, text="Logout", command=self.logout).pack(fill="x", pady=2)
+        ttk.Button(wrapper, text="Logout", command=self.logout, style="Danger.TButton").pack(fill="x", pady=2)
 
     def manage_camps_menu(self):
         top = tk.Toplevel(self)
@@ -572,8 +579,14 @@ class LogisticsWindow(ttk.Frame):
         return camps[indices[0]].name
 
     def logout(self):
-        self.master.destroy()
-        launch_login()
+        state_info = capture_window_state(self.master)
+        root = self.master
+        for child in list(root.winfo_children()):
+            child.destroy()
+        root.title("CampTrack Login")
+        init_style(root)
+        apply_window_state(root, state_info, min_w=480, min_h=360)
+        LoginWindow(root)
 
 
 class ScoutWindow(ttk.Frame):
@@ -603,7 +616,8 @@ class ScoutWindow(ttk.Frame):
             ("Messaging", self.messaging_ui),
             ("Logout", self.logout),
         ]:
-            ttk.Button(stats_frame, text=text, command=cmd).pack(fill="x", pady=2)
+            style = "Danger.TButton" if "Logout" in text else "TButton"
+            ttk.Button(stats_frame, text=text, command=cmd, style=style).pack(fill="x", pady=2)
 
     def select_camps_ui(self):
         camps = read_from_file()
@@ -755,8 +769,14 @@ class ScoutWindow(ttk.Frame):
         tk.Button(convo_win, text="Send", command=send).pack(pady=5)
 
     def logout(self):
-        self.master.destroy()
-        launch_login()
+        state_info = capture_window_state(self.master)
+        root = self.master
+        for child in list(root.winfo_children()):
+            child.destroy()
+        root.title("CampTrack Login")
+        init_style(root)
+        apply_window_state(root, state_info, min_w=480, min_h=360)
+        LoginWindow(root)
 
 def simple_prompt(prompt):
     return simpledialog.askstring("Input", prompt)
@@ -805,6 +825,35 @@ def select_camp_dialog(title, camps, allow_multiple=False, allow_cancel=False):
     top.wait_window()
     return result["indices"]
 
+def capture_window_state(win):
+    win.update_idletasks()
+    return {
+        "width": win.winfo_width(),
+        "height": win.winfo_height(),
+        "state": win.state(),
+        "geom": win.winfo_geometry(),
+        "screen_w": win.winfo_screenwidth(),
+        "screen_h": win.winfo_screenheight(),
+    }
+
+
+def apply_window_state(win, state_info, min_w, min_h):
+    was_full = (
+        state_info["state"] != "normal"
+        or (state_info["width"] >= state_info["screen_w"] * 0.9 and state_info["height"] >= state_info["screen_h"] * 0.9)
+    )
+    if was_full:
+        win.minsize(state_info["screen_w"], state_info["screen_h"])
+        try:
+            win.state("zoomed")
+        except Exception:
+            win.attributes("-fullscreen", True)
+    else:
+        win.minsize(min_w, min_h)
+        target_w = max(state_info["width"], min_w)
+        target_h = max(state_info["height"], min_h)
+        center_window(win, width=target_w, height=target_h)
+
 
 def init_style(root):
     style = ttk.Style(root)
@@ -822,6 +871,18 @@ def init_style(root):
     style.map("TButton",
               background=[("active", THEME_ACCENT_ACTIVE), ("pressed", THEME_ACCENT_PRESSED)],
               foreground=[("disabled", "#9ca3af")])
+    style.configure(
+        "Danger.TButton",
+        padding=8,
+        background="#dc2626",
+        foreground=THEME_FG,
+        font=("Helvetica", 11, "bold"),
+    )
+    style.map(
+        "Danger.TButton",
+        background=[("active", "#b91c1c"), ("pressed", "#991b1b")],
+        foreground=[("disabled", "#9ca3af")],
+    )
     style.configure("TLabelframe", background=THEME_CARD, foreground=THEME_FG, padding=6)
     style.configure("TLabelframe.Label", background=THEME_CARD, foreground=THEME_FG, font=("Helvetica", 11, "bold"))
 
