@@ -3,6 +3,8 @@ from tkinter import ttk, messagebox, filedialog, simpledialog
 import os
 from datetime import datetime
 from PIL import Image, ImageTk
+from chat_window import open_chat_window, open_group_chat_window
+
 
 from user_logins import users, load_logins, check_disabled_logins, save_logins, disabled_logins, enable_login
 from features.admin import list_users
@@ -813,43 +815,7 @@ class AdminWindow(ttk.Frame):
         ttk.Button(frame, text="Enable", command=submit, style="Primary.TButton").pack(fill="x", pady=(4, 0))
 
     def messaging_ui(self):
-        convo_win = tk.Toplevel(self)
-        convo_win.title("Messaging")
-        convo_win.configure(bg=THEME_BG)
-        frame = ttk.Frame(convo_win, padding=12, style="Card.TFrame")
-        frame.pack(fill="both", expand=True)
-        ttk.Label(frame, text="Conversations").pack()
-        lb_frame = ttk.Frame(frame, style="Card.TFrame")
-        lb_frame.pack(fill="both", expand=True, pady=6)
-        listbox = tk.Listbox(
-            lb_frame,
-            bg="#0b1729",
-            fg=THEME_FG,
-            selectbackground=THEME_ACCENT,
-            highlightthickness=0,
-            relief="flat",
-        )
-        scrollbar = ttk.Scrollbar(lb_frame, orient="vertical", command=listbox.yview)
-        listbox.configure(yscrollcommand=scrollbar.set)
-        listbox.pack(side="left", fill="both", expand=True, padx=(4, 0), pady=4)
-        scrollbar.pack(side="right", fill="y", padx=(0, 4), pady=4)
-        partners = get_conversations_for_user(self.username)
-        for p in partners:
-            listbox.insert("end", p)
-        ttk.Label(frame, text="Recipient:").pack()
-        recipient_entry = ttk.Entry(frame, style="App.TEntry")
-        recipient_entry.pack(fill="x", pady=2)
-        ttk.Label(frame, text="Message:").pack()
-        message_entry = ttk.Entry(frame, width=50, style="App.TEntry")
-        message_entry.pack(fill="x", pady=2)
-
-        def send():
-            to = recipient_entry.get().strip()
-            msg = message_entry.get().strip()
-            if to and msg:
-                send_message(self.username, to, msg)
-                messagebox.showinfo("Sent", f"Message sent to {to}")
-        ttk.Button(frame, text="Send", command=send).pack(pady=8, fill="x")
+        open_chat_window(self.master, self.username)
 
     def logout(self):
         state_info = capture_window_state(self.master)
@@ -1347,44 +1313,9 @@ class LogisticsWindow(ttk.Frame):
             top.destroy()
 
         ttk.Button(frame, text="Delete", command=delete, style="Danger.TButton").pack(fill="x", pady=(8, 0))
-    def messaging_ui(self):
-        convo_win = tk.Toplevel(self)
-        convo_win.title("Messaging")
-        convo_win.configure(bg=THEME_BG)
-        frame = ttk.Frame(convo_win, padding=12, style="Card.TFrame")
-        frame.pack(fill="both", expand=True)
-        ttk.Label(frame, text="Conversations").pack()
-        lb_frame = ttk.Frame(frame, style="Card.TFrame")
-        lb_frame.pack(fill="both", expand=True, pady=6)
-        listbox = tk.Listbox(
-            lb_frame,
-            bg="#0b1729",
-            fg=THEME_FG,
-            selectbackground=THEME_ACCENT,
-            highlightthickness=0,
-            relief="flat",
-        )
-        scrollbar = ttk.Scrollbar(lb_frame, orient="vertical", command=listbox.yview)
-        listbox.configure(yscrollcommand=scrollbar.set)
-        listbox.pack(side="left", fill="both", expand=True, padx=(4, 0), pady=4)
-        scrollbar.pack(side="right", fill="y", padx=(0, 4), pady=4)
-        partners = get_conversations_for_user(self.username)
-        for p in partners:
-            listbox.insert("end", p)
-        ttk.Label(frame, text="Recipient:").pack()
-        recipient_entry = ttk.Entry(frame, style="App.TEntry")
-        recipient_entry.pack(fill="x", pady=2)
-        ttk.Label(frame, text="Message:").pack()
-        message_entry = ttk.Entry(frame, width=50, style="App.TEntry")
-        message_entry.pack(fill="x", pady=2)
 
-        def send():
-            to = recipient_entry.get().strip()
-            msg = message_entry.get().strip()
-            if to and msg:
-                send_message(self.username, to, msg)
-                messagebox.showinfo("Sent", f"Message sent to {to}")
-        ttk.Button(frame, text="Send", command=send).pack(pady=8, fill="x")
+    def messaging_ui(self):
+        open_chat_window(self.master, self.username)
 
     def choose_camp_name(self, title="Select a camp", subtitle=None):
         camps = read_from_file()
@@ -1482,11 +1413,16 @@ class ScoutWindow(ttk.Frame):
         stats_frame.pack(fill="both", expand=True, pady=(0, 14))
         for text, cmd in [
             ("View Stats", self.stats_ui),
-            ("Messaging", self.messaging_ui),
+            ("Private Messages", self.messaging_ui),
+            ("Camp Group Chats", self.group_chat_ui),
             ("Logout", self.logout),
         ]:
             style = "Danger.TButton" if "Logout" in text else "TButton"
             ttk.Button(stats_frame, text=text, command=cmd, style=style).pack(fill="x", pady=6)
+
+    def group_chat_ui(self):
+        from chat_window import open_group_chat_window
+        open_group_chat_window(self, self.username)
 
     def select_camps_ui(self):
         camps = read_from_file()
@@ -1742,43 +1678,7 @@ class ScoutWindow(ttk.Frame):
         text.insert("end", "\n".join(lines))
 
     def messaging_ui(self):
-        convo_win = tk.Toplevel(self)
-        convo_win.title("Messaging")
-        convo_win.configure(bg=THEME_BG)
-        frame = ttk.Frame(convo_win, padding=12, style="Card.TFrame")
-        frame.pack(fill="both", expand=True)
-        ttk.Label(frame, text="Conversations", style="Header.TLabel").pack()
-        lb_frame = ttk.Frame(frame, style="Card.TFrame")
-        lb_frame.pack(fill="both", expand=True, pady=6)
-        listbox = tk.Listbox(
-            lb_frame,
-            bg="#0b1729",
-            fg=THEME_FG,
-            selectbackground=THEME_ACCENT,
-            highlightthickness=0,
-            relief="flat",
-        )
-        scrollbar = ttk.Scrollbar(lb_frame, orient="vertical", command=listbox.yview)
-        listbox.configure(yscrollcommand=scrollbar.set)
-        listbox.pack(side="left", fill="both", expand=True, padx=(4, 0), pady=4)
-        scrollbar.pack(side="right", fill="y", padx=(0, 4), pady=4)
-        partners = get_conversations_for_user(self.username)
-        for p in partners:
-            listbox.insert("end", p)
-        ttk.Label(frame, text="Recipient:", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
-        recipient_entry = ttk.Entry(frame, style="App.TEntry")
-        recipient_entry.pack(fill="x", pady=2)
-        ttk.Label(frame, text="Message:", style="FieldLabel.TLabel").pack(anchor="w", pady=(6, 2))
-        message_entry = ttk.Entry(frame, width=50, style="App.TEntry")
-        message_entry.pack(fill="x", pady=2)
-
-        def send():
-            to = recipient_entry.get().strip()
-            msg = message_entry.get().strip()
-            if to and msg:
-                send_message(self.username, to, msg)
-                messagebox.showinfo("Sent", f"Message sent to {to}")
-        ttk.Button(frame, text="Send", command=send, style="Primary.TButton").pack(pady=8, fill="x")
+        open_chat_window(self.master, self.username)
 
     def logout(self):
         state_info = capture_window_state(self.master)
