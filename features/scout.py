@@ -288,26 +288,36 @@ def record_daily_activity():
             activity_name = input("Activity name (optional, press enter to skip): ").strip()
             activity_time = input("Time (optional, e.g. 14:00): ").strip()
             notes = input("Enter notes/outcomes/incidents for this entry: ").strip()
+            if notes == "":
+                print ("You cannot add an empty entry.")
+                add_new_entry = get_yes_no("Would you like continue adding this entry? (y/n): ")
+                if add_new_entry == "y":
+                    continue
+                else:
+                    break
 
-            # optional food used for this activity
-            food_used = input("Food units used for this activity (optional number): ").strip()
-            food_units = None
-            if food_used.isdigit():
-                food_units = int(food_used)
-
-            record_daily_activity_data(camp, new_date, activity_name, activity_time, notes, food_units)
-
-            view_choice = input("Entry added. View today's entries? (y/n): ").strip().lower()
-            if view_choice == "y":
-                print(camp.activities.get(new_date, []))
             else:
-                continue
+                # optional food used for this activity
+                food_used = input("Food units used for this activity (optional number): ").strip()
+                food_units = None
+                if food_used.isdigit():
+                    food_units = int(food_used)
 
-            add_new_entry = get_yes_no("Would you like to add another entry? (y/n): ")
-            if add_new_entry == "y":
-                continue
-            else:
-                break
+                record_daily_activity_data(camp, new_date, activity_name, activity_time, notes, food_units)
+
+                view_choice = input("Entry added. View today's entries? (y/n): ").strip().lower()
+                if view_choice == "y":
+                    print(camp.activities.get(new_date, []))
+                else:
+                    continue
+
+                add_new_entry = get_yes_no("Would you like to add another entry? (y/n): ")
+                if add_new_entry == "y":
+                    continue
+                else:
+                    break
+
+
 
 
 def get_yes_no(prompt):
