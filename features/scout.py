@@ -1,6 +1,7 @@
 import os
 import json
 import csv
+import re
 from datetime import datetime
 
 from camp_class import Camp, save_to_file, read_from_file
@@ -301,6 +302,12 @@ def record_daily_activity():
                 print(camp.activities.get(new_date, []))
             else:
                 continue
+
+            add_new_entry = input("Would you like to add another entry? (y/n): ").strip().lower()
+            if add_new_entry == "y" or "" or "yes" or "ye":
+                continue
+            elif re.fullmatch(r"n[a-z]*", add_new_entry):
+                break
 
 def add_activity_entry(camp, date, activity_name, activity_time, notes, food_units=None):
     """Pure helper to add an activity entry to a camp."""
