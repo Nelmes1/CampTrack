@@ -274,28 +274,33 @@ def record_daily_activity():
     print(f"\nAdding activities/notes for: {camp.name}")
 
     while True:
+        date_today = datetime.today().date()
         new_date = input("Enter the date (YYYY-MM-DD) or type n to exit: ").strip()
         if new_date.lower() == "n":
             break
 
-        activity_name = input("Activity name (optional, press enter to skip): ").strip()
-        activity_time = input("Time (optional, e.g. 14:00): ").strip()
-        notes = input("Enter notes/outcomes/incidents for this entry: ").strip()
+        new_date_as_datetime = datetime.strptime(new_date, "%Y-%m-%d").date()
+        if new_date_as_datetime > date_today:
+            print("Invalid date. You entered a date in the future.")
 
-        # optional food used for this activity
-        food_used = input("Food units used for this activity (optional number): ").strip()
-        food_units = None
-        if food_used.isdigit():
-            food_units = int(food_used)
-
-        record_daily_activity_data(camp, new_date, activity_name, activity_time, notes, food_units)
-
-        view_choice = input("Entry added. View today's entries? (y/n): ").strip().lower()
-        if view_choice == "y":
-            print(camp.activities.get(new_date, []))
         else:
-            continue
+            activity_name = input("Activity name (optional, press enter to skip): ").strip()
+            activity_time = input("Time (optional, e.g. 14:00): ").strip()
+            notes = input("Enter notes/outcomes/incidents for this entry: ").strip()
 
+            # optional food used for this activity
+            food_used = input("Food units used for this activity (optional number): ").strip()
+            food_units = None
+            if food_used.isdigit():
+                food_units = int(food_used)
+
+            record_daily_activity_data(camp, new_date, activity_name, activity_time, notes, food_units)
+
+            view_choice = input("Entry added. View today's entries? (y/n): ").strip().lower()
+            if view_choice == "y":
+                print(camp.activities.get(new_date, []))
+            else:
+                continue
 
 def add_activity_entry(camp, date, activity_name, activity_time, notes, food_units=None):
     """Pure helper to add an activity entry to a camp."""
