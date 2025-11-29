@@ -303,11 +303,26 @@ def record_daily_activity():
             else:
                 continue
 
-            add_new_entry = input("Would you like to add another entry? (y/n): ").strip().lower()
-            if add_new_entry == "y" or "" or "yes" or "ye":
+            add_new_entry = get_yes_no("Would you like to add another entry? (y/n): ")
+            if add_new_entry == "y":
                 continue
-            elif re.fullmatch(r"n[a-z]*", add_new_entry):
+            else:
                 break
+
+
+def get_yes_no(prompt):
+    """Pure helper to ask user to enter yes or no.
+        Asks the user for a yes/no to a question until they enter a valid response.
+        "y" for yes (including y*, yes*, or empty enter)
+            "n" for no (including n* responses)"""
+    while True:
+        response = input(prompt).strip().lower()
+        if re.fullmatch(r"y[a-z]*", response) or response == "":
+            return "y"
+        elif re.fullmatch(r"n[a-z]*", response):
+            return "n"
+        else:
+            print("Invalid entry. Please type in y or n")
 
 def add_activity_entry(camp, date, activity_name, activity_time, notes, food_units=None):
     """Pure helper to add an activity entry to a camp."""
