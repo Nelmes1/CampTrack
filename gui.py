@@ -1414,6 +1414,7 @@ class ScoutWindow(ttk.Frame):
         stats_frame.pack(fill="both", expand=True, pady=(0, 14))
         for text, cmd in [
             ("View Stats", self.stats_ui),
+            ("View Camp Activities", self.view_activities_ui),
             ("Messaging", self.messaging_ui),
             ("Logout", self.logout),
         ]:
