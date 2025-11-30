@@ -1842,6 +1842,59 @@ class ScoutWindow(ttk.Frame):
         if first:
             tree.selection_set(first[0])
             show_details()
+        
+        def delete_selected():
+            sel = tree.selection()
+            if not sel:
+                show_error_toast(self.master, "Error", "Please select an activity to delete.")
+                return
+
+            item_id = sel[0]
+            info = item_details.get(item_id)
+            if not info:
+                return
+
+            confirm = messagebox.askyesno(
+                "Delete Activity",
+                "Are you sure you want to delete this activity entry?"
+            )
+            if not confirm:
+                return
+
+            date = info.get("date")
+            entry = info.get("entry")
+            food_used = info.get("food_used", None)
+
+            if date in camp.activities:
+                entries = camp.activities[date]
+                try:
+                    entries.remove(entry)
+                except ValueError:
+                    pass
+                if not entries:
+                    del camp.activities[date]
+
+            if food_used:
+                if date in camp.daily_food_usage:
+                    camp.daily_food_usage[date] -= food_used
+                    if camp.daily_food_usage[date] <= 0:
+                        del camp.daily_food_usage[date]
+            save_to_file()
+
+            tree.delete(item_id)
+            del item_details[item_id]
+            details_text.delete("1.0", "end")
+
+            remaining = tree.get_children()
+            if remaining:
+                tree.selection_set(remaining[0])
+                show_details()
+
+        ttk.Button(frame, text="Delete Selected Activity", command=delete_selected, style="Danger.TButton",).pack(fill="x", pady=(4, 4))
+        first = tree.get_children()
+        if first:
+            tree.selection_set(first[0])
+            show_details()
 
 
 

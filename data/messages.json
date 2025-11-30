@@ -115,6 +115,13 @@
             "text": "hi",
             "timestamp": "2025-11-29 11:34:58",
             "read": true
+        },
+        {
+            "from": "leader1",
+            "to": "leader2",
+            "text": "hello",
+            "timestamp": "2025-11-30 12:29:12",
+            "read": false
         }
     ]
 }

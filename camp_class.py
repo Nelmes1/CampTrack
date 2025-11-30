@@ -30,6 +30,7 @@ class Camp:
         self.daily_records = {}
         self.pay_rate = 0
         self.group_chat = []  # Add group chat to each camp
+        self.incidents = []
 
         Camp.all_camps.append(self)
 
