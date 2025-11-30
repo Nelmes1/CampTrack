@@ -1,9 +1,9 @@
 import os
 import json
 import csv
-from datetime import datetime
+from datetime import datetime, timedelta
 
-from camp_class import Camp, save_to_file, read_from_file
+from camp_class import Camp, save_to_file, read_from_file, generate_camper_id
 from utils import get_int, data_path
 
 
@@ -61,7 +61,10 @@ def load_campers_csv(filepath):
                 name = row["Name"].strip()
                 age = row["Age"].strip()
                 activities = row["Activities"].split(';')
-                campers[name] = {
+
+                camper_id = generate_camper_id()
+                campers[camper_id] = {
+                    "name" : name,
                     "age": age,
                     "activities": [a.strip() for a in activities]
                 }
@@ -74,16 +77,19 @@ def save_campers(camp_name, campers):
     camps = read_from_file()
     for camp in camps:
         if camp.name == camp_name:
-            for name in campers.keys():
+            if camp.campers_info is None:
+                camp.campers_info = {}
+            for camper_id, info in campers.items():
                 value = False
                 for other_camp in camps:
-                    if other_camp.name != camp_name and name in other_camp.campers:
+                    if other_camp.name != camp_name and camper_id in other_camp.campers:
                         # camper already assigned elsewhere
                         value = True
                         break
                 if value is False:
-                    if name not in camp.campers:
-                        camp.campers.append(name)
+                    if camper_id not in camp.campers:
+                        camp.campers.append(camper_id)
+                    camp.campers_info[camper_id] = info
             break
     save_to_file()
     return {"status": "ok", "camp": camp_name, "added": list(campers.keys())}
@@ -194,6 +200,8 @@ def assign_camps_to_leader_ui(leader_username):
         for name in res["selected"]:
             print(name)
         print("\nYour camp selections have been saved")
+        
+
 
 
 def save_food_requirement(camp_name, food_per_camper):
@@ -248,19 +256,19 @@ def assign_food_amount_pure(camp_name, food_per_camper):
     return assign_food_amount_data(camp, food_per_camper)
 
 
-def record_daily_activity_data(camp, date, activity_name, activity_time, notes, food_units=None):
+def record_daily_activity_data(camp, date, activity_name, activity_time, notes, food_units=None, campers=None):
     """Pure helper to add an activity entry to a camp; returns status and entry."""
     if camp is None:
         return {"status": "no_camp"}
-    entry = add_activity_entry(camp, date, activity_name, activity_time, notes, food_units)
+    entry = add_activity_entry(camp, date, activity_name, activity_time, notes, food_units, campers)
     return {"status": "ok", "entry": entry}
 
 
-def record_activity_entry_data(camp_name, date, activity_name, activity_time, notes, food_units=None):
+def record_activity_entry_data(camp_name, date, activity_name, activity_time, notes, food_units=None, campers=None):
     camp = find_camp_by_name(camp_name)
     if camp is None:
         return {"status": "camp_not_found"}
-    return record_daily_activity_data(camp, date, activity_name, activity_time, notes, food_units)
+    return record_daily_activity_data(camp, date, activity_name, activity_time, notes, food_units, campers)
 
 
 def record_daily_activity():
@@ -287,8 +295,29 @@ def record_daily_activity():
         food_units = None
         if food_used.isdigit():
             food_units = int(food_used)
+        
+        if camp.campers:
+            print("\nCampers in this camp:")
+            for idx, camper_name in enumerate(camp.campers, start=1):
+                print(f" [{idx}]{camper_name}")
+            sel = input(
+                "Enter number of campers who took part (comma-seperated or blank for none): "
+            ).strip()
+            campers_for_activity = []
+            if sel:
+                try:
+                    indices = [int(x) for x in sel.split(",")]
+                    for i in indices:
+                        if 1<= 1 <= len(camp.campers):
+                            campers_for_activity.append(camp.campers[i-1])
+                except ValueError:
+                    print("Invalid camper selection.")
+                    campers_for_activity = []
+        else:
+            campers_for_activity= []
+        
+        record_daily_activity_data(camp, new_date, activity_name, activity_time, notes, food_units, campers_for_activity)
 
-        record_daily_activity_data(camp, new_date, activity_name, activity_time, notes, food_units)
 
         view_choice = input("Entry added. View today's entries? (y/n): ").strip().lower()
         if view_choice == "y":
@@ -297,7 +326,7 @@ def record_daily_activity():
             continue
 
 
-def add_activity_entry(camp, date, activity_name, activity_time, notes, food_units=None):
+def add_activity_entry(camp, date, activity_name, activity_time, notes, food_units=None, campers=None):
     """Pure helper to add an activity entry to a camp."""
     entry = {
         "activity": activity_name or "unspecified",
@@ -306,6 +335,9 @@ def add_activity_entry(camp, date, activity_name, activity_time, notes, food_uni
     }
     if food_units is not None:
         entry["food_used"] = food_units
+
+    if campers:
+        entry["campers"] = campers
 
     if date not in camp.activities:
         camp.activities[date] = []
@@ -358,6 +390,28 @@ def view_activity_stats():
     if stats["total_food_used"] is not None:
         print(f"\nTotal food used across recorded activities: {stats['total_food_used']} units")
 
+
+def activity_participation_data(camp):
+    if not camp.activities:
+        return {"status": "no_activities", "entries": []}
+    summary = []
+    for date, entries in sorted(camp.activities.items()):
+        for e in entries:
+            act_name = e.get("activity","unspecified")
+            campers = e.get("campers", [])
+            try:
+                num = len(campers)
+                campers_list = list(campers)
+            except:
+                num=0
+                campers_list = []
+            summary.append({
+                "date" : date,
+                "activity" : act_name,
+                "num_campers" : num,
+                "campers" : campers
+            })
+        return {"status": "ok", "entries": summary}
 
 def info_from_json():
     with open(data_path('camp_data.json'), 'r') as file:

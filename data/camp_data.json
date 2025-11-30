@@ -20,6 +20,7 @@
             "Bella",
             "Edward"
         ],
+        "campers_info": {},
         "activities": {
             "2025-06-10": [
                 {
@@ -33,6 +34,18 @@
                     "time": "19:00",
                     "notes": "Songs and stories",
                     "food_used": 1
+                },
+                {
+                    "activity": "Hiking",
+                    "time": "13:00",
+                    "notes": "",
+                    "food_used": 12,
+                    "campers": [
+                        "Alice",
+                        "Ben",
+                        "Cara",
+                        "Dylan"
+                    ]
                 }
             ],
             "2025-06-11": [
@@ -50,12 +63,13 @@
             ]
         },
         "daily_food_usage": {
-            "2025-06-10": 3,
+            "2025-06-10": 15,
             "2025-06-11": 1
         },
         "daily_records": {
             "2025-06-10": [
-                "Good weather, completed hike."
+                "Good weather, completed hike.",
+                ""
             ],
             "2025-06-11": [
                 "Learned map skills and first aid."
@@ -89,13 +103,15 @@
         "food_stock": 15,
         "scout_leaders": [
             "leader2",
-            "leader3"
+            "leader3",
+            "leader1"
         ],
         "campers": [
             "Ella",
             "Finn",
             "Grace"
         ],
+        "campers_info": {},
         "activities": {
             "2025-07-05": [
                 {
@@ -151,6 +167,7 @@
             "Kira",
             "Liam"
         ],
+        "campers_info": {},
         "activities": {
             "2025-08-15": [
                 {

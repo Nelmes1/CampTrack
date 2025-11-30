@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog, simpledialog
 import os
-from datetime import datetime
+from datetime import datetime,timedelta
 from PIL import Image, ImageTk
 
 from user_logins import users, load_logins, check_disabled_logins, save_logins, disabled_logins, enable_login
@@ -24,6 +24,7 @@ from features.scout import (
     bulk_assign_campers_from_csv,
     assign_food_amount_pure,
     record_activity_entry_data,
+    activity_participation_data,
     engagement_scores_data,
     money_earned_per_camp_data,
     total_money_earned_value,
@@ -1482,6 +1483,7 @@ class ScoutWindow(ttk.Frame):
         stats_frame.pack(fill="both", expand=True, pady=(0, 14))
         for text, cmd in [
             ("View Stats", self.stats_ui),
+            ("View Camp Activities", self.view_activities_ui),
             ("Messaging", self.messaging_ui),
             ("Logout", self.logout),
         ]:
@@ -1646,8 +1648,9 @@ class ScoutWindow(ttk.Frame):
             return
         supervised = [c for c in camps if self.username in c.scout_leaders]
         if not supervised:
-            messagebox.showinfo("Bulk Assign", "You are not supervisiing any camps yet.")
+            messagebox.showinfo("Activity", "You are not supervising any camps yet.")
             return
+
         top = tk.Toplevel(self)
         top.title("Record Activity")
         top.configure(bg=THEME_BG)
@@ -1660,6 +1663,44 @@ class ScoutWindow(ttk.Frame):
         camp_var = tk.StringVar(value=supervised[0].name)
         ttk.OptionMenu(frame, camp_var, supervised[0].name, *[c.name for c in supervised]).pack(fill="x", pady=(0, 8))
 
+        def get_selected_camp():
+            name = camp_var.get()
+            for c in supervised:
+                if c.name == name:
+                    return c
+            return supervised[0]
+
+        ttk.Label(frame, text="Date", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
+        date_var = tk.StringVar()
+        date_menu = ttk.OptionMenu(frame, date_var, "")
+        date_menu.pack(fill="x", pady=(0, 8))
+
+        def refresh_dates(*args):
+            camp_obj = get_selected_camp()
+            try:
+                start = datetime.strptime(camp_obj.start_date, "%Y-%m-%d").date()
+                end = datetime.strptime(camp_obj.end_date, "%Y-%m-%d").date()
+            except ValueError:
+                dates = []
+            else:
+                dates = []
+                d = start
+                while d <= end:
+                    dates.append(d.isoformat())
+                    d += timedelta(days=1)
+
+            menu = date_menu["menu"]
+            menu.delete(0, "end")
+            if dates:
+                for d_str in dates:
+                    menu.add_command(label=d_str, command=lambda v=d_str: date_var.set(v))
+                date_var.set(dates[0])
+            else:
+                date_var.set("")
+
+        camp_var.trace_add("write", refresh_dates)
+        refresh_dates()
+
         def add_entry(label, initial=""):
             ttk.Label(frame, text=label, style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
             entry = ttk.Entry(frame, style="App.TEntry")
@@ -1668,7 +1709,6 @@ class ScoutWindow(ttk.Frame):
             entry.pack(fill="x", pady=(0, 6))
             return entry
 
-        date_entry = add_entry("Date (YYYY-MM-DD)")
         activity_entry = add_entry("Activity name (optional)")
         time_entry = add_entry("Time (optional)")
 
@@ -1680,9 +1720,31 @@ class ScoutWindow(ttk.Frame):
         food_entry = ttk.Entry(frame, style="App.TEntry")
         food_entry.pack(fill="x", pady=(0, 10))
 
+        ttk.Label(frame, text="Campers in this activity (optional)", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
+        campers_listbox = tk.Listbox(
+            frame,
+            selectmode="extended",
+            height=6,
+            bg="#0b1729",
+            fg=THEME_FG,
+            selectbackground=THEME_ACCENT,
+            highlightthickness=0,
+            relief="flat",
+        )
+        campers_listbox.pack(fill="both", expand=True, pady=(0, 8))
+
+        def refresh_campers_list(*args):
+            campers_listbox.delete(0, "end")
+            camp_obj = get_selected_camp()
+            # Here camp_obj.campers is your list of camper names for that camp
+            for name in camp_obj.campers:
+                campers_listbox.insert("end", name)
+        camp_var.trace_add("write", refresh_campers_list)
+        refresh_campers_list()
+        
         def submit():
-            camp = camp_var.get()
-            date = date_entry.get().strip()
+            camp_name = camp_var.get()
+            date = date_var.get().strip()
             if not date:
                 show_error_toast(self.master, "Error", "Date is required.")
                 return
@@ -1697,15 +1759,156 @@ class ScoutWindow(ttk.Frame):
                 except ValueError:
                     show_error_toast(self.master, "Error", "Food units must be a whole number.")
                     return
-            res = record_activity_entry_data(camp, date, activity_name, activity_time, notes, food_units)
+
+            sel = campers_listbox.curselection()
+            selected_campers = [campers_listbox.get(i) for i in sel]
+
+            res = record_activity_entry_data(
+                camp_name,
+                date,
+                activity_name,
+                activity_time,
+                notes,
+                food_units,
+                selected_campers,
+            )
             status = res.get("status")
             if status == "ok":
-                messagebox.showinfo("Success", f"Entry recorded for {camp} on {date}.")
+                messagebox.showinfo("Success", f"Entry recorded for {camp_name} on {date}.")
                 top.destroy()
             else:
                 show_error_toast(self.master, "Error", status or "Unknown error")
 
         ttk.Button(frame, text="Save Entry", command=submit, style="Primary.TButton").pack(fill="x", pady=(4, 0))
+
+    def view_activities_ui(self):
+        camps = read_from_file()
+        if not camps:
+            messagebox.showinfo("Activities", "No camps exist.")
+            return
+        
+        supervised = [c for c in camps if self.username in c.scout_leaders]
+        if not supervised:
+            messagebox.showinfo("Activities", "You are not supervising any camps yet.")
+            return
+        
+        indices = select_camp_dialog(
+            "Select camp to view activities",
+            supervised,
+            allow_multiple = False,
+            allow_cancel= True,
+        )
+        if not indices:
+            return
+        camp = supervised[indices[0]]
+
+        data = activity_participation_data(camp)
+        if data["status"] != "ok":
+            messagebox.showinfo("Activities",f"No activities recorded for {camp.name}")
+            return
+        
+        top = tk.Toplevel(self)
+        top.title(f"Activities for {camp.name}")
+        top.configure(bg=THEME_BG)
+        frame = ttk.Frame(top, style="Card.TFrame")
+        frame.pack(fill="both", expand=True)
+
+        ttk.Label(frame, text=f"Activities for {camp.name}", style="Header.TLabel").pack(anchor="w", pady=(0, 0))
+        table_frame = ttk.Frame(frame, style="Card.TFrame")
+        table_frame.pack(fill="both", expand=True)
+
+        columns = ("date", "time", "activity", "num_campers", "campers")
+        tree = ttk.Treeview(table_frame, columns=columns, show="headings", height=10,)
+        tree.pack(side="left", fill="both", expand=True)
+
+        scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=tree.yview)
+        tree.configure(yscrollcommand=scrollbar.set)
+        scrollbar.pack(side="right", fill="y")
+
+        tree.heading("date", text="Date")
+        tree.heading("time", text="Time")
+        tree.heading("activity", text="Activity")
+        tree.heading("num_campers", text="# Campers")
+        tree.heading("campers", text="Campers")
+
+        tree.column("date", width=100, anchor="w")
+        tree.column("time", width=70, anchor="w")
+        tree.column("activity", width=140, anchor="w")
+        tree.column("num_campers", width=80, anchor="center")
+        tree.column("campers", width=220, anchor="w")
+
+        item_details = {}
+
+        for date in sorted(camp.activities.keys()):
+            entries = camp.activities.get(date, [])
+            for e in entries:
+                act_name = e.get("activity", "unspecified")
+                time_val = e.get("time", "") or ""
+                notes = e.get("notes", "") or ""
+                food_used = e.get("food_used", "")
+                campers = e.get("campers", [])
+                if type(campers) == list:
+                    camper_list = campers
+                else:
+                    camper_list = []
+                num_campers = len(camper_list)
+                campers_str = ", ".join(camper_list)
+
+                
+                item_id = tree.insert(
+                    "",
+                    "end",
+                    values=(date, time_val, act_name, num_campers, campers_str),
+                )
+
+                item_details[item_id] = {
+                    "date": date,
+                    "time": time_val,
+                    "activity": act_name,
+                    "notes": notes,
+                    "campers": camper_list,
+                    "food_used": food_used,
+                }
+        details_frame = ttk.LabelFrame(frame, text="Details", padding=8, style="Card.TFrame")
+        details_frame.pack(fill="both", expand=True, pady=(4, 0))
+
+        details_text = tk.Text(details_frame, height=8, bg="#0b1729", fg=THEME_FG, wrap="word", highlightthickness=0, relief="flat",)
+        details_text.pack(fill="both", expand=True)
+
+        def show_details(event=None):
+            sel = tree.selection()
+            if not sel:
+                return
+            item_id = sel[0]
+            info = item_details.get(item_id, {})
+            details_text.delete("1.0", "end")
+
+            lines = []
+            lines.append(f"Date: {info.get('date', '')}")
+            lines.append(f"Time: {info.get('time', '')}")
+            lines.append(f"Activity: {info.get('activity', '')}")
+
+            campers_full = info.get("campers", [])
+            campers_str = ", ".join(campers_full) if campers_full else "none recorded"
+            lines.append(f"Campers: {campers_str}")
+
+            food_used = info.get("food_used", None)
+            if food_used is not None:
+                lines.append(f"Food used: {food_used} unit(s)")
+
+            lines.append("")
+            lines.append("Notes / log:")
+            lines.append(info.get("notes", ""))
+
+            details_text.insert("end", "\n".join(lines))
+
+        tree.bind("<<TreeviewSelect>>", show_details)
+        first = tree.get_children()
+        if first:
+            tree.selection_set(first[0])
+            show_details()
+
+
 
     def stats_ui(self):
         camps = read_from_file()
