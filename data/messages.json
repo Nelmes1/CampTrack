@@ -23,14 +23,98 @@
             "to": "admin",
             "text": "hello",
             "timestamp": "2025-11-27 16:29:51",
-            "read": false
+            "read": true
         },
         {
             "from": "admin",
             "to": "leader1",
             "text": "hey",
             "timestamp": "2025-11-27 21:01:31",
+            "read": true
+        },
+        {
+            "from": "logistics",
+            "to": "admin",
+            "text": "hi",
+            "timestamp": "2025-11-29 10:26:23",
+            "read": true
+        },
+        {
+            "from": "logistics",
+            "to": "leader2",
+            "text": "hello",
+            "timestamp": "2025-11-29 10:27:37",
             "read": false
+        },
+        {
+            "from": "admin",
+            "to": "logistics",
+            "text": "hi",
+            "timestamp": "2025-11-29 10:28:57",
+            "read": false
+        },
+        {
+            "from": "coordinator",
+            "to": "admin",
+            "text": "hello",
+            "timestamp": "2025-11-29 10:30:32",
+            "read": false
+        },
+        {
+            "from": "leader1",
+            "to": "admin",
+            "text": "hellllo",
+            "timestamp": "2025-11-29 10:31:51",
+            "read": false
+        },
+        {
+            "from": "coordinator",
+            "to": "admin",
+            "text": "hello",
+            "timestamp": "2025-11-29 11:33:41",
+            "read": false
+        },
+        {
+            "from": "coordinator",
+            "to": "leader1",
+            "text": "hi",
+            "timestamp": "2025-11-29 11:33:57",
+            "read": true
+        },
+        {
+            "from": "leader1",
+            "to": "admin",
+            "text": "hey",
+            "timestamp": "2025-11-29 11:34:29",
+            "read": false
+        },
+        {
+            "from": "leader1",
+            "to": "coordinator",
+            "text": "hi",
+            "timestamp": "2025-11-29 11:34:36",
+            "read": true
+        },
+        {
+            "from": "coordinator",
+            "to": "leader1",
+            "text": "hwy",
+            "timestamp": "2025-11-29 11:34:54",
+            "read": true
+        },
+        {
+            "from": "coordinator",
+            "to": "leader1",
+            "text": "hwy",
+            "timestamp": "2025-11-29 11:34:56",
+            "read": true
+        },
+        {
+            "from": "coordinator",
+            "to": "leader1",
+            "text": "hi",
+            "timestamp": "2025-11-29 11:34:58",
+            "read": true
         }
     ]
 }
