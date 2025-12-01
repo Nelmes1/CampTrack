@@ -32,6 +32,7 @@ from features.scout import (
     total_money_earned_value,
     activity_stats_data,
     find_camp_by_name,
+    record_incident_entry_data,
 )
 from messaging import get_conversations_for_user, get_conversation, send_message
 
@@ -1406,6 +1407,7 @@ class ScoutWindow(ttk.Frame):
             ("Import Campers", self.bulk_assign_ui),
             ("Set Food per Camper", self.food_req_ui),
             ("Record Activity", self.record_activity_ui),
+            ("Record Incident", self.record_incidents_ui),
         ]:
             btn_style = "Primary.TButton" if "Select camps" in text else "TButton"
             ttk.Button(actions, text=text, command=cmd, style=btn_style).pack(fill="x", pady=6)
@@ -1415,6 +1417,7 @@ class ScoutWindow(ttk.Frame):
         for text, cmd in [
             ("View Stats", self.stats_ui),
             ("View Camp Activities", self.view_activities_ui),
+            ("View Incidents" , self.view_incidents_ui),
             ("Messaging", self.messaging_ui),
             ("Logout", self.logout),
         ]:
@@ -1647,7 +1650,7 @@ class ScoutWindow(ttk.Frame):
         activity_entry = add_entry("Activity name (optional)")
         time_entry = add_entry("Time (optional)")
 
-        ttk.Label(frame, text="Notes / outcomes / incidents", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
+        ttk.Label(frame, text="Notes / Special Achievements", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
         notes_text = tk.Text(frame, height=4, bg="#0b1729", fg=THEME_FG, highlightthickness=0, relief="flat")
         notes_text.pack(fill="both", expand=True, pady=(0, 8))
 
@@ -1891,6 +1894,265 @@ class ScoutWindow(ttk.Frame):
                 show_details()
 
         ttk.Button(frame, text="Delete Selected Activity", command=delete_selected, style="Danger.TButton",).pack(fill="x", pady=(4, 4))
+        first = tree.get_children()
+        if first:
+            tree.selection_set(first[0])
+            show_details()
+
+    def record_incidents_ui(self):
+        camps = read_from_file()
+        if not camps:
+            messagebox.showinfo("Incident", "No camps exist.")
+            return
+        supervised = [c for c in camps if self.username in c.scout_leaders]
+        if not supervised:
+            messagebox.showinfo("Incident", "You are not supervising any camps yet.")
+            return
+
+        top = tk.Toplevel(self)
+        top.title("Record Incident")
+        top.configure(bg=THEME_BG)
+        frame = ttk.Frame(top, padding=14, style="Card.TFrame")
+        frame.pack(fill="both", expand=True, padx=12, pady=12)
+        ttk.Label(frame, text="Record Incident", style="Header.TLabel").pack(pady=(0, 6))
+        ttk.Separator(frame).pack(fill="x", pady=(0, 8))
+
+        ttk.Label(frame, text="Camp", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
+        camp_var = tk.StringVar(value=supervised[0].name)
+        ttk.OptionMenu(frame, camp_var, supervised[0].name, *[c.name for c in supervised]).pack(fill="x", pady=(0, 8))
+
+        def get_selected_camp():
+            name = camp_var.get()
+            for camp in supervised:
+                if camp.name == name:
+                    return camp
+            return supervised[0]
+        
+        ttk.Label(frame, text="Date", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
+        date_var = tk.StringVar()
+        date_menu = ttk.OptionMenu(frame, date_var, "")
+        date_menu.pack(fill="x", pady=(0, 8))
+
+        def refresh_dates(*args):
+            camp_obj = get_selected_camp()
+            try:
+                start = datetime.strptime(camp_obj.start_date, "%Y-%m-%d").date()
+                end = datetime.strptime(camp_obj.end_date, "%Y-%m-%d").date()
+            except ValueError:
+                dates = []
+            else:
+                dates = []
+                d = start
+                while d <= end:
+                    dates.append(d.isoformat())
+                    d += timedelta(days=1)
+
+            menu = date_menu["menu"]
+            menu.delete(0, "end")
+            if dates:
+                for d_str in dates:
+                    menu.add_command(label=d_str, command=lambda v=d_str: date_var.set(v))
+                date_var.set(dates[0])
+            else:
+                date_var.set("")
+
+        camp_var.trace_add("write", refresh_dates)
+        refresh_dates()
+
+        def add_entry(label, initial=""):
+            ttk.Label(frame, text=label, style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
+            entry = ttk.Entry(frame, style="App.TEntry")
+            if initial:
+                entry.insert(0, initial)
+            entry.pack(fill="x", pady=(0, 6))
+            return entry
+
+        time_entry = add_entry("Time (optional)")
+
+        ttk.Label(frame, text="Incident Description", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
+        notes_text = tk.Text(frame, height=4, bg="#0b1729", fg=THEME_FG, highlightthickness=0, relief="flat")
+        notes_text.pack(fill="both", expand=True, pady=(0, 8))
+
+        ttk.Label(frame, text="Campers involved (optional)", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
+        campers_listbox = tk.Listbox(
+            frame,
+            selectmode="extended",
+            height=6,
+            bg="#0b1729",
+            fg=THEME_FG,
+            selectbackground=THEME_ACCENT,
+            highlightthickness=0,
+            relief="flat",
+        )
+        campers_listbox.pack(fill="both", expand=True, pady=(0, 8))
+    
+        def refresh_campers_list(*args):
+            campers_listbox.delete(0, "end")
+            camp_obj = get_selected_camp()
+            # Here camp_obj.campers is your list of camper names for that camp
+            for name in camp_obj.campers:
+                campers_listbox.insert("end", name)
+        camp_var.trace_add("write", refresh_campers_list)
+        refresh_campers_list()
+
+        def save_incident():
+            camp_name = camp_var.get()
+            date = date_var.get()
+            description = notes_text.get("1.0", "end").strip()
+            time_val = time_entry.get().strip()
+
+            if not date:
+                messagebox.showerror("Error", "Please select a date.")
+                return
+            if not description:
+                messagebox.showerror("Error", "Please enter a description.")
+                return
+
+            selected = campers_listbox.curselection()
+            camper_names = [campers_listbox.get(i) for i in selected]
+
+            res = record_incident_entry_data(camp_name, date, description, camper_names, time_val)
+            if res.get("status") == "ok":
+                messagebox.showinfo("Saved", "Incident recorded.")
+                top.destroy()
+            else:
+                messagebox.showerror("Error", "Could not save incident.")
+
+        tk.Button(top, text="Save Incident", command=save_incident).pack(fill="x")
+    
+    def view_incidents_ui(self):
+        camps = read_from_file()
+        if not camps:
+            messagebox.showinfo("Incidents", "No camps exist.")
+            return
+
+        supervised = [c for c in camps if self.username in c.scout_leaders]
+        if not supervised:
+            messagebox.showinfo("Incidents", "You are not supervising any camps yet.")
+            return
+
+        indices = select_camp_dialog(
+            "Select camp to view incidents",
+            supervised,
+            allow_multiple = False,
+            allow_cancel= True,
+        )
+        if not indices:
+            return
+        camp = supervised[indices[0]]
+        if not camp.incidents:
+            messagebox.showinfo("Incidents", f"No incidents recorded for {camp.name}.")
+            return
+
+        top = tk.Toplevel(self)
+        top.title(f"Incidents - {camp.name}")
+        top.configure(bg=THEME_BG)
+        ttk.Label(top, text=f"Incidents for {camp.name}", style= "Header.TLabel").pack(anchor="w", padx=9, pady=(8,4))
+        frame = ttk.Frame(top, style="Card.TFrame")  # FIXED parent here
+        frame.pack(fill="both", expand=True, padx=8, pady=(0, 8))
+        table_frame = ttk.Frame(frame, style="Card.TFrame")
+        table_frame.pack(fill="both", expand=True)
+
+        columns = ("date", "description", "campers")
+        tree = ttk.Treeview(table_frame, columns=columns, show="headings", height=10)
+        tree.pack(side="left", fill="both", expand=True)
+
+        scrollbar = tk.Scrollbar(table_frame, orient="vertical", command=tree.yview)
+        tree.configure(yscrollcommand=scrollbar.set)
+        scrollbar.pack(side="right", fill="y")
+
+        tree.heading("date", text="Date")
+        tree.heading("description", text="Description")   
+        tree.heading("campers", text="Campers")
+
+        tree.column("date", width=90, anchor="w")
+        tree.column("description", width=240, anchor="w") 
+        tree.column("campers", width=180, anchor="w")
+
+        item_details = {}
+
+        for inc in camp.incidents:
+            date = inc.get("date", "")
+            desc = inc.get("description", "")
+            time_val = inc.get("time", "") or ""
+            camper_list = inc.get("campers", [])
+            camper_str = ", ".join(camper_list) if camper_list else "none"
+
+            item_id = tree.insert("", "end", values=(date, desc, camper_str))
+            item_details[item_id] = inc  
+
+
+
+        details_frame = ttk.LabelFrame(frame, text="Incident Details", padding=8, style="Card.TFrame")
+        details_frame.pack(fill="both", expand=True, pady=(4, 0))
+
+        details_text = tk.Text(details_frame, height=8, bg="#0b1729", fg=THEME_FG, wrap="word", highlightthickness=0, relief="flat",)
+        details_text.pack(fill="both", expand=True)
+
+        def show_details(event=None):
+            sel = tree.selection()
+            if not sel:
+                return
+            item = sel[0]
+            info = item_details.get(item, {})
+            details_text.delete("1.0", "end")
+            time_val = info.get("time","")
+
+            lines = []
+            lines.append(f"Date: {info.get('date', '')}")
+            lines.append("")
+            lines.append("Time:")
+            lines.append(time_val)
+            lines.append("")
+            lines.append("Description:")
+            lines.append(info.get("description", ""))
+            campers = info.get("campers", [])
+            campers_str = ", ".join(campers) if campers else "none"
+            lines.append("")
+            lines.append(f"Campers involved: {campers_str}")
+
+            details_text.insert("end", "\n".join(lines))
+
+        tree.bind("<<TreeviewSelect>>", show_details)
+        first = tree.get_children()
+        if first:
+            tree.selection_set(first[0])
+            show_details()
+        
+        def delete_selected():
+            sel = tree.selection()
+            if not sel:
+                show_error_toast(self.master, "Error", "Please select an incident to delete.")
+                return
+
+            item_id = sel[0]
+            info = item_details.get(item_id)
+            if not info:
+                return
+
+            confirm = messagebox.askyesno(
+                "Delete Incident",
+                "Are you sure you want to delete this incident entry?"
+            )
+            if not confirm:
+                return
+
+            try:
+                camp.incidents.remove(info)
+            except ValueError:
+                pass
+            save_to_file()
+
+            tree.delete(item_id)
+            del item_details[item_id]
+            details_text.delete("1.0", "end")
+
+            remaining = tree.get_children()
+            if remaining:
+                tree.selection_set(remaining[0])
+                show_details()
+
+        ttk.Button(frame, text="Delete Selected Incident", command=delete_selected, style="Danger.TButton",).pack(fill="x", pady=(4, 4))
         first = tree.get_children()
         if first:
             tree.selection_set(first[0])

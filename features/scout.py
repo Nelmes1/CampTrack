@@ -413,6 +413,33 @@ def activity_participation_data(camp):
             })
         return {"status": "ok", "entries": summary}
 
+def record_incident_entry_data(camp_name, date, description, campers_involved, time=None):
+    camp = find_camp_by_name(camp_name)
+    if camp is None:
+        return {"status":"camp_not_found"}
+    
+    if campers_involved is None:
+        campers_involved = []
+    
+    incident = {
+        "date": date,
+        "time": time or "",
+        "description": description,
+        "campers" : campers_involved,
+    }
+    camp.incidents.append(incident)
+    save_to_file()
+    return {"status": "ok"}
+
+def incidents_for_camp_data(camp):
+    if not camp.incidents:
+        return []
+    
+    def sort_by_date(incidents):
+        return incidents.get("date", "")
+    return sorted (camp.incidents, key= sort_by_date)
+
+
 def info_from_json():
     with open(data_path('camp_data.json'), 'r') as file:
         data = json.load(file)

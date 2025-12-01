@@ -109,7 +109,8 @@ def save_to_file():
             "daily_food_usage": camp.daily_food_usage,
             "daily_records": camp.daily_records,
             "pay_rate": camp.pay_rate,
-            "group_chat": camp.group_chat
+            "group_chat": camp.group_chat,
+            "incidents": camp.incidents,
         })
 
     with open(data_path("camp_data.json"), "w") as file:
@@ -152,5 +153,6 @@ def read_from_file():
         camp.daily_records = camp_data.get("daily_records", {})
         camp.pay_rate = camp_data.get("pay_rate", 0)
         camp.group_chat = camp_data.get("group_chat", [])
+        camp.incidents = camp_data.get("incidents", [])
 
     return Camp.all_camps

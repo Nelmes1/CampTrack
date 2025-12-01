@@ -44,7 +44,7 @@
             "to": "leader2",
             "text": "hello",
             "timestamp": "2025-11-29 10:27:37",
-            "read": false
+            "read": true
         },
         {
             "from": "admin",
@@ -121,6 +121,13 @@
             "to": "leader2",
             "text": "hello",
             "timestamp": "2025-11-30 12:29:12",
+            "read": true
+        },
+        {
+            "from": "leader2",
+            "to": "leader1",
+            "text": "hello",
+            "timestamp": "2025-12-01 15:21:08",
             "read": false
         }
     ]

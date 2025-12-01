@@ -106,6 +106,24 @@
                 "text": "hello",
                 "timestamp": "2025-11-29 11:49:57"
             }
+        ],
+        "incidents": [
+            {
+                "date": "2025-06-10",
+                "time": "",
+                "description": "Fell out of a tree",
+                "campers": [
+                    "Alice"
+                ]
+            },
+            {
+                "date": "2025-06-11",
+                "time": "13:00",
+                "description": "Got a fever",
+                "campers": [
+                    "Ben"
+                ]
+            }
         ]
     },
     {
@@ -161,7 +179,8 @@
                 "text": "leader3 has joined the group chat.",
                 "timestamp": "2025-11-28 08:59:42"
             }
-        ]
+        ],
+        "incidents": []
     },
     {
         "name": "Maple Summit",
@@ -239,6 +258,7 @@
                 "text": "leader3 has joined the group chat.",
                 "timestamp": "2025-11-28 08:59:42"
             }
-        ]
+        ],
+        "incidents": []
     }
 ]
