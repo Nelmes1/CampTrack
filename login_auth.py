@@ -24,7 +24,6 @@ def login_admin():
                 break
         if not matched:
             print('\nInvalid username or password.\n')
-        break
 
 
 def login_scoutleader():
@@ -46,7 +45,6 @@ def login_scoutleader():
                 break
         if not matched:
             print('\nInvalid username or password.\n')
-        break
 
 
 def login_logisticscoordinator():
@@ -68,7 +66,6 @@ def login_logisticscoordinator():
                 break
         if not matched:
             print('\nInvalid username or password.\n')
-        break
 
 
 def login_loop():
