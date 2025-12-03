@@ -1,3 +1,7 @@
 [
-    "Food shortage at camp1! Only 1300 units left."
+    {
+        "message": "Food shortage at Camp Alpha!",
+        "read": true,
+        "timestamp": "2025-12-03 14:22"
+    }
 ]

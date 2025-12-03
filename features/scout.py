@@ -1,9 +1,9 @@
 import os
 import json
 import csv
-from datetime import datetime, timedelta
+from datetime import datetime
 
-from camp_class import Camp, save_to_file, read_from_file, generate_camper_id
+from camp_class import Camp, save_to_file, read_from_file
 from utils import get_int, data_path
 
 
@@ -61,10 +61,7 @@ def load_campers_csv(filepath):
                 name = row["Name"].strip()
                 age = row["Age"].strip()
                 activities = row["Activities"].split(';')
-
-                camper_id = generate_camper_id()
-                campers[camper_id] = {
-                    "name" : name,
+                campers[name] = {
                     "age": age,
                     "activities": [a.strip() for a in activities]
                 }
@@ -77,19 +74,16 @@ def save_campers(camp_name, campers):
     camps = read_from_file()
     for camp in camps:
         if camp.name == camp_name:
-            if camp.campers_info is None:
-                camp.campers_info = {}
-            for camper_id, info in campers.items():
+            for name in campers.keys():
                 value = False
                 for other_camp in camps:
-                    if other_camp.name != camp_name and camper_id in other_camp.campers:
+                    if other_camp.name != camp_name and name in other_camp.campers:
                         # camper already assigned elsewhere
                         value = True
                         break
                 if value is False:
-                    if camper_id not in camp.campers:
-                        camp.campers.append(camper_id)
-                    camp.campers_info[camper_id] = info
+                    if name not in camp.campers:
+                        camp.campers.append(name)
             break
     save_to_file()
     return {"status": "ok", "camp": camp_name, "added": list(campers.keys())}
@@ -147,14 +141,13 @@ def assign_camps_to_leader(camps, leader_username, selected_indices):
     # apply assignments
     for camp in camps:
         if camp.name in selected_camp_names:
-            if leader_username not in camp.scout_leaders:
-                camp.scout_leaders.append(leader_username)
+            camp.assign_leader(leader_username)
         else:
             if leader_username in camp.scout_leaders:
                 camp.scout_leaders.remove(leader_username)
-
     save_to_file()
     return {"status": "ok", "selected": selected_camp_names}
+
 
 def assign_camps_to_leader_ui(leader_username):
     camps = read_from_file()
@@ -200,8 +193,6 @@ def assign_camps_to_leader_ui(leader_username):
         for name in res["selected"]:
             print(name)
         print("\nYour camp selections have been saved")
-        
-
 
 
 def save_food_requirement(camp_name, food_per_camper):
@@ -256,19 +247,19 @@ def assign_food_amount_pure(camp_name, food_per_camper):
     return assign_food_amount_data(camp, food_per_camper)
 
 
-def record_daily_activity_data(camp, date, activity_name, activity_time, notes, food_units=None, campers=None):
+def record_daily_activity_data(camp, date, activity_name, activity_time, notes, food_units=None):
     """Pure helper to add an activity entry to a camp; returns status and entry."""
     if camp is None:
         return {"status": "no_camp"}
-    entry = add_activity_entry(camp, date, activity_name, activity_time, notes, food_units, campers)
+    entry = add_activity_entry(camp, date, activity_name, activity_time, notes, food_units)
     return {"status": "ok", "entry": entry}
 
 
-def record_activity_entry_data(camp_name, date, activity_name, activity_time, notes, food_units=None, campers=None):
+def record_activity_entry_data(camp_name, date, activity_name, activity_time, notes, food_units=None):
     camp = find_camp_by_name(camp_name)
     if camp is None:
         return {"status": "camp_not_found"}
-    return record_daily_activity_data(camp, date, activity_name, activity_time, notes, food_units, campers)
+    return record_daily_activity_data(camp, date, activity_name, activity_time, notes, food_units)
 
 
 def record_daily_activity():
@@ -295,29 +286,8 @@ def record_daily_activity():
         food_units = None
         if food_used.isdigit():
             food_units = int(food_used)
-        
-        if camp.campers:
-            print("\nCampers in this camp:")
-            for idx, camper_name in enumerate(camp.campers, start=1):
-                print(f" [{idx}]{camper_name}")
-            sel = input(
-                "Enter number of campers who took part (comma-seperated or blank for none): "
-            ).strip()
-            campers_for_activity = []
-            if sel:
-                try:
-                    indices = [int(x) for x in sel.split(",")]
-                    for i in indices:
-                        if 1<= 1 <= len(camp.campers):
-                            campers_for_activity.append(camp.campers[i-1])
-                except ValueError:
-                    print("Invalid camper selection.")
-                    campers_for_activity = []
-        else:
-            campers_for_activity= []
-        
-        record_daily_activity_data(camp, new_date, activity_name, activity_time, notes, food_units, campers_for_activity)
 
+        record_daily_activity_data(camp, new_date, activity_name, activity_time, notes, food_units)
 
         view_choice = input("Entry added. View today's entries? (y/n): ").strip().lower()
         if view_choice == "y":
@@ -326,7 +296,7 @@ def record_daily_activity():
             continue
 
 
-def add_activity_entry(camp, date, activity_name, activity_time, notes, food_units=None, campers=None):
+def add_activity_entry(camp, date, activity_name, activity_time, notes, food_units=None):
     """Pure helper to add an activity entry to a camp."""
     entry = {
         "activity": activity_name or "unspecified",
@@ -335,9 +305,6 @@ def add_activity_entry(camp, date, activity_name, activity_time, notes, food_uni
     }
     if food_units is not None:
         entry["food_used"] = food_units
-
-    if campers:
-        entry["campers"] = campers
 
     if date not in camp.activities:
         camp.activities[date] = []
@@ -391,53 +358,14 @@ def view_activity_stats():
         print(f"\nTotal food used across recorded activities: {stats['total_food_used']} units")
 
 
-def activity_participation_data(camp):
-    if not camp.activities:
-        return {"status": "no_activities", "entries": []}
-    summary = []
-    for date, entries in sorted(camp.activities.items()):
-        for e in entries:
-            act_name = e.get("activity","unspecified")
-            campers = e.get("campers", [])
-            try:
-                num = len(campers)
-                campers_list = list(campers)
-            except:
-                num=0
-                campers_list = []
-            summary.append({
-                "date" : date,
-                "activity" : act_name,
-                "num_campers" : num,
-                "campers" : campers
-            })
-        return {"status": "ok", "entries": summary}
-
-def record_incident_entry_data(camp_name, date, description, campers_involved, time=None):
-    camp = find_camp_by_name(camp_name)
-    if camp is None:
-        return {"status":"camp_not_found"}
-    
-    if campers_involved is None:
-        campers_involved = []
-    
-    incident = {
-        "date": date,
-        "time": time or "",
-        "description": description,
-        "campers" : campers_involved,
-    }
-    camp.incidents.append(incident)
-    save_to_file()
-    return {"status": "ok"}
-
-def incidents_for_camp_data(camp):
-    if not camp.incidents:
-        return []
-    
-    def sort_by_date(incidents):
-        return incidents.get("date", "")
-    return sorted (camp.incidents, key= sort_by_date)
+def print_engagement_score():
+    scores = engagement_scores_data()
+    if not scores:
+        print("\nNo camps found.")
+        return
+    print("\n--- Existing Camps ---")
+    for i, (name, score) in enumerate(scores, start=1):
+        print(f"{i}. {name} (Engagement: {score})")
 
 
 def info_from_json():
@@ -483,16 +411,7 @@ def show_total_money():
 
 def engagement_scores_data():
     read_from_file()
-    scores = []
-    for camp in Camp.all_camps:
-        if camp.activities:
-            score = sum(len(entries) for entries in camp.activities.values())
-        else:
-            score = 0
-    
-        scores.append((camp.name, score))
-    return scores
-
+    return [(camp.name, _engagement_score(camp)) for camp in Camp.all_camps]
 
 
 def money_earned_per_camp_data():

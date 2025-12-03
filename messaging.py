@@ -297,3 +297,4 @@ def open_group_chat(current_user, assigned_camps):
                     print("Invalid choice. Please try again.")
         else:
             print("Invalid choice. Please select a valid camp.")
+

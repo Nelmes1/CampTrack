@@ -2,13 +2,6 @@ from datetime import datetime, timedelta
 import json
 import os
 from utils import data_path
-import uuid
-
-
-def generate_camper_id():
-    """ Returns a unique camper ID."""
-    return "cmp_" + uuid.uuid().hex[:8]
-
 
 class Camp:
     all_camps = []
@@ -24,13 +17,11 @@ class Camp:
         # Always start empty – system fills these later
         self.scout_leaders = []
         self.campers = []
-        self.campers_info = {}
         self.activities = {}
         self.daily_food_usage = {}
         self.daily_records = {}
         self.pay_rate = 0
         self.group_chat = []  # Add group chat to each camp
-        self.incidents = []
 
         Camp.all_camps.append(self)
 
@@ -104,13 +95,11 @@ def save_to_file():
             "food_stock": camp.food_stock,
             "scout_leaders": camp.scout_leaders,
             "campers": camp.campers,
-            "campers_info" : camp.campers_info,
             "activities": camp.activities,
             "daily_food_usage": camp.daily_food_usage,
             "daily_records": camp.daily_records,
             "pay_rate": camp.pay_rate,
-            "group_chat": camp.group_chat,
-            "incidents": camp.incidents,
+            "group_chat": camp.group_chat
         })
 
     with open(data_path("camp_data.json"), "w") as file:
@@ -147,12 +136,10 @@ def read_from_file():
         # Restore saved values
         camp.scout_leaders = camp_data.get("scout_leaders", [])
         camp.campers = camp_data.get("campers", [])
-        camp.campers_info = camp_data.get("campers_info", {})
         camp.activities = camp_data.get("activities", {})
         camp.daily_food_usage = camp_data.get("daily_food_usage", {})
         camp.daily_records = camp_data.get("daily_records", {})
         camp.pay_rate = camp_data.get("pay_rate", 0)
         camp.group_chat = camp_data.get("group_chat", [])
-        camp.incidents = camp_data.get("incidents", [])
 
     return Camp.all_camps
