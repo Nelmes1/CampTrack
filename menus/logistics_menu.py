@@ -11,7 +11,7 @@ from features.logistics import (
     plot_engagement_scores,
     set_pay_rate,
 )
-from features.notifications import load_notifications
+from features.notifications import load_notifications, read_all_from_file
 from camp_class import read_from_file
 from utils import get_int
 
@@ -142,12 +142,17 @@ def run(users):
 
         elif choice == 6:
             notes = load_notifications()
-            if notes:
-                print("\n--- Notifications ---")
-                for n in notes:
-                    print("-", n)
-            else:
-                print("No notifications found.")
+            if not notes:
+                print("\nNo notifications.")
+                continue
+            print("\n--- Notifications ---")
+            for n in notes:
+                icon = "✓" if n.get("read") else "•"
+                ts = n.get("timestamp", "unknown time")
+                print(f"{icon} [{ts}] {n['message']}")
+
+            mark_all_as_read()
+            
         elif choice == 7:
             messaging_menu("logistics", users)
 

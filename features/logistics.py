@@ -93,6 +93,8 @@ def compute_food_shortage(camp_name):
             total_available = camp.food_stock * camp_duration_days
             required_amount = camper_count * food_per_camper * camp_duration_days
             status = "shortage" if total_available < required_amount else "ok"
+            if status == "shortage":
+                add_notification(f"Food shortage at {camp.name}! Only {total_available} units left but {required_amount} needed.")
             return {
                 "status": status,
                 "required": required_amount,

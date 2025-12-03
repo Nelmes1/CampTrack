@@ -20,7 +20,7 @@ from features.logistics import (
     plot_leaders_per_camp,
     plot_engagement_scores,
 )
-from features.notifications import load_notifications
+from features.notifications import load_notifications, mark_all_as_read, add_notification
 from features.scout import (
     assign_camps_to_leader,
     bulk_assign_campers_from_csv,
@@ -1097,9 +1097,38 @@ class LogisticsWindow(ttk.Frame):
             text.insert("end", f"{k}: {v}\n")
 
     def notifications_ui(self):
+        notif_win = tk.Toplevel(self)
+        notif_win.title("Notifications")
+        notif_win.configure(bg=THEME_BG)
+        frame = ttk.Frame(notif_win, padding=12, style="Card.TFrame")
+        frame.pack(fill="both", expand=True)
+        ttk.Label(frame, text="Notifications").pack(pady=(0, 4))
+        lb_frame = ttk.Frame(frame, style="Card.TFrame")
+        lb_frame.pack(fill="both", expand=True, pady=6)
+        listbox = tk.Listbox(
+            lb_frame,
+            bg=THEME_CARD,
+            fg=THEME_FG,
+            selectbackground=THEME_ACCENT,
+            highlightthickness=0,
+            relief="flat",
+        )
+        scrollbar = ttk.Scrollbar(lb_frame, orient="vertical", command=listbox.yview)
+        listbox.configure(yscrollcommand=scrollbar.set)
+        listbox.pack(side="left", fill="both", expand=True, padx=(4, 0), pady=4)
+        scrollbar.pack(side="right", fill="y", padx=(0, 4), pady=4)
         notes = load_notifications()
-        messagebox.showinfo("Notifications", "\n".join(str(n) for n in notes) if notes else "No notifications")
+        if not notes:
+            listbox.insert("end", "No notifications.")
+        else:
+            for n in notes:
+                status = "✓" if n.get("read") else "•"
+                timestamp = n.get("timestamp", "")
+                message = n.get("message", "")
+                listbox.insert("end", f"{status} {timestamp} — {message}")
 
+        mark_all_as_read()
+        
     def visualise_menu(self):
         top = tk.Toplevel(self)
         top.title("Visualise Camp Data")
@@ -1177,6 +1206,7 @@ class LogisticsWindow(ttk.Frame):
 
             read_from_file()
             Camp(name, location, camp_type, start_date, end_date, food_stock)
+            add_notification(f"Camp {name} created")
             save_to_file()
             messagebox.showinfo("Success", f"Camp {name} created.")
             top.destroy()
@@ -1277,6 +1307,7 @@ class LogisticsWindow(ttk.Frame):
             camp_obj.end_date = new_end or camp_obj.end_date
             camp_obj.food_stock = nf
             camp_obj.pay_rate = pr
+            add_notification(f"Camp {camp_obj.name} edited")
             save_to_file()
             messagebox.showinfo("Success", "Camp updated.")
             top.destroy()
@@ -1310,6 +1341,7 @@ class LogisticsWindow(ttk.Frame):
                 return
             camps.remove(camp_obj)
             Camp.all_camps = camps
+            add_notification(f"Camp {camp_obj.name} deleted")
             save_to_file()
             messagebox.showinfo("Success", f"Camp '{camp_obj.name}' deleted.")
             top.destroy()
@@ -2196,6 +2228,7 @@ class ScoutWindow(ttk.Frame):
 
     def messaging_ui(self):
         open_chat_window(self.master, self.username)
+        open_group_chat_window(self.master, self.username)
 
     def logout(self):
         state_info = capture_window_state(self.master)

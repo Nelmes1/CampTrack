@@ -7,7 +7,7 @@ import uuid
 
 def generate_camper_id():
     """ Returns a unique camper ID."""
-    return "cmp_" + uuid.uuid().hex[:8]
+    return "cmp_" + uuid.uuid4().hex[:8]
 
 
 class Camp:

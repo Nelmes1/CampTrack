@@ -1,3 +1,16 @@
 [
-    "Food shortage at camp1! Only 1300 units left."
+    {
+        "message": "Food stock low at Camp Alpha",
+        "read": true
+    },
+    {
+        "message": "Food shortage at Rivendell! Only 2 units left but 800 needed.",
+        "read": true,
+        "timestamp": "2025-12-03 21:37"
+    },
+    {
+        "message": "camp Rivendell edited",
+        "read": true,
+        "timestamp": "2025-12-03 21:55"
+    }
 ]

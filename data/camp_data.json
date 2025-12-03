@@ -7,8 +7,7 @@
         "end_date": "2025-06-12",
         "food_stock": 20,
         "scout_leaders": [
-            "leader3",
-            "leader1"
+            "leader3"
         ],
         "campers": [
             "Alice",
@@ -135,8 +134,7 @@
         "food_stock": 15,
         "scout_leaders": [
             "leader2",
-            "leader3",
-            "leader1"
+            "leader3"
         ],
         "campers": [
             "Ella",
@@ -259,6 +257,62 @@
                 "timestamp": "2025-11-28 08:59:42"
             }
         ],
+        "incidents": []
+    },
+    {
+        "name": "Rivendell",
+        "location": "Misty Mountains",
+        "camp_type": 3,
+        "start_date": "2025-10-10",
+        "end_date": "2025-10-11",
+        "food_stock": 15,
+        "scout_leaders": [
+            "leader1"
+        ],
+        "campers": [
+            "cmp_164eef28",
+            "cmp_b9cb1888",
+            "cmp_7ce0b5d0",
+            "cmp_a331f7e5"
+        ],
+        "campers_info": {
+            "cmp_164eef28": {
+                "name": "Emily",
+                "age": "12",
+                "activities": [
+                    "Swimming",
+                    "Climbing",
+                    "Archery"
+                ]
+            },
+            "cmp_b9cb1888": {
+                "name": "Jacob",
+                "age": "10",
+                "activities": [
+                    "Archery"
+                ]
+            },
+            "cmp_7ce0b5d0": {
+                "name": "Bella",
+                "age": "11",
+                "activities": [
+                    "Swimming",
+                    "Archery"
+                ]
+            },
+            "cmp_a331f7e5": {
+                "name": "Edward",
+                "age": "13",
+                "activities": [
+                    "Swimming"
+                ]
+            }
+        },
+        "activities": {},
+        "daily_food_usage": {},
+        "daily_records": {},
+        "pay_rate": 0,
+        "group_chat": [],
         "incidents": []
     }
 ]

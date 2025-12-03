@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 from camp_class import Camp, save_to_file, read_from_file
 from utils import get_int
+from features.notifications import add_notification 
 
 
 # -------------------------------------------------
@@ -90,7 +91,7 @@ def edit_camp():
         print("Edit cancelled.")
         return
     camp.pay_rate = new_pay
-
+    add_notification(f"camp {camp.name} edited")
     save_to_file()
     print("\nCamp updated successfully!")
 
@@ -119,6 +120,8 @@ def delete_camp():
     if confirm != "y":
         print("\nDeletion cancelled.")
         return
+    
+    add_notification(f"camp {camp.name} deleted")
 
     del camps[choice - 1]
     Camp.all_camps = camps
@@ -178,6 +181,7 @@ def create_camp():
             initial_food_stock,
 
         )
+        add_notification(f"camp {name} created")
         save_to_file()
         print("\nCamp successfully created!")
     else:
