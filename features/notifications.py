@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from utils import data_path
 
 
@@ -17,5 +18,15 @@ def save_notifications(notifications):
 
 def add_notification(message):
     data = load_notifications()
-    data.append(message)
+    data.append({
+        "message": message,
+        "read": False,
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M")
+    })
+    save_notifications(data)
+
+def mark_all_as_read():
+    data = load_notifications()
+    for n in data:
+        n["read"] = True
     save_notifications(data)
