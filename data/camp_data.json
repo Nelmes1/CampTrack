@@ -1,0 +1,264 @@
+[
+    {
+        "name": "Pine Ridge",
+        "location": "North Valley",
+        "camp_type": 2,
+        "start_date": "2025-06-10",
+        "end_date": "2025-06-12",
+        "food_stock": 20,
+        "scout_leaders": [
+            "leader3",
+            "leader1"
+        ],
+        "campers": [
+            "Alice",
+            "Ben",
+            "Cara",
+            "Dylan",
+            "Emily",
+            "Jacob",
+            "Bella",
+            "Edward"
+        ],
+        "campers_info": {},
+        "activities": {
+            "2025-06-10": [
+                {
+                    "activity": "Hike",
+                    "time": "09:00",
+                    "notes": "Trail loop",
+                    "food_used": 2
+                },
+                {
+                    "activity": "Campfire",
+                    "time": "19:00",
+                    "notes": "Songs and stories",
+                    "food_used": 1
+                },
+                {
+                    "activity": "Hiking",
+                    "time": "13:00",
+                    "notes": "",
+                    "food_used": 12,
+                    "campers": [
+                        "Alice",
+                        "Ben",
+                        "Cara",
+                        "Dylan"
+                    ]
+                }
+            ],
+            "2025-06-11": [
+                {
+                    "activity": "Orienteering",
+                    "time": "10:00",
+                    "notes": "Map skills"
+                },
+                {
+                    "activity": "First Aid",
+                    "time": "14:00",
+                    "notes": "Basics",
+                    "food_used": 1
+                }
+            ]
+        },
+        "daily_food_usage": {
+            "2025-06-10": 12
+        },
+        "daily_records": {
+            "2025-06-10": [
+                "Good weather, completed hike.",
+                ""
+            ],
+            "2025-06-11": [
+                "Learned map skills and first aid."
+            ]
+        },
+        "pay_rate": 100,
+        "group_chat": [
+            {
+                "from": "System",
+                "text": "leader1 has joined the group chat.",
+                "timestamp": "2025-11-28 08:56:57"
+            },
+            {
+                "from": "System",
+                "text": "leader3 has joined the group chat.",
+                "timestamp": "2025-11-28 08:59:42"
+            },
+            {
+                "from": "System",
+                "text": "leader1 has joined the group chat.",
+                "timestamp": "2025-11-28 10:27:27"
+            },
+            {
+                "from": "leader3",
+                "text": "hello group",
+                "timestamp": "2025-11-29 10:34:20"
+            },
+            {
+                "from": "leader3",
+                "text": "hello group",
+                "timestamp": "2025-11-29 11:49:39"
+            },
+            {
+                "from": "leader3",
+                "text": "hello",
+                "timestamp": "2025-11-29 11:49:57"
+            }
+        ],
+        "incidents": [
+            {
+                "date": "2025-06-10",
+                "time": "",
+                "description": "Fell out of a tree",
+                "campers": [
+                    "Alice"
+                ]
+            },
+            {
+                "date": "2025-06-11",
+                "time": "13:00",
+                "description": "Got a fever",
+                "campers": [
+                    "Ben"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Cedar Grove",
+        "location": "East Woods",
+        "camp_type": 1,
+        "start_date": "2025-07-05",
+        "end_date": "2025-07-05",
+        "food_stock": 15,
+        "scout_leaders": [
+            "leader2",
+            "leader3",
+            "leader1"
+        ],
+        "campers": [
+            "Ella",
+            "Finn",
+            "Grace"
+        ],
+        "campers_info": {},
+        "activities": {
+            "2025-07-05": [
+                {
+                    "activity": "Archery",
+                    "time": "11:00",
+                    "notes": "Safety basics",
+                    "food_used": 1
+                },
+                {
+                    "activity": "Nature Walk",
+                    "time": "15:00",
+                    "notes": "Identified plants"
+                }
+            ]
+        },
+        "daily_food_usage": {
+            "2025-07-05": 1
+        },
+        "daily_records": {
+            "2025-07-05": [
+                "Great engagement, no incidents."
+            ]
+        },
+        "pay_rate": 90,
+        "group_chat": [
+            {
+                "from": "System",
+                "text": "leader1 has joined the group chat.",
+                "timestamp": "2025-11-28 08:56:57"
+            },
+            {
+                "from": "System",
+                "text": "leader3 has joined the group chat.",
+                "timestamp": "2025-11-28 08:59:42"
+            }
+        ],
+        "incidents": []
+    },
+    {
+        "name": "Maple Summit",
+        "location": "Highlands",
+        "camp_type": 3,
+        "start_date": "2025-08-15",
+        "end_date": "2025-08-18",
+        "food_stock": 25,
+        "scout_leaders": [
+            "leader2",
+            "leader3"
+        ],
+        "campers": [
+            "Hana",
+            "Ivan",
+            "Jon",
+            "Kira",
+            "Liam"
+        ],
+        "campers_info": {},
+        "activities": {
+            "2025-08-15": [
+                {
+                    "activity": "Camp Setup",
+                    "time": "10:00",
+                    "notes": "Pitched tents"
+                }
+            ],
+            "2025-08-16": [
+                {
+                    "activity": "Climbing",
+                    "time": "09:30",
+                    "notes": "Beginner wall",
+                    "food_used": 2
+                },
+                {
+                    "activity": "Crafts",
+                    "time": "14:00",
+                    "notes": "Wood carving"
+                }
+            ],
+            "2025-08-17": [
+                {
+                    "activity": "Trail Maintenance",
+                    "time": "10:00",
+                    "notes": "Cleared debris",
+                    "food_used": 1
+                }
+            ]
+        },
+        "daily_food_usage": {
+            "2025-08-16": 2,
+            "2025-08-17": 1
+        },
+        "daily_records": {
+            "2025-08-15": [
+                "Setup complete, no issues."
+            ],
+            "2025-08-16": [
+                "Climbing session successful."
+            ],
+            "2025-08-17": [
+                "Maintenance done, good teamwork."
+            ]
+        },
+        "pay_rate": 110,
+        "group_chat": [
+            {
+                "from": "System",
+                "text": "leader1 has joined the group chat.",
+                "timestamp": "2025-11-28 08:58:39"
+            },
+            {
+                "from": "System",
+                "text": "leader3 has joined the group chat.",
+                "timestamp": "2025-11-28 08:59:42"
+            }
+        ],
+        "incidents": []
+    }
+]
