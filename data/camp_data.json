@@ -165,7 +165,7 @@
                 "Great engagement, no incidents."
             ]
         },
-        "pay_rate": 90,
+        "pay_rate": 65,
         "group_chat": [
             {
                 "from": "System",
@@ -308,11 +308,33 @@
                 ]
             }
         },
-        "activities": {},
-        "daily_food_usage": {},
-        "daily_records": {},
+        "activities": {
+            "2025-10-10": [
+                {
+                    "activity": "Council of elrond",
+                    "time": "",
+                    "notes": "Created the fellowship",
+                    "food_used": 20
+                }
+            ]
+        },
+        "daily_food_usage": {
+            "2025-10-10": 20
+        },
+        "daily_records": {
+            "2025-10-10": [
+                "Created the fellowship"
+            ]
+        },
         "pay_rate": 0,
         "group_chat": [],
-        "incidents": []
+        "incidents": [
+            {
+                "date": "2025-10-10",
+                "time": "",
+                "description": "Boromir tried to steal the ring",
+                "campers": []
+            }
+        ]
     }
 ]

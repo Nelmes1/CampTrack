@@ -12,5 +12,29 @@
         "message": "camp Rivendell edited",
         "read": true,
         "timestamp": "2025-12-03 21:55"
+    },
+    {
+        "message": "Pay rate set to: 100 at Pine Ridge",
+        "read": true,
+        "timestamp": "2025-12-08T21:59:41.941659",
+        "level": "INFO"
+    },
+    {
+        "message": "Pay rate set to: 25 at Cedar Grove",
+        "read": true,
+        "timestamp": "2025-12-08T22:12:44.053307",
+        "level": "INFO"
+    },
+    {
+        "message": "Incident recorded at Rivendell",
+        "read": true,
+        "timestamp": "2025-12-08T22:20:07.939163",
+        "level": "INFO"
+    },
+    {
+        "message": "Pay rate set to: 65 at Cedar Grove",
+        "read": true,
+        "timestamp": "2025-12-08 22:29",
+        "level": "INFO"
     }
 ]

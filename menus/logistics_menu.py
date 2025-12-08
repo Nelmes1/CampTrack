@@ -11,7 +11,7 @@ from features.logistics import (
     plot_engagement_scores,
     set_pay_rate,
 )
-from features.notifications import load_notifications, read_all_from_file
+from features.notifications import load_notifications, mark_all_as_read
 from camp_class import read_from_file
 from utils import get_int
 
@@ -149,7 +149,7 @@ def run(users):
             for n in notes:
                 icon = "✓" if n.get("read") else "•"
                 ts = n.get("timestamp", "unknown time")
-                print(f"{icon} [{ts}] {n['message']}")
+                print(f"{icon} [{level}] [{ts}] {n['message']}")
 
             mark_all_as_read()
             

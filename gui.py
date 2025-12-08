@@ -467,6 +467,9 @@ class AdminWindow(ttk.Frame):
                         u['password'] = new_pwd
                         break
                 save_logins()
+                add_notification(
+                    f"[Admin: {self.username}] Changed password for user '{username}'",
+                    level="WARNING")
                 refresh_tree()
                 dlg.destroy()
 
@@ -489,6 +492,9 @@ class AdminWindow(ttk.Frame):
             if sel['username'] in ds:
                 ds.remove(sel['username'])
                 save_disabled_set(ds)
+            add_notification(
+                f"[Admin: {self.username}] Deleted user '{username}'",
+                level="CRITICAL")
             save_logins()
             refresh_tree()
 
@@ -645,6 +651,9 @@ class AdminWindow(ttk.Frame):
             target_list = users['admin'] if role == "admin" else users[role]
             target_list.append({'username': username, 'password': pwd})
             save_logins()
+            add_notification(
+                f"[Admin: {self.username}] Created user '{username}' with role '{role}'",
+                level="INFO")
             messagebox.showinfo("Success", f"Added {role}: {username}")
             top.destroy()
 
@@ -700,6 +709,9 @@ class AdminWindow(ttk.Frame):
                     u['password'] = new_pwd
                     break
             save_logins()
+            add_notification(
+                f"[Admin: {self.username}] Changed password for user '{username}'",
+                level="WARNING")
             messagebox.showinfo("Success", "Password updated.")
             top.destroy()
 
@@ -747,6 +759,10 @@ class AdminWindow(ttk.Frame):
                 return
             users[role] = [u for u in users[role] if u['username'] != target_user]
             save_logins()
+            add_notification(
+                f"[Admin: {self.username}] Deleted user '{var.get()}'",
+                level="INFO")
+            top.destroy()
             messagebox.showinfo("Success", f"Deleted {target_user}.")
             top.destroy()
 
@@ -774,6 +790,9 @@ class AdminWindow(ttk.Frame):
             target_user = user_var.get()
             disabled_logins(target_user)
             save_logins()
+            add_notification(
+                f"[Admin: {self.username}] Disabled user '{var.get()}'",
+                level="WARNING")
             messagebox.showinfo("Success", f"Disabled {target_user}.")
             top.destroy()
 
@@ -811,6 +830,9 @@ class AdminWindow(ttk.Frame):
                 show_error_toast(self.master, "Error", "User no longer exists.")
                 return
             enable_login(target_user)
+            add_notification(
+                f"[Admin: {self.username}] Enabled user '{var.get()}'",
+                level="INFO")
             messagebox.showinfo("Success", f"Enabled {target_user}.")
             top.destroy()
 
@@ -1125,7 +1147,8 @@ class LogisticsWindow(ttk.Frame):
                 status = "✓" if n.get("read") else "•"
                 timestamp = n.get("timestamp", "")
                 message = n.get("message", "")
-                listbox.insert("end", f"{status} {timestamp} — {message}")
+                level = n.get("level", "INFO")
+                listbox.insert("end", f"{status} {level} {timestamp} — {message}")
 
         mark_all_as_read()
         

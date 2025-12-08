@@ -16,13 +16,18 @@ def save_notifications(notifications):
         json.dump(notifications, f, indent=4)
 
 
-def add_notification(message):
+def add_notification(message, level='INFO'):
+    valid_levels = ['INFO', 'WARNING', 'ERROR', 'CRITICAL']
+    if level.upper() not in valid_levels:
+        level = 'INFO'
     data = load_notifications()
-    data.append({
+    new_notification = {
         "message": message,
         "read": False,
-        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M")
-    })
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "level": level.upper()
+    }
+    data.append(new_notification)
     save_notifications(data)
 
 def mark_all_as_read():

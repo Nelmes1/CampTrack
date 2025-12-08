@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 
 from camp_class import Camp, save_to_file, read_from_file, generate_camper_id
 from utils import get_int, data_path
+from features.notifications import add_notification
 
 
 def camps_overlap(camp1, camp2):
@@ -91,6 +92,7 @@ def save_campers(camp_name, campers):
                         camp.campers.append(camper_id)
                     camp.campers_info[camper_id] = info
             break
+    add_notification(f"Campers assigned to {camp.name}")
     save_to_file()
     return {"status": "ok", "camp": camp_name, "added": list(campers.keys())}
 
@@ -268,6 +270,7 @@ def record_activity_entry_data(camp_name, date, activity_name, activity_time, no
     camp = find_camp_by_name(camp_name)
     if camp is None:
         return {"status": "camp_not_found"}
+    add_notification(f"Activity recorded at {camp_name}")
     return record_daily_activity_data(camp, date, activity_name, activity_time, notes, food_units, campers)
 
 
@@ -428,6 +431,7 @@ def record_incident_entry_data(camp_name, date, description, campers_involved, t
         "campers" : campers_involved,
     }
     camp.incidents.append(incident)
+    add_notification(f"Incident recorded at {camp_name}")
     save_to_file()
     return {"status": "ok"}
 
@@ -589,6 +593,7 @@ def bulk_assign_campers():
 
         res = bulk_assign_campers_data(selected_camp, campers)
         if res and res.get("status") == "ok":
+            
             print(f"\nSuccessfully assigned {len(campers)} campers to {selected_camp.name}!")
         else:
             print("\nNo campers were assigned.")

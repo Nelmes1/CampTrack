@@ -58,21 +58,21 @@
             "to": "admin",
             "text": "hello",
             "timestamp": "2025-11-29 10:30:32",
-            "read": false
+            "read": true
         },
         {
             "from": "leader1",
             "to": "admin",
             "text": "hellllo",
             "timestamp": "2025-11-29 10:31:51",
-            "read": false
+            "read": true
         },
         {
             "from": "coordinator",
             "to": "admin",
             "text": "hello",
             "timestamp": "2025-11-29 11:33:41",
-            "read": false
+            "read": true
         },
         {
             "from": "coordinator",
@@ -86,7 +86,7 @@
             "to": "admin",
             "text": "hey",
             "timestamp": "2025-11-29 11:34:29",
-            "read": false
+            "read": true
         },
         {
             "from": "leader1",
@@ -128,7 +128,7 @@
             "to": "leader1",
             "text": "hello",
             "timestamp": "2025-12-01 15:21:08",
-            "read": false
+            "read": true
         }
     ]
 }

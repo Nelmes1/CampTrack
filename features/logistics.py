@@ -13,6 +13,7 @@ def _engagement_score(camp):
     """Simple engagement proxy based on recorded activities and daily reports."""
     activity_events = sum(len(events) for events in camp.activities.values())
     record_entries = sum(len(entries) for entries in camp.daily_records.values())
+    add_notification(f"Activity updated at {camp.name}")
     return activity_events + record_entries
 
 
@@ -23,6 +24,7 @@ def top_up_food_data(camp_name, amount):
     for camp in camps:
         if camp.name == camp_name:
             camp.food_stock += amount
+            add_notification(f"Food level increased at {camp_name} by {amount}")
             save_to_file()
             return {"status": "ok", "camp_name": camp_name, "amount": amount}
     return {"status": "camp_not_found"}
@@ -46,6 +48,7 @@ def set_food_stock_data(camp_name, new_stock):
     for camp in camps:
         if camp.name == camp_name:
             camp.food_stock = new_stock
+            add_notification(f"Food stock set to :{new_stock} at {camp_name}")
             save_to_file()
             return {"status": "ok", "camp_name": camp_name, "new_stock": new_stock}
     return {"status": "camp_not_found"}
@@ -94,7 +97,7 @@ def compute_food_shortage(camp_name):
             required_amount = camper_count * food_per_camper * camp_duration_days
             status = "shortage" if total_available < required_amount else "ok"
             if status == "shortage":
-                add_notification(f"Food shortage at {camp.name}! Only {total_available} units left but {required_amount} needed.")
+                add_notification(f"Food shortage at {camp.name}! Only {total_available} units left but {required_amount} needed.", level="CRITICAL")
             return {
                 "status": status,
                 "required": required_amount,
@@ -122,7 +125,7 @@ def check_food_shortage(camp_name):
         return
     print(f"{res['camp_name']} requires {res['required']} units for {res['campers']} campers over {res['days']} day(s).")
     if status == "shortage":
-        add_notification(f"Food shortage at {camp_name}! Only {res['camp_food_stock']} units left but {res['required']} needed.")
+        add_notification(f"Food shortage at {camp_name}! Only {res['camp_food_stock']} units left but {res['required']} needed.", level="CRITICAL")
     else:
         print("Food stock is sufficient.")
 #check_food_shortage takes food_per_camper, validates it, computes the total requirement (campers × per-day × duration), 
@@ -256,6 +259,7 @@ def set_pay_rate_data(camp_name, rate):
     for camp in camps:
         if camp.name == camp_name:
             camp.pay_rate = rate
+            add_notification(f"Pay rate set to: {rate} at {camp_name}")
             save_to_file()
             return {"status": "ok", "camp_name": camp_name, "rate": rate}
     return {"status": "camp_not_found"}
