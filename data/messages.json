@@ -4,131 +4,294 @@
             "from": "logistics",
             "to": "admin",
             "text": "hello",
-            "timestamp": "2025-11-24 20:10:13"
+            "timestamp": "2025-11-24 20:10:13",
+            "read": true,
+            "priority": false,
+            "requires_ack": false,
+            "acked": false,
+            "pinned": false,
+            "attachment": null,
+            "metadata": {}
         },
         {
             "from": "admin",
             "to": "leader1",
             "text": "hello leader1",
-            "timestamp": "2025-11-25 04:07:15"
+            "timestamp": "2025-11-25 04:07:15",
+            "read": false,
+            "priority": false,
+            "requires_ack": false,
+            "acked": false,
+            "pinned": false,
+            "attachment": null,
+            "metadata": {}
         },
         {
             "from": "logistics",
             "to": "admin",
             "text": "hey",
-            "timestamp": "2025-11-25 05:17:13"
+            "timestamp": "2025-11-25 05:17:13",
+            "read": true,
+            "priority": false,
+            "requires_ack": false,
+            "acked": false,
+            "pinned": false,
+            "attachment": null,
+            "metadata": {}
         },
         {
             "from": "leader1",
             "to": "admin",
             "text": "hello",
             "timestamp": "2025-11-27 16:29:51",
-            "read": true
+            "read": true,
+            "priority": false,
+            "requires_ack": false,
+            "acked": false,
+            "pinned": false,
+            "attachment": null,
+            "metadata": {}
         },
         {
             "from": "admin",
             "to": "leader1",
             "text": "hey",
             "timestamp": "2025-11-27 21:01:31",
-            "read": true
+            "read": true,
+            "priority": false,
+            "requires_ack": false,
+            "acked": false,
+            "pinned": false,
+            "attachment": null,
+            "metadata": {}
         },
         {
             "from": "logistics",
             "to": "admin",
             "text": "hi",
             "timestamp": "2025-11-29 10:26:23",
-            "read": true
+            "read": true,
+            "priority": false,
+            "requires_ack": false,
+            "acked": false,
+            "pinned": false,
+            "attachment": null,
+            "metadata": {}
         },
         {
             "from": "logistics",
             "to": "leader2",
             "text": "hello",
             "timestamp": "2025-11-29 10:27:37",
-            "read": true
+            "read": true,
+            "priority": false,
+            "requires_ack": false,
+            "acked": false,
+            "pinned": false,
+            "attachment": null,
+            "metadata": {}
         },
         {
             "from": "admin",
             "to": "logistics",
             "text": "hi",
             "timestamp": "2025-11-29 10:28:57",
-            "read": false
+            "read": false,
+            "priority": false,
+            "requires_ack": false,
+            "acked": false,
+            "pinned": false,
+            "attachment": null,
+            "metadata": {}
         },
         {
             "from": "coordinator",
             "to": "admin",
             "text": "hello",
             "timestamp": "2025-11-29 10:30:32",
-            "read": true
+            "read": true,
+            "priority": false,
+            "requires_ack": false,
+            "acked": false,
+            "pinned": false,
+            "attachment": null,
+            "metadata": {}
         },
         {
             "from": "leader1",
             "to": "admin",
             "text": "hellllo",
             "timestamp": "2025-11-29 10:31:51",
-            "read": true
+            "read": true,
+            "priority": false,
+            "requires_ack": false,
+            "acked": false,
+            "pinned": false,
+            "attachment": null,
+            "metadata": {}
         },
         {
             "from": "coordinator",
             "to": "admin",
             "text": "hello",
             "timestamp": "2025-11-29 11:33:41",
-            "read": true
+            "read": true,
+            "priority": false,
+            "requires_ack": false,
+            "acked": false,
+            "pinned": false,
+            "attachment": null,
+            "metadata": {}
         },
         {
             "from": "coordinator",
             "to": "leader1",
             "text": "hi",
             "timestamp": "2025-11-29 11:33:57",
-            "read": true
+            "read": true,
+            "priority": false,
+            "requires_ack": false,
+            "acked": false,
+            "pinned": false,
+            "attachment": null,
+            "metadata": {}
         },
         {
             "from": "leader1",
             "to": "admin",
             "text": "hey",
             "timestamp": "2025-11-29 11:34:29",
-            "read": true
+            "read": true,
+            "priority": false,
+            "requires_ack": false,
+            "acked": false,
+            "pinned": false,
+            "attachment": null,
+            "metadata": {}
         },
         {
             "from": "leader1",
             "to": "coordinator",
             "text": "hi",
             "timestamp": "2025-11-29 11:34:36",
-            "read": true
+            "read": true,
+            "priority": false,
+            "requires_ack": false,
+            "acked": false,
+            "pinned": false,
+            "attachment": null,
+            "metadata": {}
         },
         {
             "from": "coordinator",
             "to": "leader1",
             "text": "hwy",
             "timestamp": "2025-11-29 11:34:54",
-            "read": true
+            "read": true,
+            "priority": false,
+            "requires_ack": false,
+            "acked": false,
+            "pinned": false,
+            "attachment": null,
+            "metadata": {}
         },
         {
             "from": "coordinator",
             "to": "leader1",
             "text": "hwy",
             "timestamp": "2025-11-29 11:34:56",
-            "read": true
+            "read": true,
+            "priority": false,
+            "requires_ack": false,
+            "acked": false,
+            "pinned": false,
+            "attachment": null,
+            "metadata": {}
         },
         {
             "from": "coordinator",
             "to": "leader1",
             "text": "hi",
             "timestamp": "2025-11-29 11:34:58",
-            "read": true
+            "read": true,
+            "priority": false,
+            "requires_ack": false,
+            "acked": false,
+            "pinned": false,
+            "attachment": null,
+            "metadata": {}
         },
         {
             "from": "leader1",
             "to": "leader2",
             "text": "hello",
             "timestamp": "2025-11-30 12:29:12",
-            "read": true
+            "read": true,
+            "priority": false,
+            "requires_ack": false,
+            "acked": false,
+            "pinned": false,
+            "attachment": null,
+            "metadata": {}
         },
         {
             "from": "leader2",
             "to": "leader1",
             "text": "hello",
             "timestamp": "2025-12-01 15:21:08",
-            "read": true
+            "read": true,
+            "priority": false,
+            "requires_ack": false,
+            "acked": false,
+            "pinned": false,
+            "attachment": null,
+            "metadata": {}
+        },
+        {
+            "from": "admin",
+            "to": "coordinator",
+            "text": "hello",
+            "timestamp": "2025-12-09 21:29:47",
+            "read": false,
+            "priority": false,
+            "requires_ack": false,
+            "acked": false,
+            "pinned": true,
+            "attachment": null,
+            "metadata": {},
+            "pinned_by": "admin"
+        },
+        {
+            "from": "admin",
+            "to": "coordinator",
+            "text": "Announcement\u2026",
+            "timestamp": "2025-12-09 21:53:58",
+            "read": false,
+            "priority": true,
+            "requires_ack": true,
+            "acked": false,
+            "pinned": false,
+            "attachment": null,
+            "metadata": {
+                "broadcast": true,
+                "role": "logistics coordinator"
+            }
+        },
+        {
+            "from": "admin",
+            "to": "leader4",
+            "text": "Announcement\u2026",
+            "timestamp": "2025-12-09 21:53:58",
+            "read": false,
+            "priority": true,
+            "requires_ack": true,
+            "acked": false,
+            "pinned": false,
+            "attachment": null,
+            "metadata": {
+                "broadcast": true,
+                "role": "logistics coordinator"
+            }
         }
     ]
 }
