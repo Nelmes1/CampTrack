@@ -49,6 +49,26 @@ THEME_ACCENT_PRESSED = "#388e3c"
 _GIF_CACHE = {}
 
 
+def _read_disabled_usernames():
+    try:
+        with open('disabled_logins.txt', 'r') as file:
+            disabled = file.read().strip(',')
+            return {u for u in disabled.split(',') if u}
+    except FileNotFoundError:
+        return set()
+
+
+def _pill(parent, title, value, desc=""):
+    """Compact summary pill for clarity."""
+    card = ttk.Frame(parent, style="Card.TFrame", padding=8)
+    card.pack(side="left", expand=True, fill="x", padx=4)
+    ttk.Label(card, text=title, style="FieldLabel.TLabel").pack(anchor="w")
+    ttk.Label(card, text=value, style="Header.TLabel").pack(anchor="w")
+    if desc:
+        ttk.Label(card, text=desc, style="Subtitle.TLabel").pack(anchor="w", pady=(2, 0))
+    return card
+
+
 def _load_gif_frames_raw(name):
     """Return list of raw RGBA frames for a gif, cached."""
     if name in _GIF_CACHE:
@@ -323,7 +343,16 @@ class AdminWindow(ttk.Frame):
         if self.logo_small:
             ttk.Label(header, image=self.logo_small, background=THEME_CARD).grid(row=0, column=0, rowspan=2, sticky="w", padx=(0, 8))
         ttk.Label(header, text="Administrator", style="Header.TLabel").grid(row=0, column=1, sticky="w")
-        ttk.Label(header, text="Admin tools", style="Subtitle.TLabel").grid(row=1, column=1, sticky="w")
+        ttk.Label(header, text=f"Signed in as {self.username} · Manage users and access messaging", style="Subtitle.TLabel").grid(row=1, column=1, sticky="w")
+
+        # quick clarity summary
+        stats_row = ttk.Frame(wrapper, style="Card.TFrame")
+        stats_row.pack(fill="x", pady=(0, 12))
+        disabled = _read_disabled_usernames()
+        _pill(stats_row, "Admins", str(len(users["admin"])), "Total admin accounts")
+        _pill(stats_row, "Leaders", str(len(users["scout leader"])), "Scout leaders")
+        _pill(stats_row, "Coordinators", str(len(users["logistics coordinator"])), "Logistics coordinators")
+        _pill(stats_row, "Disabled", str(len(disabled)), "Disabled accounts")
 
         user_frame = ttk.LabelFrame(wrapper, text="User Management", padding=12, style="Card.TFrame")
         user_frame.pack(fill="both", expand=True, pady=(0, 12))
@@ -869,7 +898,17 @@ class LogisticsWindow(ttk.Frame):
         if self.logo_small:
             ttk.Label(header, image=self.logo_small, background=THEME_CARD).grid(row=0, column=0, rowspan=2, sticky="w", padx=(0, 8))
         ttk.Label(header, text="Logistics Coordinator", style="Header.TLabel").grid(row=0, column=1, sticky="w")
-        ttk.Label(header, text="Logistics overview", style="Subtitle.TLabel").grid(row=1, column=1, sticky="w")
+        ttk.Label(header, text=f"Signed in as {self.username} · Camps, food, pay rates, messaging", style="Subtitle.TLabel").grid(row=1, column=1, sticky="w")
+
+        # quick clarity summary
+        stats_row = ttk.Frame(wrapper, style="Card.TFrame")
+        stats_row.pack(fill="x", pady=(0, 12))
+        camps = read_from_file()
+        campers_total = sum(len(c.campers) for c in camps)
+        leaders_assigned = len({leader for c in camps for leader in c.scout_leaders})
+        _pill(stats_row, "Camps", str(len(camps)), "Active camps")
+        _pill(stats_row, "Campers", str(campers_total), "Across all camps")
+        _pill(stats_row, "Leaders", str(leaders_assigned), "Assigned to camps")
 
         camp_frame = ttk.LabelFrame(wrapper, text="Camp Management", padding=12, style="Card.TFrame")
         camp_frame.pack(fill="both", expand=True, pady=(0, 14))
@@ -1451,7 +1490,18 @@ class ScoutWindow(ttk.Frame):
         if self.logo_small:
             ttk.Label(header, image=self.logo_small, background=THEME_CARD).grid(row=0, column=0, rowspan=2, sticky="w", padx=(0, 8))
         ttk.Label(header, text="Scout Leader", style="Header.TLabel").grid(row=0, column=1, sticky="w")
-        ttk.Label(header, text="Scouting tools", style="Subtitle.TLabel").grid(row=1, column=1, sticky="w")
+        ttk.Label(header, text=f"Signed in as {self.username} · Supervise camps, record activities, message", style="Subtitle.TLabel").grid(row=1, column=1, sticky="w")
+
+        # quick clarity summary
+        stats_row = ttk.Frame(wrapper, style="Card.TFrame")
+        stats_row.pack(fill="x", pady=(0, 12))
+        camps = read_from_file()
+        supervised = [c for c in camps if self.username in c.scout_leaders]
+        campers_total = sum(len(c.campers) for c in supervised)
+        incidents_total = sum(len(getattr(c, "incidents", [])) for c in supervised)
+        _pill(stats_row, "Your Camps", str(len(supervised)), "Camps you supervise")
+        _pill(stats_row, "Campers", str(campers_total), "In your camps")
+        _pill(stats_row, "Incidents", str(incidents_total), "Logged incidents")
 
         actions = ttk.LabelFrame(wrapper, text="Camp Actions", padding=12, style="Card.TFrame")
         actions.pack(fill="both", expand=True, pady=(0, 14))
