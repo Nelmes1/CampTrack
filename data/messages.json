@@ -19,7 +19,7 @@
             "to": "coordinator",
             "timestamp": "2025-07-11 08:15:00",
             "text": "Please update dashboard once new campers import completes.",
-            "read": false
+            "read": true
         },
         {
             "from": "coordinator",
@@ -33,14 +33,14 @@
             "to": "coordinator",
             "timestamp": "2025-07-11 08:23:00",
             "text": "Yes\u2014top up by 10 units and notify leader2.",
-            "read": false
+            "read": true
         },
         {
             "from": "leader2",
             "to": "coordinator",
             "timestamp": "2025-07-12 14:00:00",
             "text": "We used 9 units on day 1 at Cedar Grove. Need a top-up by tomorrow.",
-            "read": false
+            "read": true
         },
         {
             "from": "coordinator",
@@ -68,7 +68,7 @@
             "to": "coordinator",
             "timestamp": "2025-07-14 10:30:00",
             "text": "Kayak session planned. Do we have spare PFDs?",
-            "read": false
+            "read": true
         },
         {
             "from": "coordinator",
