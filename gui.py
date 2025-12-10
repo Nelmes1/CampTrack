@@ -1235,7 +1235,7 @@ class LogisticsWindow(ttk.Frame):
         camp_type_entry.pack(fill="x", pady=(0, 8))
 
         start_entry = add_labeled_entry("Start date (flexible: e.g. 2025-10-10 or 10 Oct 2025)")
-        end_entry = add_labeled_entry("End date (flexible)")
+        nights_entry = add_labeled_entry("Nights (for type 3 only; min 2)")
         food_entry = add_labeled_entry("Initial daily food stock")
 
         def submit():
@@ -1253,14 +1253,28 @@ class LogisticsWindow(ttk.Frame):
                 return
             try:
                 start_date = parse_date_flexible(start_entry.get())
-                end_date = parse_date_flexible(end_entry.get())
             except ValueError:
                 show_error_toast(
                     self.master,
                     "Error",
-                    "Invalid date. Try formats like 2025-10-10, 10 Oct 2025, Oct 10 2025, or 10/10/2025.",
+                    "Invalid start date. Try formats like 2025-10-10, 10 Oct 2025, Oct 10 2025, or 10/10/2025.",
                 )
                 return
+            nights = 0
+            if camp_type == 1:
+                nights = 0
+            elif camp_type == 2:
+                nights = 1
+            elif camp_type == 3:
+                try:
+                    nights = int(nights_entry.get().strip() or "0")
+                    if nights < 2:
+                        raise ValueError
+                except ValueError:
+                    show_error_toast(self.master, "Error", "For type 3, nights must be 2 or more.")
+                    return
+            end_dt = datetime.strptime(start_date, "%Y-%m-%d").date() + timedelta(days=nights)
+            end_date = end_dt.strftime("%Y-%m-%d")
             try:
                 food_stock = int(food_entry.get().strip())
                 if food_stock < 0:
@@ -1313,6 +1327,7 @@ class LogisticsWindow(ttk.Frame):
         type_entry = add_labeled_entry("Camp type (1-3)", str(camp.camp_type))
         start_entry = add_labeled_entry("Start date (flexible)", camp.start_date)
         end_entry = add_labeled_entry("End date (flexible)", camp.end_date)
+        nights_entry = add_labeled_entry("Nights (for type 3 only; min 2)")
         food_entry = add_labeled_entry("Daily food stock", str(camp.food_stock))
         pay_entry = add_labeled_entry("Daily pay rate", str(camp.pay_rate))
 
@@ -1325,6 +1340,12 @@ class LogisticsWindow(ttk.Frame):
                     type_entry.delete(0, tk.END); type_entry.insert(0, str(c.camp_type))
                     start_entry.delete(0, tk.END); start_entry.insert(0, c.start_date)
                     end_entry.delete(0, tk.END); end_entry.insert(0, c.end_date)
+                    try:
+                        sd = datetime.strptime(c.start_date, "%Y-%m-%d")
+                        ed = datetime.strptime(c.end_date, "%Y-%m-%d")
+                        nights_entry.delete(0, tk.END); nights_entry.insert(0, str((ed - sd).days))
+                    except Exception:
+                        nights_entry.delete(0, tk.END)
                     food_entry.delete(0, tk.END); food_entry.insert(0, str(c.food_stock))
                     pay_entry.delete(0, tk.END); pay_entry.insert(0, str(c.pay_rate))
                     break
@@ -1358,7 +1379,6 @@ class LogisticsWindow(ttk.Frame):
                 return
             try:
                 new_start = parse_date_flexible(start_entry.get())
-                new_end = parse_date_flexible(end_entry.get())
             except ValueError:
                 show_error_toast(
                     self.master,
@@ -1366,6 +1386,20 @@ class LogisticsWindow(ttk.Frame):
                     "Invalid date. Try formats like 2025-10-10, 10 Oct 2025, Oct 10 2025, or 10/10/2025.",
                 )
                 return
+            nights = 0
+            if ct == 1:
+                nights = 0
+            elif ct == 2:
+                nights = 1
+            elif ct == 3:
+                try:
+                    nights = int(nights_entry.get().strip() or "0")
+                    if nights < 2:
+                        raise ValueError
+                except ValueError:
+                    show_error_toast(self.master, "Error", "For type 3, nights must be 2 or more.")
+                    return
+            new_end = (datetime.strptime(new_start, "%Y-%m-%d").date() + timedelta(days=nights)).strftime("%Y-%m-%d")
 
             camp_obj.name = name_entry.get().strip() or camp_obj.name
             camp_obj.location = loc_entry.get().strip() or camp_obj.location
