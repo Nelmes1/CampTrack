@@ -2470,34 +2470,66 @@ class ScoutWindow(ttk.Frame):
         if not camps:
             messagebox.showinfo("Stats", "No camps exist.")
             return
+        indices = select_camp_dialog("Select a camp for stats (cancel to close)", camps, allow_multiple=False, allow_cancel=True, allow_view_all=True)
+        scores = dict(engagement_scores_data())
+        money_map = dict(money_earned_per_camp_data())
+
+        def render_all(parent):
+            lines_all = []
+            for camp in camps:
+                lines_all.append(f"{camp.name} ({camp.location}) {camp.start_date} -> {camp.end_date}")
+                lines_all.append(f"Type: {camp.camp_type} | Engagement: {scores.get(camp.name, 'N/A')}")
+                if camp.name in money_map:
+                    lines_all.append(f"Money earned: ${money_map[camp.name]}")
+                stats = activity_stats_data(camp)
+                if stats["status"] == "ok":
+                    food_used = stats['total_food_used'] if stats['total_food_used'] is not None else 0
+                    lines_all.append(f"Activities: {stats['total_entries']} | Food used: {food_used}")
+                else:
+                    lines_all.append("Activities: none")
+                lines_all.append("")
+            popup = tk.Toplevel(parent)
+            popup.title("All Camp Stats")
+            frame = ttk.Frame(popup, padding=8, style="Card.TFrame")
+            frame.pack(fill="both", expand=True)
+            txt = tk.Text(frame, width=80, height=30)
+            txt.pack(fill="both", expand=True)
+            txt.insert("end", "\n".join(lines_all))
+
+        if indices is None:
+            return
+        if indices == "ALL":
+            render_all(self)
+            return
+        if not indices:
+            return
+
+        camp_obj = camps[indices[0]]
         lines = []
-        lines.append("Engagement:")
-        for name, score in engagement_scores_data():
-            lines.append(f"{name}: {score}")
-        lines.append("\nMoney per camp:")
-        for name, earned in money_earned_per_camp_data():
-            lines.append(f"{name}: ${earned}")
-        lines.append(f"\nTotal money: ${total_money_earned_value()}")
+        lines.append(f"Stats for {camp_obj.name}:")
+        lines.append(f"Engagement: {scores.get(camp_obj.name, 'N/A')}")
+        if camp_obj.name in money_map:
+            lines.append(f"Money earned: ${money_map[camp_obj.name]}")
+        lines.append(f"Total money across camps: ${total_money_earned_value()}")
 
-        # optional activity detail
-        indices = select_camp_dialog("Select a camp for activity stats (cancel to skip)", camps, allow_multiple=False, allow_cancel=True)
-        if indices:
-            camp_obj = camps[indices[0]]
-            stats = activity_stats_data(camp_obj)
-            if stats["status"] == "ok":
-                lines.append(f"\nActivity summary for {camp_obj.name}:")
-                lines.append(f"Total entries: {stats['total_entries']}")
-                if stats["total_food_used"] is not None:
-                    lines.append(f"Total food used: {stats['total_food_used']} units")
-            else:
-                lines.append(f"\nNo activities recorded for {camp_obj.name}.")
+        stats = activity_stats_data(camp_obj)
+        if stats["status"] == "ok":
+            lines.append(f"\nActivity summary for {camp_obj.name}:")
+            lines.append(f"Total entries: {stats['total_entries']}")
+            if stats["total_food_used"] is not None:
+                lines.append(f"Total food used: {stats['total_food_used']} units")
+        else:
+            lines.append(f"\nNo activities recorded for {camp_obj.name}.")
 
-        # show in a scrollable window
         top = tk.Toplevel(self)
         top.title("Scout Stats")
-        text = tk.Text(top, width=70, height=25)
-        text.pack(fill="both", expand=True)
+        body = ttk.Frame(top, padding=8, style="Card.TFrame")
+        body.pack(fill="both", expand=True)
+        text = tk.Text(body, width=70, height=25)
+        text.pack(fill="both", expand=True, pady=(0, 8))
         text.insert("end", "\n".join(lines))
+
+        ttk.Button(body, text="Show all camp stats", command=lambda: render_all(top), style="Primary.TButton").pack(fill="x", pady=(0, 4))
 
     def messaging_ui(self):
         open_chat_window(self.master, self.username)
@@ -2522,7 +2554,7 @@ def simple_prompt_int(prompt):
     return val
 
 
-def select_camp_dialog(title, camps, allow_multiple=False, allow_cancel=False):
+def select_camp_dialog(title, camps, allow_multiple=False, allow_cancel=False, allow_view_all=False):
     """Return list of selected indices from camps via a listbox dialog."""
     top = tk.Toplevel()
     top.title(title)
@@ -2564,12 +2596,19 @@ def select_camp_dialog(title, camps, allow_multiple=False, allow_cancel=False):
         result["indices"] = None
         top.destroy()
 
+    def on_view_all():
+        # special sentinel to indicate view-all
+        result["indices"] = "ALL"
+        top.destroy()
+
     btn_frame = tk.Frame(top)
     btn_frame.pack(pady=5)
     tk.Button(btn_frame, text="OK", command=on_ok).pack(side="left", padx=5)
     tk.Button(btn_frame, text="Cancel", command=on_cancel).pack(side="left", padx=5)
     if allow_cancel:
         tk.Button(btn_frame, text="Skip", command=on_cancel).pack(side="left", padx=5)
+    if allow_view_all:
+        tk.Button(btn_frame, text="View all", command=on_view_all).pack(side="left", padx=5)
 
     top.grab_set()
     top.wait_window()
