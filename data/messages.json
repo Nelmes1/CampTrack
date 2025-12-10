@@ -1,147 +1,80 @@
 {
     "messages": [
         {
-            "from": "logistics",
-            "to": "admin",
-            "text": "hello",
-            "timestamp": "2025-11-24 20:10:13"
-        },
-        {
             "from": "admin",
             "to": "leader1",
-            "text": "hello leader1",
-            "timestamp": "2025-11-25 04:07:15"
-        },
-        {
-            "from": "logistics",
-            "to": "admin",
-            "text": "hey",
-            "timestamp": "2025-11-25 05:17:13"
+            "timestamp": "2025-07-10 09:00:00",
+            "text": "Welcome aboard, leader1. Please review Pine Ridge Base prep.",
+            "read": true
         },
         {
             "from": "leader1",
             "to": "admin",
-            "text": "hello",
-            "timestamp": "2025-11-27 16:29:51",
-            "read": true
+            "timestamp": "2025-07-10 09:05:00",
+            "text": "Thanks! Food stock confirmed at 40 units.",
+            "read": false
         },
         {
             "from": "admin",
-            "to": "leader1",
-            "text": "hey",
-            "timestamp": "2025-11-27 21:01:31",
-            "read": true
-        },
-        {
-            "from": "logistics",
-            "to": "admin",
-            "text": "hi",
-            "timestamp": "2025-11-29 10:26:23",
-            "read": true
-        },
-        {
-            "from": "logistics",
-            "to": "leader2",
-            "text": "hello",
-            "timestamp": "2025-11-29 10:27:37",
-            "read": true
-        },
-        {
-            "from": "admin",
-            "to": "logistics",
-            "text": "hi",
-            "timestamp": "2025-11-29 10:28:57",
+            "to": "coordinator",
+            "timestamp": "2025-07-11 08:15:00",
+            "text": "Please update dashboard once new campers import completes.",
             "read": false
         },
         {
             "from": "coordinator",
             "to": "admin",
-            "text": "hello",
-            "timestamp": "2025-11-29 10:30:32",
-            "read": true
+            "timestamp": "2025-07-11 08:20:00",
+            "text": "Will do. Also, shortage warning at Cedar Grove overnight?",
+            "read": false
         },
         {
-            "from": "leader1",
-            "to": "admin",
-            "text": "hellllo",
-            "timestamp": "2025-11-29 10:31:51",
-            "read": true
-        },
-        {
-            "from": "coordinator",
-            "to": "admin",
-            "text": "hello",
-            "timestamp": "2025-11-29 11:33:41",
-            "read": true
-        },
-        {
-            "from": "coordinator",
-            "to": "leader1",
-            "text": "hi",
-            "timestamp": "2025-11-29 11:33:57",
-            "read": true
-        },
-        {
-            "from": "leader1",
-            "to": "admin",
-            "text": "hey",
-            "timestamp": "2025-11-29 11:34:29",
-            "read": true
-        },
-        {
-            "from": "leader1",
+            "from": "admin",
             "to": "coordinator",
-            "text": "hi",
-            "timestamp": "2025-11-29 11:34:36",
-            "read": true
-        },
-        {
-            "from": "coordinator",
-            "to": "leader1",
-            "text": "hwy",
-            "timestamp": "2025-11-29 11:34:54",
-            "read": true
-        },
-        {
-            "from": "coordinator",
-            "to": "leader1",
-            "text": "hwy",
-            "timestamp": "2025-11-29 11:34:56",
-            "read": true
-        },
-        {
-            "from": "coordinator",
-            "to": "leader1",
-            "text": "hi",
-            "timestamp": "2025-11-29 11:34:58",
-            "read": true
-        },
-        {
-            "from": "leader1",
-            "to": "leader2",
-            "text": "hello",
-            "timestamp": "2025-11-30 12:29:12",
-            "read": true
+            "timestamp": "2025-07-11 08:23:00",
+            "text": "Yes\u2014top up by 10 units and notify leader2.",
+            "read": false
         },
         {
             "from": "leader2",
-            "to": "leader1",
-            "text": "hello",
-            "timestamp": "2025-12-01 15:21:08",
-            "read": true
-        },
-        {
-            "from": "admin",
             "to": "coordinator",
-            "text": "hi",
-            "timestamp": "2025-12-10 07:47:18",
+            "timestamp": "2025-07-12 14:00:00",
+            "text": "We used 9 units on day 1 at Cedar Grove. Need a top-up by tomorrow.",
             "read": false
         },
         {
-            "from": "admin",
+            "from": "coordinator",
             "to": "leader2",
-            "text": "hi",
-            "timestamp": "2025-12-10 07:47:36",
+            "timestamp": "2025-07-12 14:05:00",
+            "text": "Noted. Adding 10 units to buffer.",
+            "read": false
+        },
+        {
+            "from": "leader3",
+            "to": "leader1",
+            "timestamp": "2025-07-13 16:45:00",
+            "text": "Any tips for summit prep?",
+            "read": true
+        },
+        {
+            "from": "leader1",
+            "to": "leader3",
+            "timestamp": "2025-07-13 16:48:00",
+            "text": "Pack extra water, check winds. Our ridge day used 10 units.",
+            "read": false
+        },
+        {
+            "from": "leader4",
+            "to": "coordinator",
+            "timestamp": "2025-07-14 10:30:00",
+            "text": "Kayak session planned. Do we have spare PFDs?",
+            "read": false
+        },
+        {
+            "from": "coordinator",
+            "to": "leader4",
+            "timestamp": "2025-07-14 10:35:00",
+            "text": "Yes, 6 spare PFDs in storage. I\u2019ll have them ready.",
             "read": false
         }
     ]

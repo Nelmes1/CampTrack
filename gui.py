@@ -2532,8 +2532,16 @@ class ScoutWindow(ttk.Frame):
         ttk.Button(body, text="Show all camp stats", command=lambda: render_all(top), style="Primary.TButton").pack(fill="x", pady=(0, 4))
 
     def messaging_ui(self):
-        open_chat_window(self.master, self.username)
-        open_group_chat_window(self.master, self.username)
+        top = tk.Toplevel(self)
+        top.title("Messaging")
+        top.configure(bg=THEME_BG)
+        frame = ttk.Frame(top, padding=14, style="Card.TFrame")
+        frame.pack(fill="both", expand=True, padx=12, pady=12)
+        ttk.Label(frame, text="Messaging", style="Header.TLabel").pack(anchor="w", pady=(0, 6))
+        ttk.Separator(frame).pack(fill="x", pady=(0, 8))
+        ttk.Button(frame, text="Direct Messages", command=lambda: open_chat_window(self.master, self.username), style="Primary.TButton").pack(fill="x", pady=4)
+        ttk.Button(frame, text="Group Chat", command=lambda: open_group_chat_window(self.master, self.username)).pack(fill="x", pady=4)
+        ttk.Button(frame, text="Close", command=top.destroy).pack(fill="x", pady=(8, 0))
 
     def logout(self):
         root = self.master
