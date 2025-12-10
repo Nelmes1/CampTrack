@@ -149,7 +149,8 @@ def run(users):
             for n in notes:
                 icon = "✓" if n.get("read") else "•"
                 ts = n.get("timestamp", "unknown time")
-                print(f"{icon} [{level}] [{ts}] {n['message']}")
+                lvl = n.get("level", "INFO")
+                print(f"{icon} [{lvl}] [{ts}] {n['message']}")
 
             mark_all_as_read()
             
