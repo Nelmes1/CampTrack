@@ -330,16 +330,10 @@ class AdminWindow(ttk.Frame):
         for text, cmd in [
             ("View all users", self.list_users_ui),
             ("Add a new user", self.add_user_ui),
-            ("Edit a user's password", self.edit_user_password_ui),
-            ("Delete a user", self.delete_user_ui),
-            ("Disable a user", self.disable_user_ui),
-            ("Enable a user", self.enable_user_ui),
         ]:
             btn_style = "TButton"
             if "Add" in text:
                 btn_style = "Primary.TButton"
-            if "Delete" in text or "Disable" in text:
-                btn_style = "Danger.TButton"
             ttk.Button(user_frame, text=text, command=cmd, style=btn_style).pack(fill="x", pady=2)
 
         misc_frame = ttk.LabelFrame(wrapper, text="Other", padding=12, style="Card.TFrame")
@@ -359,6 +353,13 @@ class AdminWindow(ttk.Frame):
         ttk.Label(header, text="All Users", style="Header.TLabel").pack(anchor="w")
         ttk.Label(header, text="Admin, Scout Leader, Logistics Coordinator", style="Subtitle.TLabel").pack(anchor="w")
         ttk.Separator(frame).pack(fill="x", pady=(0, 10))
+
+        search_row = ttk.Frame(frame, style="Card.TFrame")
+        search_row.pack(fill="x", pady=(0, 8))
+        ttk.Label(search_row, text="Search users", style="FieldLabel.TLabel").pack(side="left", padx=(0, 6))
+        search_var = tk.StringVar()
+        search_entry = ttk.Entry(search_row, textvariable=search_var, style="App.TEntry")
+        search_entry.pack(side="left", fill="x", expand=True)
 
         # load disabled usernames
         columns = ("Role", "Username", "Password", "Status")
@@ -417,13 +418,26 @@ class AdminWindow(ttk.Frame):
             for child in tree.get_children():
                 tree.delete(child)
             ds = load_disabled_set()
+            term = search_var.get().strip().lower()
+
+            def matches(role_label, username):
+                status = "Disabled" if username in ds else "Active"
+                if not term:
+                    return True
+                text = f"{role_label} {username} {status}".lower()
+                return term in text
+
             for admin in users['admin']:
-                add_row("Admin", admin, ds)
+                if matches("Admin", admin['username']):
+                    add_row("Admin", admin, ds)
             for role in ['scout leader', 'logistics coordinator']:
                 for user in users[role]:
-                    add_row(role.title(), user, ds)
+                    role_label = role.title()
+                    if matches(role_label, user['username']):
+                        add_row(role_label, user, ds)
             if len(tree.get_children()) == 0:
-                tree.insert("", "end", values=("—", "No users found.", "", ""))
+                msg = "No users found." if not term else "No matches for search."
+                tree.insert("", "end", values=("—", msg, "", ""))
             refresh_scrollbar()
             tree.after_idle(refresh_scrollbar)
 
@@ -612,6 +626,8 @@ class AdminWindow(ttk.Frame):
         ttk.Button(btn_frame, text="Delete", command=delete_user, style="Danger.TButton").pack(side="left", padx=4, pady=2)
 
         refresh_tree()
+        search_var.trace_add("write", lambda *_: refresh_tree())
+        search_entry.focus_set()
 
     def add_user_ui(self):
         top = tk.Toplevel(self)
