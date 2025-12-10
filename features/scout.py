@@ -304,6 +304,9 @@ def record_activity_entry_data(camp_name, date, activity_name, activity_time, no
 
 def record_daily_activity():
     camps = read_from_file()
+    if not camps:
+        print("\nNo camps exist yet.")
+        return
     for i, camp in enumerate(camps, start=1):
         print(f"{i} | {camp.name}| {camp.start_date} -> {camp.end_date}")
 
@@ -316,6 +319,11 @@ def record_daily_activity():
         new_date = input("Enter the date (YYYY-MM-DD) or type n to exit: ").strip()
         if new_date.lower() == "n":
             break
+        try:
+            datetime.strptime(new_date, "%Y-%m-%d")
+        except ValueError:
+            print("Invalid date. Use YYYY-MM-DD (e.g., 2024-06-15).")
+            continue
 
         activity_name = input("Activity name (optional, press enter to skip): ").strip()
         activity_time = input("Time (optional, e.g. 14:00): ").strip()
@@ -339,8 +347,10 @@ def record_daily_activity():
                 try:
                     indices = [int(x) for x in sel.split(",")]
                     for i in indices:
-                        if 1<= 1 <= len(camp.campers):
+                        if 1 <= i <= len(camp.campers):
                             campers_for_activity.append(camp.campers[i-1])
+                        else:
+                            print(f"Ignoring invalid camper number: {i}")
                 except ValueError:
                     print("Invalid camper selection.")
                     campers_for_activity = []
