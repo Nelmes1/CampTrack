@@ -100,10 +100,18 @@ def save_campers(camp_name, campers):
 
     save_to_file()
     if added_names:
-        add_notification(f"{len(added_names)} camper(s) added to {camp_name}: " +", ".join(added_names))
+        add_notification(
+            f"{len(added_names)} camper(s) added to {camp_name}: " +", ".join(added_names),
+            category="CAMP",
+            context={"camp": camp_name, "type": "camp"},
+        )
     else: 
-        add_notification(f"No new campers were added to {camp_name}.")
-    
+        add_notification(
+            f"No new campers were added to {camp_name}.",
+            category="CAMP",
+            context={"camp": camp_name, "type": "camp"},
+        )
+
     return {"status": "ok", "camp": camp_name, "added": list(campers.keys())}
 
 
@@ -311,7 +319,11 @@ def record_activity_entry_data(camp_name, date, activity_name, activity_time, no
     camp = find_camp_by_name(camp_name)
     if camp is None:
         return {"status": "camp_not_found"}
-    add_notification(f"Activity recorded at {camp_name}")
+    add_notification(
+        f"Activity recorded at {camp_name}",
+        category="CAMP",
+        context={"camp": camp_name, "type": "camp"},
+    )
     return record_daily_activity_data(camp, date, activity_name, activity_time, notes, food_units, campers)
 
 
@@ -482,7 +494,12 @@ def record_incident_entry_data(camp_name, date, description, campers_involved, t
         "campers" : campers_involved,
     }
     camp.incidents.append(incident)
-    add_notification(f"Incident recorded at {camp_name}")
+    add_notification(
+        f"Incident recorded at {camp_name}",
+        level="WARNING",
+        category="CAMP",
+        context={"camp": camp_name, "type": "camp"},
+    )
     save_to_file()
     return {"status": "ok"}
 

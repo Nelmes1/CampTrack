@@ -95,7 +95,11 @@ def edit_camp():
         print("Edit cancelled.")
         return
     camp.pay_rate = new_pay
-    add_notification(f"camp {camp.name} edited")
+    add_notification(
+        f"camp {camp.name} edited",
+        category="CAMP",
+        context={"camp": camp.name, "type": "camp"},
+    )
     save_to_file()
     print("\nCamp updated successfully!")
 
@@ -125,7 +129,11 @@ def delete_camp():
         print("\nDeletion cancelled.")
         return
     
-    add_notification(f"camp {camp.name} deleted")
+    add_notification(
+        f"camp {camp.name} deleted",
+        category="CAMP",
+        context={"camp": camp.name, "type": "camp"},
+    )
 
     del camps[choice - 1]
     Camp.all_camps = camps
@@ -185,7 +193,11 @@ def create_camp():
             initial_food_stock,
 
         )
-        add_notification(f"camp {name} created")
+        add_notification(
+            f"camp {name} created",
+            category="CAMP",
+            context={"camp": name, "type": "camp"},
+        )
         save_to_file()
         print("\nCamp successfully created!")
     else:

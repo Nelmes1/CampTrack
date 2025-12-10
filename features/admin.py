@@ -60,7 +60,7 @@ def add_user():
     else:
         users[new_role].append({'username': new_username, 'password': new_password})
     print(f"\nUser {new_username} added successfully as {new_role}!")
-    add_notification(f"New user: {new_username} added as {new_role}")
+    add_notification(f"New user: {new_username} added as {new_role}", category="SYSTEM")
     save_logins()
 
 

@@ -6,7 +6,11 @@ try:
     from dateutil import parser as date_parser
 except ImportError:
     date_parser = None
-from PIL import Image, ImageTk
+try:
+    from PIL import Image, ImageTk
+except ImportError:
+    Image = None
+    ImageTk = None
 from chat_window import open_chat_window, open_group_chat_window
 from user_logins import users, load_logins, check_disabled_logins, save_logins, disabled_logins, enable_login
 from features.admin import list_users
@@ -22,7 +26,17 @@ from features.logistics import (
     plot_leaders_per_camp,
     plot_engagement_scores,
 )
-from features.notifications import load_notifications, mark_all_as_read, add_notification, count_unread
+from features.notifications import (
+    load_notifications,
+    mark_all_as_read,
+    add_notification,
+    clear_notifications,
+    count_unread,
+    mute_category,
+    unmute_category,
+    get_thresholds,
+    set_thresholds,
+)
 from features.scout import (
     assign_camps_to_leader,
     bulk_assign_campers_from_csv,
@@ -86,6 +100,9 @@ def _load_gif_frames_raw(name):
     """Return list of raw RGBA frames for a gif, cached."""
     if name in _GIF_CACHE:
         return _GIF_CACHE[name]
+    if Image is None:
+        _GIF_CACHE[name] = []
+        return []
     path = os.path.join(os.path.dirname(__file__), name)
     frames = []
     if os.path.exists(path):
@@ -182,6 +199,185 @@ def _build_shell(master, username, role, sections):
     return content, nav, nav_buttons, nav_map
 
 
+def open_notifications_window(master, refresh_badge_cb=None, filter_fn=None, username=None):
+    """Reusable notifications window with filters, search, grouping, and actions."""
+    notif_win = tk.Toplevel(master)
+    notif_win.title("Notifications")
+    notif_win.configure(bg=THEME_BG)
+    notif_win.minsize(700, 520)
+    center_window(notif_win, width=900, height=520)
+    frame = ttk.Frame(notif_win, padding=16, style="Card.TFrame")
+    frame.pack(fill="both", expand=True)
+
+    ttk.Label(frame, text="Notifications", style="Header.TLabel").pack(pady=(0, 6), anchor="w")
+    ttk.Separator(frame).pack(fill="x", pady=(0, 8))
+
+    controls = ttk.Frame(frame, style="Card.TFrame")
+    controls.pack(fill="x", pady=(0, 6))
+    ttk.Label(controls, text="Level:", style="FieldLabel.TLabel").pack(side="left")
+    level_var = tk.StringVar(value="ALL")
+    ttk.Combobox(controls, values=["ALL", "INFO", "WARNING", "ERROR", "CRITICAL"], textvariable=level_var, state="readonly", width=12).pack(side="left", padx=(4, 12))
+    unread_only = tk.BooleanVar(value=False)
+    ttk.Checkbutton(controls, text="Unread only", variable=unread_only).pack(side="left")
+    group_var = tk.BooleanVar(value=False)
+    ttk.Checkbutton(controls, text="Group similar", variable=group_var).pack(side="left", padx=(8, 0))
+    ttk.Label(controls, text="Search:", style="FieldLabel.TLabel").pack(side="left", padx=(12, 4))
+    search_var = tk.StringVar(value="")
+    ttk.Entry(controls, textvariable=search_var, style="App.TEntry", width=24).pack(side="left")
+    ttk.Button(controls, text="Refresh", command=lambda: refresh_list()).pack(side="left", padx=(8, 0))
+    ttk.Button(controls, text="Mark all read", command=lambda: mark_all()).pack(side="left", padx=(8, 0))
+
+    action_bar = ttk.Frame(frame, style="Card.TFrame")
+    action_bar.pack(fill="x", pady=(0, 6))
+    ttk.Button(action_bar, text="Open Context", command=lambda: open_context()).pack(side="left", padx=(0, 6))
+    ttk.Button(action_bar, text="Mute Category 1h", command=lambda: mute_selected(60)).pack(side="left", padx=(0, 6))
+    ttk.Button(action_bar, text="Unmute Category", command=lambda: mute_selected(0)).pack(side="left", padx=(0, 6))
+    ttk.Button(action_bar, text="Set Warning Buffer", command=lambda: set_buffer()).pack(side="left", padx=(0, 6))
+    ttk.Button(action_bar, text="Clear All", command=lambda: clear_all()).pack(side="left", padx=(0, 6))
+
+    lb_frame = ttk.Frame(frame, style="Card.TFrame")
+    lb_frame.pack(fill="both", expand=True, pady=6)
+    listbox = tk.Listbox(
+        lb_frame,
+        bg=THEME_CARD,
+        fg=THEME_FG,
+        selectbackground=THEME_ACCENT,
+        highlightthickness=0,
+        relief="flat",
+    )
+    scrollbar = ttk.Scrollbar(lb_frame, orient="vertical", command=listbox.yview)
+    listbox.configure(yscrollcommand=scrollbar.set)
+    listbox.pack(side="left", fill="both", expand=True, padx=(4, 0), pady=4)
+    scrollbar.pack(side="right", fill="y", padx=(0, 4), pady=4)
+
+    current_items = []
+
+    def icon_for(level):
+        return {"INFO": "ℹ", "WARNING": "⚠", "ERROR": "!", "CRITICAL": "‼"}.get(level, "•")
+
+    def refresh_list():
+        nonlocal current_items
+        listbox.delete(0, "end")
+        notes = load_notifications(username=username)
+        if filter_fn:
+            notes = [n for n in notes if filter_fn(n)]
+        filtered = []
+        level_choice = level_var.get()
+        query = search_var.get().lower().strip()
+        for n in notes:
+            if unread_only.get() and n.get("read"):
+                continue
+            if level_choice != "ALL" and n.get("level") != level_choice:
+                continue
+            if query and query not in n.get("message", "").lower():
+                continue
+            filtered.append(n)
+
+        if group_var.get():
+            grouped = {}
+            for n in filtered:
+                key = (n.get("level"), n.get("category"), n.get("message"))
+                grouped.setdefault(key, {"sample": n, "count": 0})
+                grouped[key]["count"] += 1
+            current_items = []
+            if not grouped:
+                listbox.insert("end", "No notifications.")
+            else:
+                for (lvl, cat, msg), info in grouped.items():
+                    count = info["count"]
+                    status = "mixed" if count > 1 else ("✓" if info["sample"].get("read") else "•")
+                    icon = icon_for(lvl)
+                    line = f"{icon} {lvl} {cat} x{count} — {msg}"
+                    listbox.insert("end", line)
+                    current_items.append({"group": True, "count": count, **info["sample"]})
+        else:
+            current_items = filtered
+            if not filtered:
+                listbox.insert("end", "No notifications.")
+            else:
+                for n in filtered:
+                    status = "✓" if n.get("read") else "•"
+                    timestamp = n.get("timestamp", "")
+                    message = n.get("message", "")
+                    level = n.get("level", "INFO")
+                    cat = n.get("category", "GENERAL")
+                    icon = icon_for(level)
+                    listbox.insert("end", f"{status} {icon} [{level}/{cat}] {timestamp} — {message}")
+
+    def mark_all():
+        if username:
+            mark_all_as_read(username)
+        if refresh_badge_cb:
+            refresh_badge_cb()
+        refresh_list()
+
+    def set_buffer():
+        cur = get_thresholds().get("shortage_warning_buffer", 0.15)
+        val = simpledialog.askstring("Warning Buffer", f"Set shortage warning buffer (current: {cur:.2f})", parent=notif_win)
+        if val is None:
+            return
+        try:
+            set_thresholds(float(val))
+            messagebox.showinfo("Saved", "Warning buffer updated.")
+        except ValueError:
+            show_error_toast(master, "Error", "Enter a number like 0.15 for 15%.")
+
+    def clear_all():
+        if not messagebox.askyesno("Confirm", "Clear all notifications?"):
+            return
+        clear_notifications()
+        if refresh_badge_cb:
+            refresh_badge_cb()
+        refresh_list()
+
+    def get_selected():
+        sel = listbox.curselection()
+        if not sel:
+            return None
+        idx = sel[0]
+        if idx >= len(current_items):
+            return None
+        item = current_items[idx]
+        if item.get("group"):
+            return None
+        return item
+
+    def open_context():
+        item = get_selected()
+        if not item:
+            show_error_toast(master, "Context", "Select a single notification with context.")
+            return
+        ctx = item.get("context") or {}
+        if "camp" in ctx:
+            messagebox.showinfo("Context", f"Open camp: {ctx.get('camp')}")
+        else:
+            messagebox.showinfo("Context", "No linked action for this notification.")
+
+    def mute_selected(minutes=60):
+        item = get_selected()
+        if not item:
+            show_error_toast(master, "Mute", "Select a notification first.")
+            return
+        cat = item.get("category", "GENERAL")
+        if minutes == 0:
+            unmute_category(cat)
+            messagebox.showinfo("Mute", f"Unmuted {cat}.")
+        else:
+            mute_category(cat, minutes=minutes)
+            messagebox.showinfo("Mute", f"Muted {cat} for {minutes} minute(s).")
+        refresh_list()
+
+    refresh_list()
+    center_in_place(notif_win)
+
+
+def _unread_count(filter_fn=None, username=None):
+    notes = load_notifications(username=username)
+    if filter_fn:
+        notes = [n for n in notes if filter_fn(n)]
+    return len([n for n in notes if not n.get("read_by") or (username and username not in n.get("read_by"))])
+
+
 def show_error_toast(master, title, message, duration=2000):
     """Non-blocking error popup so animations keep running."""
     top = tk.Toplevel(master)
@@ -214,6 +410,8 @@ def show_error_toast(master, title, message, duration=2000):
 
 
 def load_logo(max_px=260):
+    if Image is None or ImageTk is None:
+        return None
     logo_path = os.path.join(os.path.dirname(__file__), "image.png")
     if not os.path.exists(logo_path):
         return None
@@ -410,10 +608,16 @@ class AdminWindow(ttk.Frame):
             [
                 ("Dashboard", self._focus_dashboard),
                 ("User Management", self.list_users_ui),
+                ("Notifications", self.notifications_ui),
                 ("Messaging", self.messaging_ui),
                 ("Logout", self.logout),
             ],
         )
+        # admin sees critical/error by default
+        self._notif_filter = lambda n: n.get("level") in {"CRITICAL", "ERROR"}
+        # admin sees critical/error by default
+        self._notif_filter = lambda n: n.get("level") in {"CRITICAL", "ERROR"}
+        self._refresh_notification_badge()
 
         # HERO
         hero = ttk.Frame(content, style="Card.TFrame", padding=SPACING["lg"])
@@ -461,6 +665,17 @@ class AdminWindow(ttk.Frame):
     def _focus_dashboard(self):
         # placeholder hook to align with nav; already on dashboard
         pass
+
+    def _refresh_notification_badge(self):
+        unread = count_unread(self.username, filter_fn=self._notif_filter)
+        btn = self._nav_map.get("Notifications")
+        if not btn:
+            return
+        label = "Notifications" if unread == 0 else f"Notifications ({unread})"
+        btn.config(text=label)
+
+    def notifications_ui(self):
+        open_notifications_window(self, refresh_badge_cb=self._refresh_notification_badge)
 
     def list_users_ui(self):
         top = tk.Toplevel(self)
@@ -1013,6 +1228,22 @@ class AdminWindow(ttk.Frame):
         center_in_place(top)
         center_in_place(top)
 
+    def notifications_ui(self):
+        open_notifications_window(
+            self,
+            refresh_badge_cb=self._refresh_notification_badge,
+            filter_fn=self._notif_filter,
+            username=self.username,
+        )
+
+    def _refresh_notification_badge(self):
+        unread = _unread_count(filter_fn=self._notif_filter, username=self.username)
+        btn = self._nav_map.get("Notifications")
+        if not btn:
+            return
+        label = "Notifications" if unread == 0 else f"Notifications ({unread})"
+        btn.config(text=label)
+
     def logout(self):
         root = self.master
         state_info = capture_window_state(root)
@@ -1049,6 +1280,7 @@ class LogisticsWindow(ttk.Frame):
             sections,
         )
         self._sections = sections
+        self._notif_filter = None  # coordinator sees all
         self._refresh_notification_badge()
 
         # HERO
@@ -1109,7 +1341,7 @@ class LogisticsWindow(ttk.Frame):
         pass
 
     def _refresh_notification_badge(self):
-        unread = count_unread()
+        unread = count_unread(self.username, filter_fn=self._notif_filter)
         btn = self._nav_map.get("Notifications")
         if not btn:
             return
@@ -1359,69 +1591,7 @@ class LogisticsWindow(ttk.Frame):
         center_in_place(top)
 
     def notifications_ui(self):
-        notif_win = tk.Toplevel(self)
-        notif_win.title("Notifications")
-        notif_win.configure(bg=THEME_BG)
-        notif_win.minsize(600, 500)
-        center_window(notif_win, width=900, height=500)
-        frame = ttk.Frame(notif_win, padding=16, style="Card.TFrame")
-        frame.pack(fill="both", expand=True)
-        ttk.Label(frame, text="Notifications", style="Header.TLabel").pack(pady=(0, 6), anchor="w")
-        ttk.Separator(frame).pack(fill="x", pady=(0, 8))
-        controls = ttk.Frame(frame, style="Card.TFrame")
-        controls.pack(fill="x", pady=(0, 6))
-        ttk.Label(controls, text="Filter by level:", style="FieldLabel.TLabel").pack(side="left")
-        level_var = tk.StringVar(value="ALL")
-        level_combo = ttk.Combobox(controls, values=["ALL", "INFO", "WARNING", "ERROR", "CRITICAL"], textvariable=level_var, state="readonly", width=12)
-        level_combo.pack(side="left", padx=(4, 12))
-        unread_only = tk.BooleanVar(value=False)
-        ttk.Checkbutton(controls, text="Unread only", variable=unread_only).pack(side="left")
-        ttk.Button(controls, text="Refresh", command=lambda: refresh_list()).pack(side="left", padx=(8, 0))
-        ttk.Button(controls, text="Mark all read", command=lambda: mark_all()).pack(side="left", padx=(8, 0))
-
-        lb_frame = ttk.Frame(frame, style="Card.TFrame")
-        lb_frame.pack(fill="both", expand=True, pady=6)
-        listbox = tk.Listbox(
-            lb_frame,
-            bg=THEME_CARD,
-            fg=THEME_FG,
-            selectbackground=THEME_ACCENT,
-            highlightthickness=0,
-            relief="flat",
-        )
-        scrollbar = ttk.Scrollbar(lb_frame, orient="vertical", command=listbox.yview)
-        listbox.configure(yscrollcommand=scrollbar.set)
-        listbox.pack(side="left", fill="both", expand=True, padx=(4, 0), pady=4)
-        scrollbar.pack(side="right", fill="y", padx=(0, 4), pady=4)
-
-        def refresh_list():
-            listbox.delete(0, "end")
-            notes = load_notifications()
-            filtered = []
-            level_choice = level_var.get()
-            for n in notes:
-                if unread_only.get() and n.get("read"):
-                    continue
-                if level_choice != "ALL" and n.get("level") != level_choice:
-                    continue
-                filtered.append(n)
-            if not filtered:
-                listbox.insert("end", "No notifications.")
-            else:
-                for n in filtered:
-                    status = "✓" if n.get("read") else "•"
-                    timestamp = n.get("timestamp", "")
-                    message = n.get("message", "")
-                    level = n.get("level", "INFO")
-                    listbox.insert("end", f"{status} {level} {timestamp} — {message}")
-
-        def mark_all():
-            mark_all_as_read()
-            self._refresh_notification_badge()
-            refresh_list()
-
-        refresh_list()
-        center_in_place(notif_win)
+        open_notifications_window(self, refresh_badge_cb=self._refresh_notification_badge)
         
     def visualise_menu(self):
         top = tk.Toplevel(self)
@@ -1778,10 +1948,16 @@ class ScoutWindow(ttk.Frame):
                 ("View Stats", self.stats_ui),
                 ("View Activities", self.view_activities_ui),
                 ("View Incidents", self.view_incidents_ui),
+                ("Notifications", self.notifications_ui),
                 ("Messaging", self.messaging_ui),
                 ("Logout", self.logout),
             ],
         )
+        # Scout sees notifications for camps they supervise
+        camps = read_from_file()
+        supervised_names = {c.name for c in camps if self.username in c.scout_leaders}
+        self._notif_filter = lambda n: (n.get("context") or {}).get("camp") in supervised_names
+        self._refresh_notification_badge()
 
         # HERO
         hero = ttk.Frame(content, style="Card.TFrame", padding=SPACING["lg"])
@@ -1843,6 +2019,22 @@ class ScoutWindow(ttk.Frame):
     def _focus_dashboard(self):
         # placeholder to align with nav; content already visible
         pass
+
+    def _refresh_notification_badge(self):
+        unread = count_unread(self.username, filter_fn=self._notif_filter)
+        btn = self._nav_map.get("Notifications")
+        if not btn:
+            return
+        label = "Notifications" if unread == 0 else f"Notifications ({unread})"
+        btn.config(text=label)
+
+    def notifications_ui(self):
+        open_notifications_window(
+            self,
+            refresh_badge_cb=self._refresh_notification_badge,
+            filter_fn=self._notif_filter,
+            username=self.username,
+        )
 
     def group_chat_ui(self):
         from chat_window import open_group_chat_window
