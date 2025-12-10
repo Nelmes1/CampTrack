@@ -1151,12 +1151,16 @@ class LogisticsWindow(ttk.Frame):
             return
         top = tk.Toplevel(self)
         top.title("Dashboard Summary")
-        text = tk.Text(top, width=80, height=20)
+        top.minsize(1200, 100)
+        frame = ttk.Frame(top, padding=10, style="Card.TFrame")
+        frame.pack(fill="both", expand=True)
+        text = tk.Text(frame, width=120, height=15)
         text.pack(fill="both", expand=True)
         text.insert("end", df.to_string(index=False))
         text.insert("end", "\n\nSummary:\n")
         for k, v in summary.items():
             text.insert("end", f"{k}: {v}\n")
+        center_window(top, width=1200, height=400)
 
     def notifications_ui(self):
         notif_win = tk.Toplevel(self)
