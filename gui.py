@@ -22,7 +22,7 @@ from features.logistics import (
     plot_leaders_per_camp,
     plot_engagement_scores,
 )
-from features.notifications import load_notifications, mark_all_as_read, add_notification
+from features.notifications import load_notifications, mark_all_as_read, add_notification, count_unread
 from features.scout import (
     assign_camps_to_leader,
     bulk_assign_campers_from_csv,
@@ -167,17 +167,19 @@ def _build_shell(master, username, role, sections):
     ttk.Label(nav, text=f"Signed in as {username}", style="Subtitle.TLabel").grid(row=2, column=0, sticky="w", pady=(0, SPACING["md"]))
 
     nav_buttons = []
+    nav_map = {}
     for idx, (label, callback) in enumerate(sections, start=3):
         btn = ttk.Button(nav, text=label, command=callback, style="Ghost.TButton")
         btn.grid(row=idx, column=0, sticky="ew", pady=3)
         nav_buttons.append(btn)
+        nav_map[label] = btn
 
     # RIGHT CONTENT
     content = ttk.Frame(outer, padding=SPACING["lg"], style="App.TFrame")
     content.grid(row=0, column=1, sticky="nsew")
     content.columnconfigure(0, weight=1)
     content.rowconfigure(1, weight=1)
-    return content, nav
+    return content, nav, nav_buttons, nav_map
 
 
 def show_error_toast(master, title, message, duration=2000):
@@ -401,7 +403,7 @@ class AdminWindow(ttk.Frame):
         _attach_gif_background(self, gif_name="campfire1.gif", start_delay=500)
         self.pack(fill="both", expand=True)
 
-        content, nav = _build_shell(
+        content, nav, self._nav_buttons, self._nav_map = _build_shell(
             self,
             username,
             "Administrator",
@@ -1030,21 +1032,24 @@ class LogisticsWindow(ttk.Frame):
         master.minsize(1040, 820)
         self.pack(fill="both", expand=True)
 
-        content, nav = _build_shell(
+        sections = [
+            ("Dashboard", self._focus_dashboard),
+            ("Manage Camps", self.manage_camps_menu),
+            ("Food Allocation", self.food_allocation_menu),
+            ("Financial Settings", self.financial_settings_ui),
+            ("Visualise Data", self.visualise_menu),
+            ("Notifications", self.notifications_ui),
+            ("Messaging", self.messaging_ui),
+            ("Logout", self.logout),
+        ]
+        content, nav, self._nav_buttons, self._nav_map = _build_shell(
             self,
             username,
             "Logistics Coordinator",
-            [
-                ("Dashboard", self._focus_dashboard),
-                ("Manage Camps", self.manage_camps_menu),
-                ("Food Allocation", self.food_allocation_menu),
-                ("Financial Settings", self.financial_settings_ui),
-                ("Visualise Data", self.visualise_menu),
-                ("Notifications", self.notifications_ui),
-                ("Messaging", self.messaging_ui),
-                ("Logout", self.logout),
-            ],
+            sections,
         )
+        self._sections = sections
+        self._refresh_notification_badge()
 
         # HERO
         hero = ttk.Frame(content, style="Card.TFrame", padding=SPACING["lg"])
@@ -1102,6 +1107,14 @@ class LogisticsWindow(ttk.Frame):
     def _focus_dashboard(self):
         # placeholder to match nav selection; content already visible
         pass
+
+    def _refresh_notification_badge(self):
+        unread = count_unread()
+        btn = self._nav_map.get("Notifications")
+        if not btn:
+            return
+        label = "Notifications" if unread == 0 else f"Notifications ({unread})"
+        btn.config(text=label)
 
     def manage_camps_menu(self):
         top = tk.Toplevel(self)
@@ -1355,6 +1368,17 @@ class LogisticsWindow(ttk.Frame):
         frame.pack(fill="both", expand=True)
         ttk.Label(frame, text="Notifications", style="Header.TLabel").pack(pady=(0, 6), anchor="w")
         ttk.Separator(frame).pack(fill="x", pady=(0, 8))
+        controls = ttk.Frame(frame, style="Card.TFrame")
+        controls.pack(fill="x", pady=(0, 6))
+        ttk.Label(controls, text="Filter by level:", style="FieldLabel.TLabel").pack(side="left")
+        level_var = tk.StringVar(value="ALL")
+        level_combo = ttk.Combobox(controls, values=["ALL", "INFO", "WARNING", "ERROR", "CRITICAL"], textvariable=level_var, state="readonly", width=12)
+        level_combo.pack(side="left", padx=(4, 12))
+        unread_only = tk.BooleanVar(value=False)
+        ttk.Checkbutton(controls, text="Unread only", variable=unread_only).pack(side="left")
+        ttk.Button(controls, text="Refresh", command=lambda: refresh_list()).pack(side="left", padx=(8, 0))
+        ttk.Button(controls, text="Mark all read", command=lambda: mark_all()).pack(side="left", padx=(8, 0))
+
         lb_frame = ttk.Frame(frame, style="Card.TFrame")
         lb_frame.pack(fill="both", expand=True, pady=6)
         listbox = tk.Listbox(
@@ -1369,18 +1393,34 @@ class LogisticsWindow(ttk.Frame):
         listbox.configure(yscrollcommand=scrollbar.set)
         listbox.pack(side="left", fill="both", expand=True, padx=(4, 0), pady=4)
         scrollbar.pack(side="right", fill="y", padx=(0, 4), pady=4)
-        notes = load_notifications()
-        if not notes:
-            listbox.insert("end", "No notifications.")
-        else:
-            for n in notes:
-                status = "✓" if n.get("read") else "•"
-                timestamp = n.get("timestamp", "")
-                message = n.get("message", "")
-                level = n.get("level", "INFO")
-                listbox.insert("end", f"{status} {level} {timestamp} — {message}")
 
-        mark_all_as_read()
+        def refresh_list():
+            listbox.delete(0, "end")
+            notes = load_notifications()
+            filtered = []
+            level_choice = level_var.get()
+            for n in notes:
+                if unread_only.get() and n.get("read"):
+                    continue
+                if level_choice != "ALL" and n.get("level") != level_choice:
+                    continue
+                filtered.append(n)
+            if not filtered:
+                listbox.insert("end", "No notifications.")
+            else:
+                for n in filtered:
+                    status = "✓" if n.get("read") else "•"
+                    timestamp = n.get("timestamp", "")
+                    message = n.get("message", "")
+                    level = n.get("level", "INFO")
+                    listbox.insert("end", f"{status} {level} {timestamp} — {message}")
+
+        def mark_all():
+            mark_all_as_read()
+            self._refresh_notification_badge()
+            refresh_list()
+
+        refresh_list()
         center_in_place(notif_win)
         
     def visualise_menu(self):
@@ -1725,7 +1765,7 @@ class ScoutWindow(ttk.Frame):
         master.minsize(1040, 820)
         self.pack(fill="both", expand=True)
 
-        content, nav = _build_shell(
+        content, nav, self._nav_buttons, self._nav_map = _build_shell(
             self,
             username,
             "Scout Leader",
