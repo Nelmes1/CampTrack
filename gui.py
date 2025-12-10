@@ -1537,8 +1537,8 @@ class ScoutWindow(ttk.Frame):
         actions.pack(fill="both", expand=True, pady=(0, 14))
         ttk.Label(actions, text="Select camps, import campers, and set food needs.", style="Subtitle.TLabel").pack(anchor="w", pady=(0, 6))
         for text, cmd in [
-            ("Select Camp(s) to supervise", self.select_camps_ui),
-            #("Stop supervising Camp(s)", self.unsupervise_camps_ui),
+            ("Select Camp(s) to Supervise", self.select_camps_ui),
+            ("Stop Supervising Camp(s)", self.unsupervise_camps_ui),
             ("Manage Campers", self.bulk_assign_ui),
             ("Set Food per Camper", self.food_req_ui),
             ("Record Activity", self.record_activity_ui),
@@ -1644,7 +1644,7 @@ class ScoutWindow(ttk.Frame):
         else:
             show_error_toast(self.master, "Error", status or "Unknown error")
     
-    """def unsupervise_camps_ui(self):
+    def unsupervise_camps_ui(self):
         camps = read_from_file()
         if not camps:
             messagebox.showinfo("Stop Supervising", "No camps exist.")
@@ -1669,7 +1669,7 @@ class ScoutWindow(ttk.Frame):
                 camp.scout_leaders.remove(self.username)
         
         save_to_file()
-        messagebox.showinfo("Updated", "You are no longer supervising the selected camp(s).")"""
+        messagebox.showinfo("Updated", "You are no longer supervising the selected camp(s).")
 
 
     def bulk_assign_ui(self):
@@ -1744,14 +1744,13 @@ class ScoutWindow(ttk.Frame):
                 refresh_campers()
             elif status == "file_not_found":
                 show_error_toast(self.master, "Error", "CSV file not found.")
-            elif status == "csv_already_used_this_camp":
-                show_error_toast(self.master, "Eror", "This CSV has already been used for this camp")
-            elif status == "csv_overlap_other_camp":
-                show_error_toast(self.master, "Error", "This CSV was used for another camp whose dates overlap")
             elif status == "camp_not_found":
                 show_error_toast(self.master, "Error", "Camp not found.")
             elif status == "no_campers":
                 messagebox.showinfo("Result", "No campers in CSV.")
+            elif status == "no_new_campers":
+                show_error_toast(self.master, "No new campers",("No campers were imported. "
+                "They may already be assigned to this camp or to another camp with overlapping dates"),)
             else:
                 show_error_toast(self.master, "Error", status or "Unknown error")
 
@@ -2325,7 +2324,7 @@ class ScoutWindow(ttk.Frame):
             else:
                 messagebox.showerror("Error", "Could not save incident.")
 
-        tk.Button(top, text="Save Incident", command=save_incident).pack(fill="x")
+        ttk.Button(frame, text="Save Incident", command=save_incident, style="Primary.TButton").pack(fill="x", pady=(4,0))
     
     def view_incidents_ui(self):
         camps = read_from_file()

@@ -211,7 +211,28 @@
             "Ella Nguyen",
             "Zoe Carter"
         ],
-        "campers_info": {},
+        "campers_info": {
+            "Jacob Black": {
+                "dob": "18/03/2008",
+                "emergency": [
+                    "Bone fracture"
+                ]
+            },
+            "Bella Swan": {
+                "dob": "27/01/2007",
+                "emergency": [
+                    "Depression"
+                ]
+            },
+            "Edward Cullen": {
+                "dob": "04/10/2011",
+                "emergency": []
+            },
+            "Emily Smith": {
+                "dob": "08/02/2010",
+                "emergency": []
+            }
+        },
         "activities": {
             "2025-08-01": [
                 {
@@ -371,7 +392,58 @@
             "Eli Barnes",
             "Stella Price"
         ],
-        "campers_info": {},
+        "campers_info": {
+            "Beatrice Prior": {
+                "dob": "12/08/2008",
+                "emergency": [
+                    "History of injuries"
+                ]
+            },
+            "Jeanine Mathews": {
+                "dob": "03/02/2007",
+                "emergency": []
+            },
+            "Caleb Prior": {
+                "dob": "19/06/2009",
+                "emergency": [
+                    "Type 1 diabetes;Anxiety;COVID;Diptheria"
+                ]
+            },
+            "Christina Parker": {
+                "dob": "09/11/2007",
+                "emergency": [
+                    "Arm injury"
+                ]
+            },
+            "James DaSnake": {
+                "dob": "23/04/2008",
+                "emergency": []
+            },
+            "Drew Turner": {
+                "dob": "31/01/2009",
+                "emergency": []
+            },
+            "Peter Hayes": {
+                "dob": "20/12/2007",
+                "emergency": [
+                    "Behavioural aggression history"
+                ]
+            },
+            "Tobias Eaton": {
+                "dob": "14/07/2010",
+                "emergency": [
+                    "Asthma"
+                ]
+            },
+            "Will Sheriden": {
+                "dob": "01/03/2006",
+                "emergency": []
+            },
+            "Marcus Eaton": {
+                "dob": "03/07/2010",
+                "emergency": []
+            }
+        },
         "activities": {
             "2025-09-05": [
                 {

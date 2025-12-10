@@ -91,12 +91,19 @@ def save_campers(camp_name, campers):
     if target_camp.campers_info is None:
         target_camp.campers_info = {}
 
+    added_names = []
+
     for name, info in campers.items():
         if name not in target_camp.campers:
             target_camp.campers.append(name)
         target_camp.campers_info[name] = info
 
     save_to_file()
+    if added_names:
+        add_notification(f"{len(added_names)} camper(s) added to {camp_name}: " +", ".join(added_names))
+    else: 
+        add_notification(f"No new campers were added to {camp_name}.")
+    
     return {"status": "ok", "camp": camp_name, "added": list(campers.keys())}
 
 
@@ -114,51 +121,49 @@ def bulk_assign_campers_data(selected_camp, campers):
         return {"status": "no_camp"}
     # prevent duplicates across camps
     camps = read_from_file()
-    for name in list(campers.keys()):
-        for other_camp in camps:
-            if other_camp.name != selected_camp.name and name in other_camp.campers:
-                # remove camper already assigned elsewhere
-                campers.pop(name, None)
-                break
-    return save_campers(selected_camp.name, campers)
+    value = None
+    for camp in camps:
+        if camp.name == selected_camp.name:
+            target = camp
+            break
+    if target is None:
+        return {"status": "camp_not_found"}
 
+    allowed = {}
+    for name, info in campers.items():
+        if name in target.campers:
+            continue
+        blocked = False
+        for other in camps:
+            if other is target:
+                continue
+            if name in other.campers and camps_overlap(target, other):
+                blocked = True
+                break
+        if blocked:
+            continue
+
+        allowed[name] = info
+
+    if not allowed:
+        return {"status": "no_new_campers"}
+
+    return save_campers(target.name, allowed)
 
 def bulk_assign_campers_from_csv(camp_name, filepath):
     """Pure helper: assign campers from a CSV to a named camp."""
     if not os.path.exists(filepath):
         return {"status": "file_not_found"}
-    camps = read_from_file()
+
     selected_camp = find_camp_by_name(camp_name)
     if selected_camp is None:
         return {"status": "camp_not_found"}
-    if getattr(selected_camp, "imported_csvs", None) is None:  
-        selected_camp.imported_csvs = []
     
-    filename = os.path.basename(filepath)
-
-    if filename in selected_camp.imported_csvs:
-        return {"status": "csv_already_used_this_camp"}
-    
-    for other_camp in camps:
-        if other_camp is selected_camp:
-            if other_camp is selected_camp:
-                continue
-            other_list = getattr(other_camp, "imported_csvs", [])
-            if filename in other_list:
-                if camps_overlap(selected_camp, other_camp):
-                    return {"status": "csv_overlap_other_camp"}
-                
     campers = load_campers_csv(filepath)
     if not campers:
-        return {"status": "no_campers"}
-    
-    result = bulk_assign_campers_data(selected_camp, campers)
+        return {"status" : "no_campers"}
 
-    if result.get("status") == "ok":
-        selected_camp.imported_csvs.append(filename)
-        save_to_file()
-    
-    return result
+    return bulk_assign_campers_data(selected_camp, campers)
 
 
 def assign_camps_to_leader(camps, leader_username, selected_indices):
