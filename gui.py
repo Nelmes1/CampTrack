@@ -297,7 +297,7 @@ class LoginWindow(ttk.Frame):
             root.configure(bg=THEME_BG)
             root.title(f"CampTrack - {role}")
             init_style(root)
-            apply_window_state(root, state_info, min_w=760, min_h=600)
+            restore_geometry(root, state_info, min_w=1040, min_h=820)
             if role == "admin":
                 AdminWindow(root, uname)
             elif role == "scout leader":
@@ -860,13 +860,13 @@ class AdminWindow(ttk.Frame):
         open_chat_window(self.master, self.username)
 
     def logout(self):
-        state_info = capture_window_state(self.master)
         root = self.master
+        state_info = capture_window_state(root)
         for child in list(root.winfo_children()):
             child.destroy()
         root.title("CampTrack Login")
         init_style(root)
-        apply_window_state(root, state_info, min_w=480, min_h=360)
+        restore_geometry(root, state_info, min_w=1040, min_h=820)
         LoginWindow(root)
 
 
@@ -875,7 +875,7 @@ class LogisticsWindow(ttk.Frame):
         super().__init__(master, padding=0, style="App.TFrame")
         self.username = username
         _attach_gif_background(self, gif_name="campfire1.gif", delay=140, start_delay=500)
-        master.minsize(640, 640)
+        master.minsize(1040, 820)
         self.pack(fill="both", expand=True)
         wrapper = ttk.Frame(self, padding=18, style="Card.TFrame", width=520)
         wrapper.pack(expand=True, padx=20, pady=16)
@@ -1442,13 +1442,13 @@ class LogisticsWindow(ttk.Frame):
         return result["camp"]
 
     def logout(self):
-        state_info = capture_window_state(self.master)
         root = self.master
+        state_info = capture_window_state(root)
         for child in list(root.winfo_children()):
             child.destroy()
         root.title("CampTrack Login")
         init_style(root)
-        apply_window_state(root, state_info, min_w=480, min_h=360)
+        restore_geometry(root, state_info, min_w=1040, min_h=820)
         LoginWindow(root)
 
 
@@ -1457,7 +1457,7 @@ class ScoutWindow(ttk.Frame):
         super().__init__(master, padding=0, style="App.TFrame")
         self.username = username
         _attach_gif_background(self, gif_name="campfire1.gif", delay=140, start_delay=500)
-        master.minsize(640, 640)
+        master.minsize(1040, 820)
         self.pack(fill="both", expand=True)
         wrapper = ttk.Frame(self, padding=18, style="Card.TFrame", width=520)
         wrapper.pack(expand=True, padx=20, pady=16)
@@ -2444,13 +2444,13 @@ class ScoutWindow(ttk.Frame):
         open_group_chat_window(self.master, self.username)
 
     def logout(self):
-        state_info = capture_window_state(self.master)
         root = self.master
         for child in list(root.winfo_children()):
             child.destroy()
         root.title("CampTrack Login")
         init_style(root)
-        apply_window_state(root, state_info, min_w=480, min_h=360)
+        state_info = capture_window_state(root)
+        restore_geometry(root, state_info, min_w=1040, min_h=820)
         LoginWindow(root)
 
 def simple_prompt(prompt):
@@ -2543,6 +2543,27 @@ def apply_window_state(win, state_info, min_w, min_h):
         target_w = max(state_info["width"], min_w)
         target_h = max(state_info["height"], min_h)
         center_window(win, width=target_w, height=target_h)
+
+
+def restore_geometry(win, state_info, min_w=1040, min_h=820):
+    """Restore size/position without recentering; fallback to centering if unknown."""
+    win.update_idletasks()
+    w = max(state_info.get("width", min_w), min_w)
+    h = max(state_info.get("height", min_h), min_h)
+    geom = state_info.get("geom")
+    try:
+        if geom and "+" in geom:
+            parts = geom.split("+")
+            if len(parts) >= 3 and "x" in parts[0]:
+                x = int(parts[1])
+                y = int(parts[2])
+                win.minsize(w, h)
+                win.geometry(f"{w}x{h}+{x}+{y}")
+                return
+    except Exception:
+        pass
+    win.minsize(w, h)
+    center_window(win, width=w, height=h)
 
 
 def init_style(root):
@@ -2710,11 +2731,11 @@ def launch_login():
     root.withdraw()
     root.title("CampTrack Login")
     # Start larger so role windows retain space for full cards/log out buttons
-    root.minsize(900, 720)
+    root.minsize(1040, 820)
     root.configure(bg=THEME_BG)
     init_style(root)
     LoginWindow(root)
-    center_window(root, width=960, height=760)
+    center_window(root, width=1100, height=880)
     root.deiconify()
     root.mainloop()
 
