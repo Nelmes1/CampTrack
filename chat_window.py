@@ -1,10 +1,15 @@
 import tkinter as tk
-from tkinter import ttk, messagebox, simpledialog
+from tkinter import ttk, messagebox, simpledialog, filedialog
 
 from messaging import (
     get_conversations_for_user,
     get_conversation,
     send_message,
+    send_broadcast,
+    search_messages,
+    export_conversation,
+    acknowledge_conversation,
+    pin_message,
     count_unread_messages,
     mark_conversation_as_read,
 )
@@ -148,6 +153,68 @@ def open_chat_window(master, username, role=None):
 
     ttk.Button(left_frame, text="New Chat", command=start_new_chat).pack(fill="x", pady=(6, 0))
 
+    def start_broadcast():
+        dialog = tk.Toplevel(convo_win)
+        dialog.title("Broadcast")
+        dialog.configure(bg=bg)
+
+        outer = ttk.Frame(dialog, padding=12, style="Card.TFrame")
+        outer.pack(fill="both", expand=True)
+
+        ttk.Label(outer, text="Broadcast Message", style="Header.TLabel").pack(anchor="w", pady=(0, 6))
+        ttk.Label(outer, text="Target:", style="FieldLabel.TLabel").pack(anchor="w")
+
+        target_var = tk.StringVar(value="all")
+        for val, label in [("all", "All users"), ("admin", "Admins"), ("scout leader", "Scout leaders"), ("logistics coordinator", "Logistics coordinators"), ("camp", "Leaders of a camp")]:
+            ttk.Radiobutton(outer, text=label, value=val, variable=target_var).pack(anchor="w")
+
+        camp_names = [c.name for c in read_from_file()]
+        camp_var = tk.StringVar(value=camp_names[0] if camp_names else "")
+        if camp_names:
+            ttk.Label(outer, text="Select camp (for camp broadcast):", style="FieldLabel.TLabel").pack(anchor="w", pady=(6, 0))
+            camp_combo = ttk.Combobox(outer, values=camp_names, textvariable=camp_var, state="readonly")
+            camp_combo.pack(fill="x", pady=(0, 6))
+
+        msg_entry = ttk.Entry(outer, style="App.TEntry")
+        msg_entry.pack(fill="x", pady=(6, 6))
+        msg_entry.insert(0, "Announcement…")
+
+        priority_flag = tk.BooleanVar(value=False)
+        ttk.Checkbutton(outer, text="Priority (requires ACK)", variable=priority_flag).pack(anchor="w", pady=(0, 6))
+
+        def send_broadcast_now():
+            text = msg_entry.get().strip()
+            if not text:
+                messagebox.showerror("Error", "Message cannot be empty.")
+                return
+            target = target_var.get()
+            if target == "all":
+                recipients = [u for u in _get_all_usernames() if u != username]
+                meta = {}
+            elif target == "camp":
+                if not camp_var.get():
+                    messagebox.showerror("Error", "No camp selected.")
+                    return
+                recipients = []
+                for camp in read_from_file():
+                    if camp.name == camp_var.get():
+                        recipients = list(set(camp.scout_leaders))
+                        break
+                if not recipients:
+                    messagebox.showerror("Error", "No leaders assigned to that camp.")
+                    return
+                meta = {"camp": camp_var.get()}
+            else:
+                recipients = [u["username"] for u in users.get(target, []) if isinstance(u, dict)]
+                meta = {"role": target}
+            send_broadcast(username, recipients, text, priority=priority_flag.get(), metadata=meta)
+            dialog.destroy()
+            refresh_conversation_list()
+
+        ttk.Button(outer, text="Send Broadcast", style="Primary.TButton", command=send_broadcast_now).pack(fill="x")
+
+    ttk.Button(left_frame, text="Broadcast", command=start_broadcast).pack(fill="x", pady=(6, 0))
+
     # Group chats only for scout leaders (your design choice)
     if role == "scout leader":
         ttk.Button(left_frame, text="Group Chats", command=lambda: open_group_chat_window(master, username)).pack(
@@ -171,6 +238,9 @@ def open_chat_window(master, username, role=None):
     entry = ttk.Entry(right_frame, style="App.TEntry")
     entry.pack(fill="x", pady=(0, 6))
 
+    priority_var = tk.BooleanVar(value=False)
+    attachment_var = tk.StringVar(value="")
+
     current_partner = tk.StringVar(value="")
 
     def refresh_chat(partner):
@@ -187,7 +257,17 @@ def open_chat_window(master, username, role=None):
         else:
             for msg in thread:
                 who = "You" if msg["from"] == username else partner
-                chat_text.insert(tk.END, f"{msg['timestamp']} - {who}: {msg['text']}\n")
+                flags = []
+                if msg.get("priority"):
+                    flags.append("PRIORITY")
+                if msg.get("requires_ack") and not msg.get("acked"):
+                    flags.append("ACK PENDING")
+                if msg.get("pinned"):
+                    flags.append("PINNED")
+                flag_str = f" [{' | '.join(flags)}]" if flags else ""
+                attach = msg.get("attachment")
+                attach_str = f" [attachment: {attach}]" if attach else ""
+                chat_text.insert(tk.END, f"{msg['timestamp']} - {who}: {msg['text']}{flag_str}{attach_str}\n")
 
         chat_text.config(state="disabled")
         refresh_conversation_list()  # update unread counters
@@ -202,11 +282,118 @@ def open_chat_window(master, username, role=None):
         if not text:
             return
 
-        send_message(username, partner, text)
+        send_message(
+            username,
+            partner,
+            text,
+            priority=priority_var.get(),
+            attachment=attachment_var.get() or None,
+        )
         entry.delete(0, tk.END)
+        priority_var.set(False)
+        attachment_var.set("")
         refresh_chat(partner)
 
-    ttk.Button(right_frame, text="Send", style="Primary.TButton", command=send_current_message).pack(fill="x")
+    def ack_priority():
+        partner = current_partner.get()
+        if not partner:
+            messagebox.showinfo("Messaging", "Select a conversation first.")
+            return
+        count = acknowledge_conversation(username, partner)
+        messagebox.showinfo("Acknowledged", f"Acknowledged {count} message(s).")
+        refresh_chat(partner)
+
+    def pin_latest():
+        partner = current_partner.get()
+        if not partner:
+            messagebox.showinfo("Messaging", "Select a conversation first.")
+            return
+        thread = get_conversation(username, partner)
+        if not thread:
+            messagebox.showinfo("Messaging", "No messages to pin.")
+            return
+        latest = thread[-1]
+        now_pin = not latest.get("pinned", False)
+        if pin_message(username, partner, latest.get("timestamp"), pinned=now_pin):
+            state = "Pinned" if now_pin else "Unpinned"
+            messagebox.showinfo("Pin", f"{state} latest message.")
+        refresh_chat(partner)
+
+    def export_current_chat():
+        partner = current_partner.get()
+        if not partner:
+            messagebox.showinfo("Messaging", "Select a conversation first.")
+            return
+        path = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Text", "*.txt")])
+        if not path:
+            return
+        if export_conversation(username, partner, path):
+            messagebox.showinfo("Export", f"Saved chat to {path}")
+        else:
+            messagebox.showerror("Export", "Could not save chat.")
+
+    def search_in_chat():
+        partner = current_partner.get()
+        if not partner:
+            messagebox.showinfo("Messaging", "Select a conversation first.")
+            return
+        query = simpledialog.askstring("Search", "Enter search text (blank = show all):", parent=convo_win)
+        if query is None:
+            return
+        date_from = simpledialog.askstring("Search", "Start date YYYY-MM-DD (optional):", parent=convo_win)
+        date_to = simpledialog.askstring("Search", "End date YYYY-MM-DD (optional):", parent=convo_win)
+        priority_only = messagebox.askyesno("Search", "Priority only?", parent=convo_win)
+
+        results = search_messages(
+            username,
+            query=query or None,
+            other=partner,
+            date_from=date_from or None,
+            date_to=date_to or None,
+            priority_only=priority_only,
+        )
+        if not results:
+            messagebox.showinfo("Search", "No results.")
+            return
+        lines = []
+        for msg in results:
+            who = "You" if msg["from"] == username else partner
+            flags = []
+            if msg.get("priority"):
+                flags.append("PRIORITY")
+            if msg.get("requires_ack") and not msg.get("acked"):
+                flags.append("ACK PENDING")
+            if msg.get("pinned"):
+                flags.append("PINNED")
+            flag_str = f" [{' | '.join(flags)}]" if flags else ""
+            lines.append(f"{msg['timestamp']} - {who}: {msg['text']}{flag_str}")
+        messagebox.showinfo("Search Results", "\n".join(lines[:200]))
+
+    controls = ttk.Frame(right_frame, style="Card.TFrame")
+    controls.pack(fill="x", pady=(0, 6))
+
+    ttk.Checkbutton(controls, text="Priority", variable=priority_var).pack(side="left", padx=(0, 6))
+
+    def choose_attachment():
+        path = filedialog.askopenfilename(title="Select attachment (optional)")
+        if path:
+            attachment_var.set(path)
+        else:
+            attachment_var.set("")
+
+    ttk.Button(controls, text="Attach", command=choose_attachment).pack(side="left", padx=(0, 6))
+    attach_label = ttk.Label(controls, textvariable=attachment_var, style="Subtitle.TLabel", width=28)
+    attach_label.pack(side="left", expand=True, anchor="w")
+
+    actions = ttk.Frame(right_frame, style="Card.TFrame")
+    actions.pack(fill="x", pady=(0, 6))
+
+    ttk.Button(actions, text="Send", style="Primary.TButton", command=send_current_message).pack(side="left", padx=(0, 6))
+    ttk.Button(actions, text="Search", command=lambda: search_in_chat()).pack(side="left", padx=(0, 6))
+    ttk.Button(actions, text="Export", command=lambda: export_current_chat()).pack(side="left", padx=(0, 6))
+    ttk.Button(actions, text="Ack Priority", command=lambda: ack_priority()).pack(side="left", padx=(0, 6))
+    ttk.Button(actions, text="Pin/Unpin", command=lambda: pin_latest()).pack(side="left", padx=(0, 6))
+
     entry.bind("<Return>", send_current_message)
 
     # when user clicks another conversation
