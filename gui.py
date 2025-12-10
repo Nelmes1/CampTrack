@@ -1458,8 +1458,8 @@ class ScoutWindow(ttk.Frame):
         ttk.Label(actions, text="Select camps, import campers, and set food needs.", style="Subtitle.TLabel").pack(anchor="w", pady=(0, 6))
         for text, cmd in [
             ("Select Camp(s) to supervise", self.select_camps_ui),
-            ("Stop supervising Camp(s)", self.unsupervise_camps_ui),
-            ("Import Campers", self.bulk_assign_ui),
+            #("Stop supervising Camp(s)", self.unsupervise_camps_ui),
+            ("Manage Campers", self.bulk_assign_ui),
             ("Set Food per Camper", self.food_req_ui),
             ("Record Activity", self.record_activity_ui),
             ("Record Incident", self.record_incidents_ui),
@@ -1503,7 +1503,7 @@ class ScoutWindow(ttk.Frame):
         else:
             show_error_toast(self.master, "Error", status or "Unknown error")
     
-    def unsupervise_camps_ui(self):
+    """def unsupervise_camps_ui(self):
         camps = read_from_file()
         if not camps:
             messagebox.showinfo("Stop Supervising", "No camps exist.")
@@ -1528,10 +1528,11 @@ class ScoutWindow(ttk.Frame):
                 camp.scout_leaders.remove(self.username)
         
         save_to_file()
-        messagebox.showinfo("Updated", "You are no longer supervising the selected camp(s).")
+        messagebox.showinfo("Updated", "You are no longer supervising the selected camp(s).")"""
 
 
     def bulk_assign_ui(self):
+        
         camps = read_from_file()
         if not camps:
             messagebox.showinfo("Bulk Assign", "No camps exist.")
@@ -1542,40 +1543,39 @@ class ScoutWindow(ttk.Frame):
             return
         
         top = tk.Toplevel(self)
-        top.title("Bulk Assign Campers")
+        top.title("Manage Campers")
         top.configure(bg=THEME_BG)
         frame = ttk.Frame(top, padding=14, style="Card.TFrame")
         frame.pack(fill="both", expand=True, padx=12, pady=12)
-        ttk.Label(frame, text="Bulk assign campers from CSV", style="Header.TLabel").pack(pady=(0, 6))
-        ttk.Label(frame, text="Select a camp and CSV to import campers.", style="Subtitle.TLabel").pack(pady=(0, 8))
-        ttk.Separator(frame).pack(fill="x", pady=(0, 8))
+
+        ttk.Label(frame, text="Manage campers", style="Header.TLabel").pack(pady=(0, 6))
+        ttk.Label(frame, text="Select a camp, import campers, and view/delete campers.", style="Subtitle.TLabel").pack(pady=(0, 8))
+        ttk.Separator(frame).pack(fill="x", pady=(4, 8))
 
         # Camp list
-        lb_frame = ttk.Frame(frame, style="Card.TFrame")
-        lb_frame.pack(fill="both", expand=True, pady=4)
-        camp_list = tk.Listbox(
-            lb_frame,
-            bg="#0b1729",
-            fg=THEME_FG,
-            selectbackground=THEME_ACCENT,
-            highlightthickness=0,
-            relief="flat",
-            height=6,
-        )
-        scroll = ttk.Scrollbar(lb_frame, orient="vertical", command=camp_list.yview)
-        camp_list.configure(yscrollcommand=scroll.set)
-        camp_list.pack(side="left", fill="both", expand=True, padx=(4, 0), pady=4)
-        scroll.pack(side="right", fill="y", padx=(0, 4), pady=4)
-        for camp in supervised:
-            camp_list.insert("end", f"{camp.name} ({camp.location})")
+        ttk.Label(frame, text="Camp", style="FieldLabel.TLabel").pack(anchor="w")
 
-        ttk.Separator(frame).pack(fill="x", pady=(4, 8))
+        camp_var = tk.StringVar()
+        camp_names = [c.name for c in supervised]
+        camp_var.set(camp_names[0])  # default to first supervised camp
+
+        camp_menu = ttk.OptionMenu(frame, camp_var, camp_names[0], *camp_names)
+        camp_menu.pack(fill="x", pady=(0, 8))
+
+        def get_selected_camp():
+            all_camps = read_from_file()
+            supervised_now = [c for c in all_camps if self.username in c.scout_leaders]
+            name = camp_var.get()
+            for c in supervised_now:
+                if c.name == name:
+                    return c
+            return None
 
         # File picker
         path_var = tk.StringVar()
-        ttk.Label(frame, text="CSV file", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
+        ttk.Label(frame, text="CSV file", style="FieldLabel.TLabel").pack(anchor="w")
         path_entry = ttk.Entry(frame, textvariable=path_var, style="App.TEntry")
-        path_entry.pack(fill="x", pady=(0, 6))
+        path_entry.pack(fill="x", pady=(0, 4))
 
         def browse():
             fp = filedialog.askopenfilename(title="Select campers CSV", filetypes=[("CSV files", "*.csv")])
@@ -1584,24 +1584,29 @@ class ScoutWindow(ttk.Frame):
 
         ttk.Button(frame, text="Browse", command=browse).pack(fill="x", pady=(0, 10))
 
+
         def submit():
-            sel = camp_list.curselection()
-            if not sel:
+            camp = get_selected_camp()
+            if camp is None:
                 show_error_toast(self.master, "Error", "Please select a camp.")
                 return
             filepath = path_var.get().strip()
             if not filepath:
                 show_error_toast(self.master, "Error", "Please choose a CSV file.")
                 return
-            camp = supervised[int(sel[0])]
+
             res = bulk_assign_campers_from_csv(camp.name, filepath)
             status = res.get("status")
             if status == "ok":
                 added = res.get("added", [])
                 messagebox.showinfo("Success", f"Assigned {len(added)} campers to {camp.name}.")
-                top.destroy()
+                refresh_campers()
             elif status == "file_not_found":
                 show_error_toast(self.master, "Error", "CSV file not found.")
+            elif status == "csv_already_used_this_camp":
+                show_error_toast(self.master, "Eror", "This CSV has already been used for this camp")
+            elif status == "csv_overlap_other_camp":
+                show_error_toast(self.master, "Error", "This CSV was used for another camp whose dates overlap")
             elif status == "camp_not_found":
                 show_error_toast(self.master, "Error", "Camp not found.")
             elif status == "no_campers":
@@ -1609,7 +1614,113 @@ class ScoutWindow(ttk.Frame):
             else:
                 show_error_toast(self.master, "Error", status or "Unknown error")
 
-        ttk.Button(frame, text="Import", command=submit, style="Primary.TButton").pack(fill="x", pady=(4, 0))
+        ttk.Button(frame, text="Import", command=submit, style="Primary.TButton").pack(fill="x", pady=(0, 8))
+
+        ttk.Separator(frame).pack(fill="x", pady=(4, 8))
+        
+        campers_frame = ttk.Frame(frame, style="Card.TFrame")
+        campers_frame.pack(fill="both", expand=True)
+
+        ttk.Label(campers_frame, text="Campers in selected camp", style="FieldLabel.TLabel").pack(anchor="w")
+
+        campers_list = tk.Listbox(
+            campers_frame,
+            bg="#0b1729",
+            fg=THEME_FG,
+            selectbackground=THEME_ACCENT,
+            highlightthickness=0,
+            relief="flat",
+            height=8,
+        )
+        campers_list.pack(fill="both", expand=True, padx=(4, 0), pady=4)
+
+        ttk.Label(frame, text="Camper details", style="FieldLabel.TLabel").pack(anchor="w", pady=(4, 2))
+        details_text = tk.Text(
+            frame,
+            height=6,
+            bg="#0b1729",
+            fg=THEME_FG,
+            highlightthickness=0,
+            relief="flat",
+            wrap="word",
+        )
+        details_text.pack(fill="both", expand=True, pady=(0, 4))
+
+
+        def show_camper_details(event=None):
+            camp = get_selected_camp()
+            if camp is None:
+                return
+            selection = campers_list.curselection()
+            if not selection:
+                return
+            idx = selection[0]
+            if idx < 0 or idx >= len(camp.campers):
+                return
+            name = camp.campers[idx]
+            info = camp.campers_info.get(name, {})
+
+            dob = info.get("dob", "")
+            emergency = info.get("emergency", [])
+            if isinstance(emergency, list):
+                emergency_str = ", ".join(emergency)
+            else:
+                emergency_str = str(emergency)
+
+            details_text.delete("1.0", "end")
+            lines = [
+                f"Name: {name}",
+                f"DOB: {dob}",
+                f"Emergency info: {emergency_str}",
+            ]
+            details_text.insert("end", "\n".join(lines))
+        
+        def refresh_campers(*args):
+            campers_list.delete(0, "end")
+            details_text.delete("1.0", "end")
+            camp = get_selected_camp()
+            if camp is None:
+                return
+            for name in camp.campers:
+                campers_list.insert("end",name)
+            if camp.campers:
+                campers_list.selection_clear(0,"end")
+                campers_list.selection_set(0)
+                show_camper_details()
+        
+
+        def delete_selected_camper(): 
+            camp = get_selected_camp()
+            if camp is None:
+                show_error_toast(self.master, "Error", "Please select a camp.")
+                return
+
+            selection = campers_list.curselection()
+            if not selection:
+                show_error_toast(self.master, "Error", "Please select a camper to delete.")
+                return
+            idx = selection[0]
+            if idx < 0 or idx >= len(camp.campers):
+                return
+            name = camp.campers[idx]
+
+            confirm = messagebox.askyesno("Confirm", "Remove this camper from the camp?")
+            if not confirm:
+                return
+
+            camp = get_selected_camp()
+            if name in camp.campers:
+                camp.campers.remove(name)
+            if name in camp.campers_info:
+                del camp.campers_info[name]
+
+            save_to_file()   
+            refresh_campers()
+        
+        ttk.Button(frame, text="Delete selected camper", command=delete_selected_camper, style="Danger.TButton").pack(fill="x", pady=(0, 0))
+        camp_var.trace_add("write", refresh_campers)
+        campers_list.bind("<<ListboxSelect>>", show_camper_details)
+        refresh_campers()
 
     def food_req_ui(self):
         camps = read_from_file()

@@ -5,10 +5,6 @@ from utils import data_path
 import uuid
 
 
-def generate_camper_id():
-    """ Returns a unique camper ID."""
-    return "cmp_" + uuid.uuid4().hex[:8]
-
 
 class Camp:
     all_camps = []
@@ -31,6 +27,7 @@ class Camp:
         self.pay_rate = 0
         self.group_chat = []  # Add group chat to each camp
         self.incidents = []
+        self.imported_csvs = []
 
         Camp.all_camps.append(self)
 
@@ -111,6 +108,7 @@ def save_to_file():
             "pay_rate": camp.pay_rate,
             "group_chat": camp.group_chat,
             "incidents": camp.incidents,
+            "imported_csvs": camp.imported_csvs,
         })
 
     with open(data_path("camp_data.json"), "w") as file:
@@ -154,5 +152,6 @@ def read_from_file():
         camp.pay_rate = camp_data.get("pay_rate", 0)
         camp.group_chat = camp_data.get("group_chat", [])
         camp.incidents = camp_data.get("incidents", [])
+        camp.imported_csvs = camp_data.get("imported_csvs", [])
 
     return Camp.all_camps

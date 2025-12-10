@@ -3,7 +3,7 @@ import json
 import csv
 from datetime import datetime, timedelta
 
-from camp_class import Camp, save_to_file, read_from_file, generate_camper_id
+from camp_class import Camp, save_to_file, read_from_file
 from utils import get_int, data_path
 from features.notifications import add_notification
 
@@ -60,14 +60,17 @@ def load_campers_csv(filepath):
             reader = csv.DictReader(file)
             for row in reader:
                 name = row["Name"].strip()
-                age = row["Age"].strip()
-                activities = row["Activities"].split(';')
-
-                camper_id = generate_camper_id()
-                campers[camper_id] = {
-                    "name" : name,
-                    "age": age,
-                    "activities": [a.strip() for a in activities]
+                dob = row["DOB"].strip()
+                emergency_raw = row.get("Emergency information", "").strip()
+                if not name:
+                    continue
+                if emergency_raw:
+                    emergency_info = [e.strip() for e in emergency_raw.split(",")]
+                else:
+                    emergency_info = []
+                campers[name] = {
+                    "dob": dob,
+                    "emergency": emergency_info
                 }
     except FileNotFoundError:
         print("\nCSV file not found.")
@@ -76,23 +79,23 @@ def load_campers_csv(filepath):
 
 def save_campers(camp_name, campers):
     camps = read_from_file()
+    target_camp = None
     for camp in camps:
         if camp.name == camp_name:
-            if camp.campers_info is None:
-                camp.campers_info = {}
-            for camper_id, info in campers.items():
-                value = False
-                for other_camp in camps:
-                    if other_camp.name != camp_name and camper_id in other_camp.campers:
-                        # camper already assigned elsewhere
-                        value = True
-                        break
-                if value is False:
-                    if camper_id not in camp.campers:
-                        camp.campers.append(camper_id)
-                    camp.campers_info[camper_id] = info
+            target_camp = camp
             break
-    add_notification(f"Campers assigned to {camp.name}")
+
+    if target_camp is None:
+        return {"status": "camp_not_found"}
+
+    if target_camp.campers_info is None:
+        target_camp.campers_info = {}
+
+    for name, info in campers.items():
+        if name not in target_camp.campers:
+            target_camp.campers.append(name)
+        target_camp.campers_info[name] = info
+
     save_to_file()
     return {"status": "ok", "camp": camp_name, "added": list(campers.keys())}
 
@@ -124,13 +127,38 @@ def bulk_assign_campers_from_csv(camp_name, filepath):
     """Pure helper: assign campers from a CSV to a named camp."""
     if not os.path.exists(filepath):
         return {"status": "file_not_found"}
+    camps = read_from_file()
     selected_camp = find_camp_by_name(camp_name)
     if selected_camp is None:
         return {"status": "camp_not_found"}
+    if getattr(selected_camp, "imported_csvs", None) is None:  
+        selected_camp.imported_csvs = []
+    
+    filename = os.path.basename(filepath)
+
+    if filename in selected_camp.imported_csvs:
+        return {"status": "csv_already_used_this_camp"}
+    
+    for other_camp in camps:
+        if other_camp is selected_camp:
+            if other_camp is selected_camp:
+                continue
+            other_list = getattr(other_camp, "imported_csvs", [])
+            if filename in other_list:
+                if camps_overlap(selected_camp, other_camp):
+                    return {"status": "csv_overlap_other_camp"}
+                
     campers = load_campers_csv(filepath)
     if not campers:
         return {"status": "no_campers"}
-    return bulk_assign_campers_data(selected_camp, campers)
+    
+    result = bulk_assign_campers_data(selected_camp, campers)
+
+    if result.get("status") == "ok":
+        selected_camp.imported_csvs.append(filename)
+        save_to_file()
+    
+    return result
 
 
 def assign_camps_to_leader(camps, leader_username, selected_indices):
