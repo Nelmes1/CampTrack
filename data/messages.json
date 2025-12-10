@@ -64,9 +64,19 @@
             "pinned": false,
             "attachment": null,
             "metadata": {}
+            "timestamp": "2025-07-10 09:05:00",
+            "text": "Thanks! Food stock confirmed at 40 units.",
+            "read": true
         },
         {
-            "from": "logistics",
+            "from": "admin",
+            "to": "coordinator",
+            "timestamp": "2025-07-11 08:15:00",
+            "text": "Please update dashboard once new campers import completes.",
+            "read": true
+        },
+        {
+            "from": "coordinator",
             "to": "admin",
             "text": "hi",
             "timestamp": "2025-11-29 10:26:23",
@@ -144,7 +154,7 @@
             "metadata": {}
         },
         {
-            "from": "coordinator",
+            "from": "leader3",
             "to": "leader1",
             "text": "hi",
             "timestamp": "2025-11-29 11:33:57",
@@ -170,7 +180,7 @@
             "metadata": {}
         },
         {
-            "from": "leader1",
+            "from": "leader4",
             "to": "coordinator",
             "text": "hi",
             "timestamp": "2025-11-29 11:34:36",

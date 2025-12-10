@@ -38,6 +38,15 @@ def open_chat_window(master, username, role=None):
 
     convo_win = tk.Toplevel(master)
     convo_win.title(f"Messaging – {username}")
+    try:
+        sw = master.winfo_screenwidth()
+        sh = master.winfo_screenheight()
+        w, h = 960, 640
+        x = int((sw - w) / 2)
+        y = int((sh - h) / 2)
+        convo_win.geometry(f"{w}x{h}+{x}+{y}")
+    except Exception:
+        pass
 
     # Try to match parent bg if using themed frames
     try:
@@ -406,6 +415,15 @@ def open_group_chat_window(master, username):
     """Separate window: group chats for camps supervised by this scout leader."""
     win = tk.Toplevel(master)
     win.title(f"Group Chats – {username}")
+    try:
+        sw = master.winfo_screenwidth()
+        sh = master.winfo_screenheight()
+        w, h = 960, 640
+        x = int((sw - w) / 2)
+        y = int((sh - h) / 2)
+        win.geometry(f"{w}x{h}+{x}+{y}")
+    except Exception:
+        pass
     try:
         bg = master.cget("bg")
     except Exception:

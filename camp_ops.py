@@ -1,4 +1,8 @@
 from datetime import datetime, timedelta
+try:
+    from dateutil import parser as date_parser
+except ImportError:
+    date_parser = None
 
 from camp_class import Camp, save_to_file, read_from_file
 from utils import get_int
@@ -191,32 +195,45 @@ def create_camp():
 
 
 def get_dates(camp_type):
-    start_date = input('\nPlease enter the start date (YYYY-MM-DD): ')
+    def parse_any_date(prompt):
+        text = input(prompt).strip()
+        while True:
+            if date_parser:
+                try:
+                    return date_parser.parse(text, fuzzy=True).date()
+                except Exception:
+                    pass
+            # fallback formats
+            for fmt in ("%Y-%m-%d", "%d-%m-%Y", "%d/%m/%Y", "%d %b %Y", "%d %B %Y"):
+                try:
+                    return datetime.strptime(text, fmt).date()
+                except ValueError:
+                    continue
+            print("Invalid date. Try formats like YYYY-MM-DD, 10 Oct 2025, Oct 10, 2025, or 10/10/2025.")
+            text = input(prompt).strip()
+
+    start_date = parse_any_date("\nPlease enter the start date (e.g. 2025-10-10 or Oct 10 2025): ")
 
     valid = False
     while not valid:
-        try:
-            first_date = datetime.strptime(start_date, "%Y-%m-%d")
-            if camp_type == 1:
-                nights = 0
-                second_date = first_date + timedelta(days=nights)
-                valid = True
-            elif camp_type == 2:
-                nights = 1
-                second_date = first_date + timedelta(days=nights)
-                valid = True
-            elif camp_type == 3:
-                nights = get_int("\nHow many nights is the camp? ")
-                if nights < 2:
-                    print("A multi-day camp must be at least 2 nights.")
-                    continue
-                second_date = first_date + timedelta(days=nights)
-                valid = True
-        except ValueError:
-            print('Invalid date format! Please use YYYY-MM-DD.')
-            start_date = input('\nPlease enter the start date (YYYY-MM-DD): ')
+        first_date = start_date
+        if camp_type == 1:
+            nights = 0
+            second_date = first_date + timedelta(days=nights)
+            valid = True
+        elif camp_type == 2:
+            nights = 1
+            second_date = first_date + timedelta(days=nights)
+            valid = True
+        elif camp_type == 3:
+            nights = get_int("\nHow many nights is the camp? ")
+            if nights < 2:
+                print("A multi-day camp must be at least 2 nights.")
+                continue
+            second_date = first_date + timedelta(days=nights)
+            valid = True
 
-    start_date = first_date.strftime("%Y-%m-%d")
-    end_date = second_date.strftime("%Y-%m-%d")
+    start_date_str = first_date.strftime("%Y-%m-%d")
+    end_date_str = second_date.strftime("%Y-%m-%d")
 
-    return start_date, end_date
+    return start_date_str, end_date_str

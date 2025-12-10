@@ -3,7 +3,7 @@ import json
 import csv
 from datetime import datetime, timedelta
 
-from camp_class import Camp, save_to_file, read_from_file, generate_camper_id
+from camp_class import Camp, save_to_file, read_from_file
 from utils import get_int, data_path
 from features.notifications import add_notification
 
@@ -60,14 +60,17 @@ def load_campers_csv(filepath):
             reader = csv.DictReader(file)
             for row in reader:
                 name = row["Name"].strip()
-                age = row["Age"].strip()
-                activities = row["Activities"].split(';')
-
-                camper_id = generate_camper_id()
-                campers[camper_id] = {
-                    "name" : name,
-                    "age": age,
-                    "activities": [a.strip() for a in activities]
+                dob = row["DOB"].strip()
+                emergency_raw = row.get("Emergency information", "").strip()
+                if not name:
+                    continue
+                if emergency_raw:
+                    emergency_info = [e.strip() for e in emergency_raw.split(",")]
+                else:
+                    emergency_info = []
+                campers[name] = {
+                    "dob": dob,
+                    "emergency": emergency_info
                 }
     except FileNotFoundError:
         print("\nCSV file not found.")
@@ -76,24 +79,31 @@ def load_campers_csv(filepath):
 
 def save_campers(camp_name, campers):
     camps = read_from_file()
+    target_camp = None
     for camp in camps:
         if camp.name == camp_name:
-            if camp.campers_info is None:
-                camp.campers_info = {}
-            for camper_id, info in campers.items():
-                value = False
-                for other_camp in camps:
-                    if other_camp.name != camp_name and camper_id in other_camp.campers:
-                        # camper already assigned elsewhere
-                        value = True
-                        break
-                if value is False:
-                    if camper_id not in camp.campers:
-                        camp.campers.append(camper_id)
-                    camp.campers_info[camper_id] = info
+            target_camp = camp
             break
-    add_notification(f"Campers assigned to {camp.name}")
+
+    if target_camp is None:
+        return {"status": "camp_not_found"}
+
+    if target_camp.campers_info is None:
+        target_camp.campers_info = {}
+
+    added_names = []
+
+    for name, info in campers.items():
+        if name not in target_camp.campers:
+            target_camp.campers.append(name)
+        target_camp.campers_info[name] = info
+
     save_to_file()
+    if added_names:
+        add_notification(f"{len(added_names)} camper(s) added to {camp_name}: " +", ".join(added_names))
+    else: 
+        add_notification(f"No new campers were added to {camp_name}.")
+    
     return {"status": "ok", "camp": camp_name, "added": list(campers.keys())}
 
 
@@ -111,30 +121,53 @@ def bulk_assign_campers_data(selected_camp, campers):
         return {"status": "no_camp"}
     # prevent duplicates across camps
     camps = read_from_file()
-    for name in list(campers.keys()):
-        for other_camp in camps:
-            if other_camp.name != selected_camp.name and name in other_camp.campers:
-                # remove camper already assigned elsewhere
-                campers.pop(name, None)
-                break
-    return save_campers(selected_camp.name, campers)
+    value = None
+    for camp in camps:
+        if camp.name == selected_camp.name:
+            target = camp
+            break
+    if target is None:
+        return {"status": "camp_not_found"}
 
+    allowed = {}
+    for name, info in campers.items():
+        if name in target.campers:
+            continue
+        blocked = False
+        for other in camps:
+            if other is target:
+                continue
+            if name in other.campers and camps_overlap(target, other):
+                blocked = True
+                break
+        if blocked:
+            continue
+
+        allowed[name] = info
+
+    if not allowed:
+        return {"status": "no_new_campers"}
+
+    return save_campers(target.name, allowed)
 
 def bulk_assign_campers_from_csv(camp_name, filepath):
     """Pure helper: assign campers from a CSV to a named camp."""
     if not os.path.exists(filepath):
         return {"status": "file_not_found"}
+
     selected_camp = find_camp_by_name(camp_name)
     if selected_camp is None:
         return {"status": "camp_not_found"}
+    
     campers = load_campers_csv(filepath)
     if not campers:
-        return {"status": "no_campers"}
+        return {"status" : "no_campers"}
+
     return bulk_assign_campers_data(selected_camp, campers)
 
 
 def assign_camps_to_leader(camps, leader_username, selected_indices):
-    """Pure helper to assign a leader to selected camps and remove from others."""
+    """Assign a leader to selected camps, keeping existing non-conflicting assignments."""
     if not selected_indices:
         return {"status": "no_selection"}
     selected_camp_names = []
@@ -142,21 +175,29 @@ def assign_camps_to_leader(camps, leader_username, selected_indices):
         if idx < 0 or idx >= len(camps):
             return {"status": "invalid_index"}
         selected_camp_names.append(camps[idx].name)
-    # check conflicts
     selected_camps = [camps[i] for i in selected_indices]
-    if camps_conflict(selected_camps):
+
+    # include existing assignments so we don't drop them unintentionally
+    existing_camps = [camp for camp in camps if leader_username in camp.scout_leaders]
+    combined = []
+    seen = set()
+    for camp in existing_camps + selected_camps:
+        if camp.name not in seen:
+            combined.append(camp)
+            seen.add(camp.name)
+
+    # check conflicts across combined assignments
+    if camps_conflict(combined):
         return {"status": "overlap"}
-    # apply assignments
-    for camp in camps:
-        if camp.name in selected_camp_names:
-            if leader_username not in camp.scout_leaders:
-                camp.scout_leaders.append(leader_username)
-        else:
-            if leader_username in camp.scout_leaders:
-                camp.scout_leaders.remove(leader_username)
+
+    # apply assignments: keep existing, add new
+    for camp in selected_camps:
+        if leader_username not in camp.scout_leaders:
+            camp.scout_leaders.append(leader_username)
 
     save_to_file()
-    return {"status": "ok", "selected": selected_camp_names}
+    combined_names = [camp.name for camp in combined]
+    return {"status": "ok", "selected": combined_names}
 
 def assign_camps_to_leader_ui(leader_username):
     camps = read_from_file()
@@ -196,9 +237,9 @@ def assign_camps_to_leader_ui(leader_username):
     elif res["status"] == "invalid_index":
         print("\nInvalid camp selection.")
     elif res["status"] == "overlap":
-        print("You camps you have selected overlap.\nPlease choose camps that do not overlap.")
+        print("Your combined camp assignments overlap.\nPlease choose camps that do not overlap.")
     elif res["status"] == "ok":
-        print(f"{leader_username} has selected these camps to supervise:")
+        print(f"{leader_username} is now supervising these camps:")
         for name in res["selected"]:
             print(name)
         print("\nYour camp selections have been saved")
@@ -276,6 +317,9 @@ def record_activity_entry_data(camp_name, date, activity_name, activity_time, no
 
 def record_daily_activity():
     camps = read_from_file()
+    if not camps:
+        print("\nNo camps exist yet.")
+        return
     for i, camp in enumerate(camps, start=1):
         print(f"{i} | {camp.name}| {camp.start_date} -> {camp.end_date}")
 
@@ -288,6 +332,11 @@ def record_daily_activity():
         new_date = input("Enter the date (YYYY-MM-DD) or type n to exit: ").strip()
         if new_date.lower() == "n":
             break
+        try:
+            datetime.strptime(new_date, "%Y-%m-%d")
+        except ValueError:
+            print("Invalid date. Use YYYY-MM-DD (e.g., 2024-06-15).")
+            continue
 
         activity_name = input("Activity name (optional, press enter to skip): ").strip()
         activity_time = input("Time (optional, e.g. 14:00): ").strip()
@@ -311,8 +360,10 @@ def record_daily_activity():
                 try:
                     indices = [int(x) for x in sel.split(",")]
                     for i in indices:
-                        if 1<= 1 <= len(camp.campers):
+                        if 1 <= i <= len(camp.campers):
                             campers_for_activity.append(camp.campers[i-1])
+                        else:
+                            print(f"Ignoring invalid camper number: {i}")
                 except ValueError:
                     print("Invalid camper selection.")
                     campers_for_activity = []
