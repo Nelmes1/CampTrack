@@ -1162,9 +1162,11 @@ class LogisticsWindow(ttk.Frame):
         notif_win = tk.Toplevel(self)
         notif_win.title("Notifications")
         notif_win.configure(bg=THEME_BG)
-        frame = ttk.Frame(notif_win, padding=12, style="Card.TFrame")
+        notif_win.minsize(520, 480)
+        frame = ttk.Frame(notif_win, padding=16, style="Card.TFrame")
         frame.pack(fill="both", expand=True)
-        ttk.Label(frame, text="Notifications").pack(pady=(0, 4))
+        ttk.Label(frame, text="Notifications", style="Header.TLabel").pack(pady=(0, 6), anchor="w")
+        ttk.Separator(frame).pack(fill="x", pady=(0, 8))
         lb_frame = ttk.Frame(frame, style="Card.TFrame")
         lb_frame.pack(fill="both", expand=True, pady=6)
         listbox = tk.Listbox(

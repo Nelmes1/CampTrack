@@ -12,7 +12,7 @@
             "to": "admin",
             "timestamp": "2025-07-10 09:05:00",
             "text": "Thanks! Food stock confirmed at 40 units.",
-            "read": false
+            "read": true
         },
         {
             "from": "admin",
@@ -26,7 +26,7 @@
             "to": "admin",
             "timestamp": "2025-07-11 08:20:00",
             "text": "Will do. Also, shortage warning at Cedar Grove overnight?",
-            "read": false
+            "read": true
         },
         {
             "from": "admin",
