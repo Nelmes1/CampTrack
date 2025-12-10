@@ -8,8 +8,6 @@ except ImportError:
     date_parser = None
 from PIL import Image, ImageTk
 from chat_window import open_chat_window, open_group_chat_window
-
-
 from user_logins import users, load_logins, check_disabled_logins, save_logins, disabled_logins, enable_login
 from features.admin import list_users
 from camp_class import Camp, save_to_file, read_from_file
@@ -44,14 +42,44 @@ from messaging import get_conversations_for_user, get_conversation, send_message
 LOGO_GREEN = "#487C56"       # match logo green
 THEME_BG = "#0b1f36"         # window background
 THEME_CARD = "#12263f"       # card background
+THEME_CARD_ALT = "#102034"   # slight contrast for inner cards
 THEME_FG = "#e6f1ff"         # main text
 THEME_MUTED = "#cbd5f5"      # subtle/secondary text
 THEME_ACCENT = LOGO_GREEN    # primary accent now matches logo
 THEME_ACCENT_ACTIVE = "#43a047"
 THEME_ACCENT_PRESSED = "#388e3c"
+THEME_BORDER = "#1f2d44"
+SPACING = {"xs": 4, "sm": 8, "md": 12, "lg": 18, "xl": 24}
 
 
 _GIF_CACHE = {}
+
+
+def _read_disabled_usernames():
+    try:
+        with open('disabled_logins.txt', 'r') as file:
+            disabled = file.read().strip(',')
+            return {u for u in disabled.split(',') if u}
+    except FileNotFoundError:
+        return set()
+
+
+def _pill(parent, title, value, desc=""):
+    """Compact summary pill for clarity."""
+    card = ttk.Frame(parent, style="Card.TFrame", padding=8)
+    card.pack(side="left", expand=True, fill="x", padx=4)
+    ttk.Label(card, text=title, style="FieldLabel.TLabel").pack(anchor="w")
+    ttk.Label(card, text=value, style="Header.TLabel").pack(anchor="w")
+    if desc:
+        ttk.Label(card, text=desc, style="Subtitle.TLabel").pack(anchor="w", pady=(2, 0))
+    return card
+
+
+def _inline_error(frame, message):
+    """Inline error text helper."""
+    lbl = ttk.Label(frame, text=message, style="Error.TLabel")
+    lbl.pack(anchor="w", pady=(2, 0))
+    return lbl
 
 
 def _load_gif_frames_raw(name):
@@ -114,6 +142,42 @@ def _attach_gif_background(container, gif_name="campfire.gif", delay=100, start_
     if container._bg_frames_raw:
         render(0)
         container.after(start_delay, animate)
+
+
+def _build_shell(master, username, role, sections):
+    """
+    Create a shell with left navigation and right content area.
+    sections: list of (label, callback) entries for nav.
+    Returns (content_frame, nav_frame).
+    """
+    outer = ttk.Frame(master, padding=0, style="App.TFrame")
+    outer.pack(fill="both", expand=True)
+    outer.columnconfigure(1, weight=1)
+    outer.rowconfigure(0, weight=1)
+
+    # LEFT NAV
+    nav = ttk.Frame(outer, padding=(SPACING["md"], SPACING["lg"]), style="Card.TFrame")
+    nav.grid(row=0, column=0, sticky="ns")
+    nav.columnconfigure(0, weight=1)
+    logo = load_logo(56)
+    if logo:
+        ttk.Label(nav, image=logo, background=THEME_CARD).grid(row=0, column=0, sticky="w", pady=(0, SPACING["md"]))
+        nav.logo_ref = logo  # keep reference
+    ttk.Label(nav, text=f"{role.title()}", style="Header.TLabel").grid(row=1, column=0, sticky="w")
+    ttk.Label(nav, text=f"Signed in as {username}", style="Subtitle.TLabel").grid(row=2, column=0, sticky="w", pady=(0, SPACING["md"]))
+
+    nav_buttons = []
+    for idx, (label, callback) in enumerate(sections, start=3):
+        btn = ttk.Button(nav, text=label, command=callback, style="Ghost.TButton")
+        btn.grid(row=idx, column=0, sticky="ew", pady=3)
+        nav_buttons.append(btn)
+
+    # RIGHT CONTENT
+    content = ttk.Frame(outer, padding=SPACING["lg"], style="App.TFrame")
+    content.grid(row=0, column=1, sticky="nsew")
+    content.columnconfigure(0, weight=1)
+    content.rowconfigure(1, weight=1)
+    return content, nav
 
 
 def show_error_toast(master, title, message, duration=2000):
@@ -336,30 +400,65 @@ class AdminWindow(ttk.Frame):
         self.username = username
         _attach_gif_background(self, gif_name="campfire1.gif", start_delay=500)
         self.pack(fill="both", expand=True)
-        wrapper = ttk.Frame(self, padding=18, style="Card.TFrame", width=520)
-        wrapper.pack(expand=True, padx=20, pady=16)
 
-        self.logo_small = load_logo(64)
-        header = ttk.Frame(wrapper, style="Card.TFrame")
-        header.pack(fill="x", pady=(0, 12))
-        header.columnconfigure(1, weight=1)
-        if self.logo_small:
-            ttk.Label(header, image=self.logo_small, background=THEME_CARD).grid(row=0, column=0, rowspan=2, sticky="w", padx=(0, 8))
-        ttk.Label(header, text="Administrator", style="Header.TLabel").grid(row=0, column=1, sticky="w")
-        ttk.Label(header, text="Admin tools", style="Subtitle.TLabel").grid(row=1, column=1, sticky="w")
+        content, nav = _build_shell(
+            self,
+            username,
+            "Administrator",
+            [
+                ("Dashboard", self._focus_dashboard),
+                ("User Management", self.list_users_ui),
+                ("Messaging", self.messaging_ui),
+                ("Logout", self.logout),
+            ],
+        )
 
-        user_frame = ttk.LabelFrame(wrapper, text="User Management", padding=12, style="Card.TFrame")
-        user_frame.pack(fill="both", expand=True, pady=(0, 12))
+        # HERO
+        hero = ttk.Frame(content, style="Card.TFrame", padding=SPACING["lg"])
+        hero.grid(row=0, column=0, sticky="ew", pady=(0, SPACING["md"]))
+        hero.columnconfigure(1, weight=1)
+        logo = load_logo(80)
+        if logo:
+            ttk.Label(hero, image=logo, background=THEME_CARD).grid(row=0, column=0, rowspan=3, sticky="w", padx=(0, SPACING["md"]))
+            hero.logo_ref = logo
+        ttk.Label(hero, text="Administrator Console", style="Title.TLabel").grid(row=0, column=1, sticky="w")
+        ttk.Label(hero, text="Create and manage accounts, monitor access, and open messaging.", style="Subtitle.TLabel").grid(row=1, column=1, sticky="w")
+        ttk.Button(hero, text="Open Messaging", command=self.messaging_ui, style="Primary.TButton").grid(row=2, column=1, sticky="w", pady=(SPACING["sm"], 0))
+
+        # SUMMARY
+        summary = ttk.Frame(content, style="Card.TFrame")
+        summary.grid(row=1, column=0, sticky="ew", pady=(0, SPACING["md"]))
+        disabled = _read_disabled_usernames()
+        _pill(summary, "Admins", str(len(users["admin"])), "Total admin accounts")
+        _pill(summary, "Leaders", str(len(users["scout leader"])), "Scout leaders")
+        _pill(summary, "Coordinators", str(len(users["logistics coordinator"])), "Logistics coordinators")
+        _pill(summary, "Disabled", str(len(disabled)), "Disabled accounts")
+
+        # GRID LAYOUT
+        main = ttk.Frame(content, style="App.TFrame")
+        main.grid(row=2, column=0, sticky="nsew")
+        main.columnconfigure(0, weight=1)
+        main.columnconfigure(1, weight=1)
+
+        user_frame = ttk.LabelFrame(main, text="User Management", padding=SPACING["md"], style="Card.TFrame")
+        user_frame.grid(row=0, column=0, sticky="nsew", padx=(0, SPACING["md"]), pady=(0, SPACING["md"]))
         for text, cmd in [
             ("View all users", self.list_users_ui),
         ]:
             btn_style = "TButton"
             ttk.Button(user_frame, text=text, command=cmd, style=btn_style).pack(fill="x", pady=2)
 
-        misc_frame = ttk.LabelFrame(wrapper, text="Other", padding=12, style="Card.TFrame")
-        misc_frame.pack(fill="both", expand=True, pady=(0, 12))
-        ttk.Button(misc_frame, text="Messaging", command=self.messaging_ui).pack(fill="x", pady=2)
-        ttk.Button(misc_frame, text="Logout", command=self.logout, style="Danger.TButton").pack(fill="x", pady=2)
+        other = ttk.LabelFrame(main, text="Quick Actions", padding=SPACING["md"], style="Card.TFrame")
+        other.grid(row=0, column=1, sticky="nsew", pady=(0, SPACING["md"]))
+        ttk.Label(other, text="Messaging", style="Header.TLabel").pack(anchor="w")
+        ttk.Label(other, text="Open direct and group chats.", style="Subtitle.TLabel").pack(anchor="w", pady=(0, SPACING["sm"]))
+        ttk.Button(other, text="Open Messaging", command=self.messaging_ui, style="Primary.TButton").pack(fill="x", pady=(0, SPACING["md"]))
+        ttk.Separator(other).pack(fill="x", pady=(SPACING["sm"], SPACING["sm"]))
+        ttk.Button(other, text="Logout", command=self.logout, style="Danger.TButton").pack(fill="x")
+
+    def _focus_dashboard(self):
+        # placeholder hook to align with nav; already on dashboard
+        pass
 
     def list_users_ui(self):
         top = tk.Toplevel(self)
@@ -930,40 +1029,79 @@ class LogisticsWindow(ttk.Frame):
         _attach_gif_background(self, gif_name="campfire1.gif", delay=140, start_delay=500)
         master.minsize(1040, 820)
         self.pack(fill="both", expand=True)
-        wrapper = ttk.Frame(self, padding=18, style="Card.TFrame", width=520)
-        wrapper.pack(expand=True, padx=20, pady=16)
 
-        self.logo_small = load_logo(64)
-        header = ttk.Frame(wrapper, style="Card.TFrame")
-        header.pack(fill="x", pady=(0, 12))
-        header.columnconfigure(1, weight=1)
-        if self.logo_small:
-            ttk.Label(header, image=self.logo_small, background=THEME_CARD).grid(row=0, column=0, rowspan=2, sticky="w", padx=(0, 8))
-        ttk.Label(header, text="Logistics Coordinator", style="Header.TLabel").grid(row=0, column=1, sticky="w")
-        ttk.Label(header, text="Logistics overview", style="Subtitle.TLabel").grid(row=1, column=1, sticky="w")
+        content, nav = _build_shell(
+            self,
+            username,
+            "Logistics Coordinator",
+            [
+                ("Dashboard", self._focus_dashboard),
+                ("Manage Camps", self.manage_camps_menu),
+                ("Food Allocation", self.food_allocation_menu),
+                ("Financial Settings", self.financial_settings_ui),
+                ("Visualise Data", self.visualise_menu),
+                ("Notifications", self.notifications_ui),
+                ("Messaging", self.messaging_ui),
+                ("Logout", self.logout),
+            ],
+        )
 
-        camp_frame = ttk.LabelFrame(wrapper, text="Camp Management", padding=12, style="Card.TFrame")
-        camp_frame.pack(fill="both", expand=True, pady=(0, 14))
-        ttk.Label(camp_frame, text="Pick a camp to create, edit, or delete.", style="Subtitle.TLabel").pack(anchor="w", pady=(0, 6))
+        # HERO
+        hero = ttk.Frame(content, style="Card.TFrame", padding=SPACING["lg"])
+        hero.grid(row=0, column=0, sticky="ew", pady=(0, SPACING["md"]))
+        hero.columnconfigure(1, weight=1)
+        logo = load_logo(80)
+        if logo:
+            ttk.Label(hero, image=logo, background=THEME_CARD).grid(row=0, column=0, rowspan=3, sticky="w", padx=(0, SPACING["md"]))
+            hero.logo_ref = logo
+        ttk.Label(hero, text="Logistics Overview", style="Title.TLabel").grid(row=0, column=1, sticky="w")
+        ttk.Label(hero, text="Define camps, manage food stock and pay rates, view notifications.", style="Subtitle.TLabel").grid(row=1, column=1, sticky="w")
+        ttk.Button(hero, text="Open Messaging", command=self.messaging_ui, style="Primary.TButton").grid(row=2, column=1, sticky="w", pady=(SPACING["sm"], 0))
+
+        # SUMMARY
+        summary = ttk.Frame(content, style="Card.TFrame")
+        summary.grid(row=1, column=0, sticky="ew", pady=(0, SPACING["md"]))
+        camps = read_from_file()
+        campers_total = sum(len(c.campers) for c in camps)
+        leaders_assigned = len({leader for c in camps for leader in c.scout_leaders})
+        _pill(summary, "Camps", str(len(camps)), "Active camps")
+        _pill(summary, "Campers", str(campers_total), "Across all camps")
+        _pill(summary, "Leaders", str(leaders_assigned), "Assigned to camps")
+
+        # GRID
+        main = ttk.Frame(content, style="App.TFrame")
+        main.grid(row=2, column=0, sticky="nsew")
+        main.columnconfigure(0, weight=1)
+        main.columnconfigure(1, weight=1)
+
+        camp_frame = ttk.LabelFrame(main, text="Camp Management", padding=SPACING["md"], style="Card.TFrame")
+        camp_frame.grid(row=0, column=0, sticky="nsew", padx=(0, SPACING["md"]), pady=(0, SPACING["md"]))
+        ttk.Label(camp_frame, text="Create, edit, or delete camps.", style="Subtitle.TLabel").pack(anchor="w", pady=(0, SPACING["sm"]))
         for text, cmd in [
             ("Manage Camps", self.manage_camps_menu),
             ("Food Allocation", self.food_allocation_menu),
             ("Financial Settings", self.financial_settings_ui),
         ]:
             btn_style = "Primary.TButton" if "Manage" in text else "TButton"
-            ttk.Button(camp_frame, text=text, command=cmd, style=btn_style).pack(fill="x", pady=6)
+            ttk.Button(camp_frame, text=text, command=cmd, style=btn_style).pack(fill="x", pady=4)
 
-        viz_frame = ttk.LabelFrame(wrapper, text="Insights & Notifications", padding=12, style="Card.TFrame")
-        viz_frame.pack(fill="both", expand=True, pady=(0, 14))
+        viz_frame = ttk.LabelFrame(main, text="Insights & Notifications", padding=SPACING["md"], style="Card.TFrame")
+        viz_frame.grid(row=0, column=1, sticky="nsew", pady=(0, SPACING["md"]))
         for text, cmd in [
             ("Dashboard", self.dashboard_ui),
             ("Visualise Data", self.visualise_menu),
             ("Notifications", self.notifications_ui),
             ("Messaging", self.messaging_ui),
         ]:
-            ttk.Button(viz_frame, text=text, command=cmd).pack(fill="x", pady=6)
+            ttk.Button(viz_frame, text=text, command=cmd).pack(fill="x", pady=4)
 
-        ttk.Button(wrapper, text="Logout", command=self.logout, style="Danger.TButton").pack(fill="x", pady=8)
+        logout_frame = ttk.Frame(content, style="App.TFrame")
+        logout_frame.grid(row=3, column=0, sticky="ew", pady=(SPACING["sm"], 0))
+        ttk.Button(logout_frame, text="Logout", command=self.logout, style="Danger.TButton").pack(side="right")
+
+    def _focus_dashboard(self):
+        # placeholder to match nav selection; content already visible
+        pass
 
     def manage_camps_menu(self):
         top = tk.Toplevel(self)
@@ -1048,12 +1186,14 @@ class LogisticsWindow(ttk.Frame):
             ttk.Label(frame, text="New daily stock", style="FieldLabel.TLabel").pack(anchor="w")
             stock_entry = ttk.Entry(frame, style="App.TEntry")
             stock_entry.pack(fill="x", pady=(0, 10))
+            err_lbl = tk.StringVar(value="")
+            ttk.Label(frame, textvariable=err_lbl, style="Error.TLabel").pack(anchor="w")
 
             def submit():
                 try:
                     val = int(stock_entry.get().strip())
                 except ValueError:
-                    show_error_toast(self.master, "Error", "Please enter a whole number.")
+                    err_lbl.set("Please enter a whole number.")
                     return
                 res = set_food_stock_data(camp, val)
                 messagebox.showinfo("Result", res.get("status"))
@@ -1121,12 +1261,14 @@ class LogisticsWindow(ttk.Frame):
             ttk.Label(frame, text="Amount to add", style="FieldLabel.TLabel").pack(anchor="w")
             amt_entry = ttk.Entry(frame, style="App.TEntry")
             amt_entry.pack(fill="x", pady=(0, 10))
+            err_lbl = tk.StringVar(value="")
+            ttk.Label(frame, textvariable=err_lbl, style="Error.TLabel").pack(anchor="w")
 
             def submit():
                 try:
                     val = int(amt_entry.get().strip())
                 except ValueError:
-                    show_error_toast(self.master, "Error", "Please enter a whole number.")
+                    err_lbl.set("Please enter a whole number.")
                     return
                 res = top_up_food_data(camp, val)
                 messagebox.showinfo("Result", res.get("status"))
@@ -1152,12 +1294,14 @@ class LogisticsWindow(ttk.Frame):
         ttk.Label(frame, text="Daily pay rate", style="FieldLabel.TLabel").pack(anchor="w")
         rate_entry = ttk.Entry(frame, style="App.TEntry")
         rate_entry.pack(fill="x", pady=(0, 10))
+        err_lbl = tk.StringVar(value="")
+        ttk.Label(frame, textvariable=err_lbl, style="Error.TLabel").pack(anchor="w")
 
         def submit():
             try:
                 val = int(rate_entry.get().strip())
             except ValueError:
-                show_error_toast(self.master, "Error", "Please enter a whole number.")
+                err_lbl.set("Please enter a whole number.")
                 return
             res = set_pay_rate_data(camp, val)
             messagebox.showinfo("Result", res.get("status"))
@@ -1271,10 +1415,13 @@ class LogisticsWindow(ttk.Frame):
         form = ttk.Frame(frame, style="Card.TFrame")
         form.pack(fill="both", expand=True)
 
-        def add_labeled_entry(label_text):
+        err_var = tk.StringVar(value="")
+
+        def add_labeled_entry(label_text, placeholder=""):
             lbl = ttk.Label(form, text=label_text, style="FieldLabel.TLabel")
             lbl.pack(anchor="w", pady=(0, 2))
             entry = ttk.Entry(form, style="App.TEntry")
+            entry.insert(0, placeholder)
             entry.pack(fill="x", pady=(0, 8))
             return entry
 
@@ -1290,17 +1437,18 @@ class LogisticsWindow(ttk.Frame):
         food_entry = add_labeled_entry("Initial daily food stock")
 
         def submit():
+            err_var.set("")
             name = name_entry.get().strip()
             location = location_entry.get().strip()
             if not name or not location:
-                show_error_toast(self.master, "Error", "Name and location are required.")
+                err_var.set("Name and location are required.")
                 return
             try:
                 camp_type = int(camp_type_entry.get().strip())
                 if camp_type not in (1, 2, 3):
                     raise ValueError
             except ValueError:
-                show_error_toast(self.master, "Error", "Camp type must be 1, 2, or 3.")
+                err_var.set("Camp type must be 1, 2, or 3.")
                 return
             try:
                 start_date = parse_date_flexible(start_entry.get())
@@ -1331,7 +1479,7 @@ class LogisticsWindow(ttk.Frame):
                 if food_stock < 0:
                     raise ValueError
             except ValueError:
-                show_error_toast(self.master, "Error", "Food stock must be a non-negative integer.")
+                err_var.set("Food stock must be a non-negative integer.")
                 return
 
             read_from_file()
@@ -1576,43 +1724,85 @@ class ScoutWindow(ttk.Frame):
         _attach_gif_background(self, gif_name="campfire1.gif", delay=140, start_delay=500)
         master.minsize(1040, 820)
         self.pack(fill="both", expand=True)
-        wrapper = ttk.Frame(self, padding=18, style="Card.TFrame", width=520)
-        wrapper.pack(expand=True, padx=20, pady=16)
 
-        self.logo_small = load_logo(64)
-        header = ttk.Frame(wrapper, style="Card.TFrame")
-        header.pack(fill="x", pady=(0, 12))
-        header.columnconfigure(1, weight=1)
-        if self.logo_small:
-            ttk.Label(header, image=self.logo_small, background=THEME_CARD).grid(row=0, column=0, rowspan=2, sticky="w", padx=(0, 8))
-        ttk.Label(header, text="Scout Leader", style="Header.TLabel").grid(row=0, column=1, sticky="w")
-        ttk.Label(header, text="Scouting tools", style="Subtitle.TLabel").grid(row=1, column=1, sticky="w")
+        content, nav = _build_shell(
+            self,
+            username,
+            "Scout Leader",
+            [
+                ("Dashboard", self._focus_dashboard),
+                ("Select Camps", self.select_camps_ui),
+                ("Import Campers", self.bulk_assign_ui),
+                ("Record Activity", self.record_activity_ui),
+                ("Record Incident", self.record_incidents_ui),
+                ("View Stats", self.stats_ui),
+                ("View Activities", self.view_activities_ui),
+                ("View Incidents", self.view_incidents_ui),
+                ("Messaging", self.messaging_ui),
+                ("Logout", self.logout),
+            ],
+        )
 
-        actions = ttk.LabelFrame(wrapper, text="Camp Actions", padding=12, style="Card.TFrame")
-        actions.pack(fill="both", expand=True, pady=(0, 14))
-        ttk.Label(actions, text="Select camps, import campers, and set food needs.", style="Subtitle.TLabel").pack(anchor="w", pady=(0, 6))
+        # HERO
+        hero = ttk.Frame(content, style="Card.TFrame", padding=SPACING["lg"])
+        hero.grid(row=0, column=0, sticky="ew", pady=(0, SPACING["md"]))
+        hero.columnconfigure(1, weight=1)
+        logo = load_logo(80)
+        if logo:
+            ttk.Label(hero, image=logo, background=THEME_CARD).grid(row=0, column=0, rowspan=3, sticky="w", padx=(0, SPACING["md"]))
+            hero.logo_ref = logo
+        ttk.Label(hero, text="Scout Leader Hub", style="Title.TLabel").grid(row=0, column=1, sticky="w")
+        ttk.Label(hero, text="Supervise camps, import campers, record activities and incidents.", style="Subtitle.TLabel").grid(row=1, column=1, sticky="w")
+        ttk.Button(hero, text="Open Messaging", command=self.messaging_ui, style="Primary.TButton").grid(row=2, column=1, sticky="w", pady=(SPACING["sm"], 0))
+
+        # SUMMARY
+        summary = ttk.Frame(content, style="Card.TFrame")
+        summary.grid(row=1, column=0, sticky="ew", pady=(0, SPACING["md"]))
+        camps = read_from_file()
+        supervised = [c for c in camps if self.username in c.scout_leaders]
+        campers_total = sum(len(c.campers) for c in supervised)
+        incidents_total = sum(len(getattr(c, "incidents", [])) for c in supervised)
+        _pill(summary, "Your Camps", str(len(supervised)), "Camps you supervise")
+        _pill(summary, "Campers", str(campers_total), "In your camps")
+        _pill(summary, "Incidents", str(incidents_total), "Logged incidents")
+
+        # GRID
+        main = ttk.Frame(content, style="App.TFrame")
+        main.grid(row=2, column=0, sticky="nsew")
+        main.columnconfigure(0, weight=1)
+        main.columnconfigure(1, weight=1)
+
+        actions = ttk.LabelFrame(main, text="Camp Actions", padding=SPACING["md"], style="Card.TFrame")
+        actions.grid(row=0, column=0, sticky="nsew", padx=(0, SPACING["md"]), pady=(0, SPACING["md"]))
+        ttk.Label(actions, text="Select camps, import campers, and set food needs.", style="Subtitle.TLabel").pack(anchor="w", pady=(0, SPACING["sm"]))
         for text, cmd in [
             ("Select Camp(s) to Supervise", self.select_camps_ui),
             ("Stop Supervising Camp(s)", self.unsupervise_camps_ui),
             ("Manage Campers", self.bulk_assign_ui),
             ("Set Food per Camper", self.food_req_ui),
-            ("Record Activity", self.record_activity_ui),
-            ("Record Incident", self.record_incidents_ui),
         ]:
             btn_style = "Primary.TButton" if "Select camps" in text else "TButton"
-            ttk.Button(actions, text=text, command=cmd, style=btn_style).pack(fill="x", pady=6)
+            ttk.Button(actions, text=text, command=cmd, style=btn_style).pack(fill="x", pady=4)
 
-        stats_frame = ttk.LabelFrame(wrapper, text="Insights & Messaging", padding=12, style="Card.TFrame")
-        stats_frame.pack(fill="both", expand=True, pady=(0, 14))
+        stats_frame = ttk.LabelFrame(main, text="Record & Review", padding=SPACING["md"], style="Card.TFrame")
+        stats_frame.grid(row=0, column=1, sticky="nsew", pady=(0, SPACING["md"]))
         for text, cmd in [
+            ("Record Activity", self.record_activity_ui),
+            ("Record Incident", self.record_incidents_ui),
             ("View Stats", self.stats_ui),
             ("View Camp Activities", self.view_activities_ui),
-            ("View Incidents" , self.view_incidents_ui),
+            ("View Incidents", self.view_incidents_ui),
             ("Messaging", self.messaging_ui),
-            ("Logout", self.logout),
         ]:
-            style = "Danger.TButton" if "Logout" in text else "TButton"
-            ttk.Button(stats_frame, text=text, command=cmd, style=style).pack(fill="x", pady=6)
+            ttk.Button(stats_frame, text=text, command=cmd).pack(fill="x", pady=4)
+
+        logout_frame = ttk.Frame(content, style="App.TFrame")
+        logout_frame.grid(row=3, column=0, sticky="ew", pady=(SPACING["sm"], 0))
+        ttk.Button(logout_frame, text="Logout", command=self.logout, style="Danger.TButton").pack(side="right")
+
+    def _focus_dashboard(self):
+        # placeholder to align with nav; content already visible
+        pass
 
     def group_chat_ui(self):
         from chat_window import open_group_chat_window
@@ -2749,12 +2939,16 @@ def init_style(root):
 
     root.configure(bg=THEME_BG)
 
-    base_font = ("Helvetica", 11)
+    base_font = ("Helvetica Neue", 11)
+    header_font = ("Helvetica Neue", 16, "bold")
+    title_font = ("Helvetica Neue", 20, "bold")
+    subtitle_font = ("Helvetica Neue", 11)
 
     # Frames / cards
     style.configure("TFrame", background=THEME_BG)
-    style.configure("App.TFrame", background=THEME_BG, padding=12)
-    style.configure("Card.TFrame", background=THEME_CARD, padding=18)
+    style.configure("App.TFrame", background=THEME_BG, padding=SPACING["md"])
+    style.configure("Card.TFrame", background=THEME_CARD, padding=SPACING["lg"])
+    style.configure("Inset.TFrame", background=THEME_CARD_ALT, padding=SPACING["md"])
 
     # General labels
     style.configure(
@@ -2767,21 +2961,21 @@ def init_style(root):
 
     style.configure(
         "Header.TLabel",
-        font=("Helvetica", 16, "bold"),
+        font=header_font,
         background=THEME_CARD,
         foreground=THEME_FG,
     )
 
     style.configure(
         "Title.TLabel",
-        font=("Helvetica", 20, "bold"),
+        font=title_font,
         background=THEME_CARD,
         foreground=THEME_FG,
     )
 
     style.configure(
         "Subtitle.TLabel",
-        font=("Helvetica", 11),
+        font=subtitle_font,
         background=THEME_CARD,
         foreground=THEME_MUTED,
     )
@@ -2795,18 +2989,18 @@ def init_style(root):
 
     style.configure(
         "Error.TLabel",
-        font=("Helvetica", 10),
+        font=("Helvetica Neue", 10),
         background=THEME_CARD,
         foreground="#fca5a5",
     )
 
     # Labelframes
-    style.configure("TLabelframe", background=THEME_CARD, foreground=THEME_FG, padding=6)
+    style.configure("TLabelframe", background=THEME_CARD, foreground=THEME_FG, padding=SPACING["sm"])
     style.configure(
         "TLabelframe.Label",
         background=THEME_CARD,
         foreground=THEME_FG,
-        font=("Helvetica", 11, "bold"),
+        font=("Helvetica Neue", 11, "bold"),
     )
 
     # Entries
@@ -2825,7 +3019,7 @@ def init_style(root):
     # Base button
     style.configure(
         "TButton",
-        padding=8,
+        padding=SPACING["sm"],
         background=THEME_ACCENT,
         foreground=THEME_FG,
         font=base_font,
@@ -2844,10 +3038,10 @@ def init_style(root):
     # Primary button (e.g. login)
     style.configure(
         "Primary.TButton",
-        padding=8,
+        padding=SPACING["sm"],
         background=THEME_ACCENT,
         foreground=THEME_FG,
-        font=("Helvetica", 11, "bold"),
+        font=("Helvetica Neue", 11, "bold"),
         borderwidth=0,
     )
     style.map(
@@ -2863,10 +3057,10 @@ def init_style(root):
     # Danger button (logout, delete, etc.)
     style.configure(
         "Danger.TButton",
-        padding=8,
+        padding=SPACING["sm"],
         background="#dc2626",
         foreground=THEME_FG,
-        font=("Helvetica", 11, "bold"),
+        font=("Helvetica Neue", 11, "bold"),
         borderwidth=0,
     )
     style.map(
@@ -2883,6 +3077,22 @@ def init_style(root):
         bordercolor=THEME_MUTED,
         darkcolor=THEME_MUTED,
         lightcolor=THEME_MUTED,
+    )
+
+    # Ghost button for nav
+    style.configure(
+        "Ghost.TButton",
+        padding=SPACING["sm"],
+        background=THEME_CARD,
+        foreground=THEME_FG,
+        font=base_font,
+        borderwidth=0,
+        relief="flat",
+    )
+    style.map(
+        "Ghost.TButton",
+        background=[("active", THEME_CARD_ALT), ("pressed", THEME_CARD_ALT)],
+        foreground=[("disabled", "#6b7280")],
     )
 
 
@@ -2912,12 +3122,12 @@ def launch_login():
     root = tk.Tk()
     root.withdraw()
     root.title("CampTrack Login")
-    # Start larger so role windows retain space for full cards/log out buttons
-    root.minsize(1040, 820)
+    # Start larger so role windows retain space for nav + content
+    root.minsize(1024, 768)
     root.configure(bg=THEME_BG)
     init_style(root)
     LoginWindow(root)
-    center_window(root, width=1100, height=880)
+    center_window(root, width=1120, height=820)
     root.deiconify()
     root.mainloop()
 
