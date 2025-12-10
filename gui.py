@@ -2,6 +2,10 @@ import tkinter as tk
 from tkinter import ttk, messagebox, filedialog, simpledialog
 import os
 from datetime import datetime,timedelta
+try:
+    from dateutil import parser as date_parser
+except ImportError:
+    date_parser = None
 from PIL import Image, ImageTk
 from chat_window import open_chat_window, open_group_chat_window
 
@@ -153,6 +157,24 @@ def load_logo(max_px=260):
             return ImageTk.PhotoImage(im)
     except Exception:
         return None
+
+
+def parse_date_flexible(text):
+    """Parse a date string into YYYY-MM-DD, allowing common human formats."""
+    text = text.strip()
+    if not text:
+        raise ValueError("blank date")
+    if date_parser:
+        try:
+            return date_parser.parse(text, fuzzy=True).date().strftime("%Y-%m-%d")
+        except Exception:
+            pass
+    for fmt in ("%Y-%m-%d", "%d-%m-%Y", "%d/%m/%Y", "%d %b %Y", "%d %B %Y"):
+        try:
+            return datetime.strptime(text, fmt).date().strftime("%Y-%m-%d")
+        except ValueError:
+            continue
+    raise ValueError("invalid date")
 
 class LoginWindow(ttk.Frame):
     def __init__(self, master):
@@ -1212,8 +1234,8 @@ class LogisticsWindow(ttk.Frame):
         camp_type_entry = ttk.Entry(form, style="App.TEntry")
         camp_type_entry.pack(fill="x", pady=(0, 8))
 
-        start_entry = add_labeled_entry("Start date (YYYY-MM-DD)")
-        end_entry = add_labeled_entry("End date (YYYY-MM-DD)")
+        start_entry = add_labeled_entry("Start date (flexible: e.g. 2025-10-10 or 10 Oct 2025)")
+        end_entry = add_labeled_entry("End date (flexible)")
         food_entry = add_labeled_entry("Initial daily food stock")
 
         def submit():
@@ -1229,14 +1251,16 @@ class LogisticsWindow(ttk.Frame):
             except ValueError:
                 show_error_toast(self.master, "Error", "Camp type must be 1, 2, or 3.")
                 return
-            start_date = start_entry.get().strip()
-            end_date = end_entry.get().strip()
-            for d in (start_date, end_date):
-                try:
-                    datetime.strptime(d, "%Y-%m-%d")
-                except Exception:
-                    show_error_toast(self.master, "Error", "Invalid date format.")
-                    return
+            try:
+                start_date = parse_date_flexible(start_entry.get())
+                end_date = parse_date_flexible(end_entry.get())
+            except ValueError:
+                show_error_toast(
+                    self.master,
+                    "Error",
+                    "Invalid date. Try formats like 2025-10-10, 10 Oct 2025, Oct 10 2025, or 10/10/2025.",
+                )
+                return
             try:
                 food_stock = int(food_entry.get().strip())
                 if food_stock < 0:
@@ -1287,8 +1311,8 @@ class LogisticsWindow(ttk.Frame):
         name_entry = add_labeled_entry("Name", camp.name)
         loc_entry = add_labeled_entry("Location", camp.location)
         type_entry = add_labeled_entry("Camp type (1-3)", str(camp.camp_type))
-        start_entry = add_labeled_entry("Start date (YYYY-MM-DD)", camp.start_date)
-        end_entry = add_labeled_entry("End date (YYYY-MM-DD)", camp.end_date)
+        start_entry = add_labeled_entry("Start date (flexible)", camp.start_date)
+        end_entry = add_labeled_entry("End date (flexible)", camp.end_date)
         food_entry = add_labeled_entry("Daily food stock", str(camp.food_stock))
         pay_entry = add_labeled_entry("Daily pay rate", str(camp.pay_rate))
 
@@ -1332,14 +1356,16 @@ class LogisticsWindow(ttk.Frame):
             except ValueError:
                 show_error_toast(self.master, "Error", "Invalid pay rate.")
                 return
-            new_start = start_entry.get().strip()
-            new_end = end_entry.get().strip()
-            for d in (new_start, new_end):
-                try:
-                    datetime.strptime(d, "%Y-%m-%d")
-                except Exception:
-                    show_error_toast(self.master, "Error", "Invalid date format.")
-                    return
+            try:
+                new_start = parse_date_flexible(start_entry.get())
+                new_end = parse_date_flexible(end_entry.get())
+            except ValueError:
+                show_error_toast(
+                    self.master,
+                    "Error",
+                    "Invalid date. Try formats like 2025-10-10, 10 Oct 2025, Oct 10 2025, or 10/10/2025.",
+                )
+                return
 
             camp_obj.name = name_entry.get().strip() or camp_obj.name
             camp_obj.location = loc_entry.get().strip() or camp_obj.location
