@@ -42,5 +42,23 @@
         "read": false,
         "timestamp": "2025-12-09 19:57",
         "level": "INFO"
+    },
+    {
+        "message": "[Admin: admin] Changed password for user 'joe'",
+        "read": false,
+        "timestamp": "2025-12-10 08:11",
+        "level": "WARNING"
+    },
+    {
+        "message": "[Admin: admin] Changed password for user 'joe'",
+        "read": false,
+        "timestamp": "2025-12-10 08:12",
+        "level": "WARNING"
+    },
+    {
+        "message": "[Admin: admin] Changed password for user 'joe'",
+        "read": false,
+        "timestamp": "2025-12-10 08:12",
+        "level": "WARNING"
     }
 ]

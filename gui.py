@@ -329,11 +329,8 @@ class AdminWindow(ttk.Frame):
         user_frame.pack(fill="both", expand=True, pady=(0, 12))
         for text, cmd in [
             ("View all users", self.list_users_ui),
-            ("Add a new user", self.add_user_ui),
         ]:
             btn_style = "TButton"
-            if "Add" in text:
-                btn_style = "Primary.TButton"
             ttk.Button(user_frame, text=text, command=cmd, style=btn_style).pack(fill="x", pady=2)
 
         misc_frame = ttk.LabelFrame(wrapper, text="Other", padding=12, style="Card.TFrame")
@@ -356,10 +353,12 @@ class AdminWindow(ttk.Frame):
 
         search_row = ttk.Frame(frame, style="Card.TFrame")
         search_row.pack(fill="x", pady=(0, 8))
-        ttk.Label(search_row, text="Search users", style="FieldLabel.TLabel").pack(side="left", padx=(0, 6))
+        search_row.columnconfigure(1, weight=1)
+        ttk.Label(search_row, text="Search users", style="FieldLabel.TLabel").grid(row=0, column=0, sticky="w", padx=(0, 6))
         search_var = tk.StringVar()
         search_entry = ttk.Entry(search_row, textvariable=search_var, style="App.TEntry")
-        search_entry.pack(side="left", fill="x", expand=True)
+        search_entry.grid(row=0, column=1, sticky="ew")
+        ttk.Button(search_row, text="Add user", command=lambda: self.add_user_ui(on_added=refresh_tree), style="Primary.TButton").grid(row=0, column=2, padx=(8, 0))
 
         # load disabled usernames
         columns = ("Role", "Username", "Password", "Status")
@@ -482,7 +481,7 @@ class AdminWindow(ttk.Frame):
                         break
                 save_logins()
                 add_notification(
-                    f"[Admin: {self.username}] Changed password for user '{username}'",
+                    f"[Admin: {self.username}] Changed password for user '{sel['username']}'",
                     level="WARNING")
                 refresh_tree()
                 dlg.destroy()
@@ -507,7 +506,7 @@ class AdminWindow(ttk.Frame):
                 ds.remove(sel['username'])
                 save_disabled_set(ds)
             add_notification(
-                f"[Admin: {self.username}] Deleted user '{username}'",
+                f"[Admin: {self.username}] Deleted user '{sel['username']}'",
                 level="CRITICAL")
             save_logins()
             refresh_tree()
@@ -629,7 +628,7 @@ class AdminWindow(ttk.Frame):
         search_var.trace_add("write", lambda *_: refresh_tree())
         search_entry.focus_set()
 
-    def add_user_ui(self):
+    def add_user_ui(self, on_added=None):
         top = tk.Toplevel(self)
         top.title("Add User")
         top.configure(bg=THEME_BG)
@@ -671,6 +670,8 @@ class AdminWindow(ttk.Frame):
                 f"[Admin: {self.username}] Created user '{username}' with role '{role}'",
                 level="INFO")
             messagebox.showinfo("Success", f"Added {role}: {username}")
+            if on_added:
+                on_added()
             top.destroy()
 
         ttk.Button(frame, text="Add User", command=submit, style="Primary.TButton").pack(fill="x", pady=(4, 0))
@@ -726,7 +727,7 @@ class AdminWindow(ttk.Frame):
                     break
             save_logins()
             add_notification(
-                f"[Admin: {self.username}] Changed password for user '{username}'",
+                f"[Admin: {self.username}] Changed password for user '{target_user}'",
                 level="WARNING")
             messagebox.showinfo("Success", "Password updated.")
             top.destroy()
@@ -776,7 +777,7 @@ class AdminWindow(ttk.Frame):
             users[role] = [u for u in users[role] if u['username'] != target_user]
             save_logins()
             add_notification(
-                f"[Admin: {self.username}] Deleted user '{var.get()}'",
+                f"[Admin: {self.username}] Deleted user '{target_user}'",
                 level="INFO")
             top.destroy()
             messagebox.showinfo("Success", f"Deleted {target_user}.")
@@ -807,7 +808,7 @@ class AdminWindow(ttk.Frame):
             disabled_logins(target_user)
             save_logins()
             add_notification(
-                f"[Admin: {self.username}] Disabled user '{var.get()}'",
+                f"[Admin: {self.username}] Disabled user '{target_user}'",
                 level="WARNING")
             messagebox.showinfo("Success", f"Disabled {target_user}.")
             top.destroy()
@@ -847,7 +848,7 @@ class AdminWindow(ttk.Frame):
                 return
             enable_login(target_user)
             add_notification(
-                f"[Admin: {self.username}] Enabled user '{var.get()}'",
+                f"[Admin: {self.username}] Enabled user '{target_user}'",
                 level="INFO")
             messagebox.showinfo("Success", f"Enabled {target_user}.")
             top.destroy()
