@@ -1,340 +1,545 @@
 [
     {
-        "name": "Pine Ridge",
-        "location": "North Valley",
-        "camp_type": 2,
-        "start_date": "2025-06-10",
-        "end_date": "2025-06-12",
-        "food_stock": 20,
+        "name": "Pine Ridge Base",
+        "location": "North Field",
+        "camp_type": 1,
+        "start_date": "2025-07-12",
+        "end_date": "2025-07-12",
+        "food_stock": 40,
         "scout_leaders": [
-            "leader3"
+            "leader1"
         ],
         "campers": [
-            "Alice",
-            "Ben",
-            "Cara",
-            "Dylan",
-            "Emily",
-            "Jacob",
-            "Bella",
-            "Edward"
+            "Ava Brooks",
+            "Liam Chen",
+            "Noah Patel",
+            "Mia Lewis"
         ],
-        "campers_info": {},
+        "campers_info": {
+            "Ava Brooks": {
+                "dob": "2012-04-10",
+                "emergency": [
+                    "Peanut allergy"
+                ]
+            },
+            "Liam Chen": {
+                "dob": "2011-11-22",
+                "emergency": []
+            },
+            "Noah Patel": {
+                "dob": "2012-08-03",
+                "emergency": [
+                    "Asthma inhaler"
+                ]
+            },
+            "Mia Lewis": {
+                "dob": "2013-02-16",
+                "emergency": []
+            }
+        },
         "activities": {
-            "2025-06-10": [
+            "2025-07-12": [
                 {
-                    "activity": "Hike",
-                    "time": "09:00",
-                    "notes": "Trail loop",
-                    "food_used": 2
-                },
-                {
-                    "activity": "Campfire",
-                    "time": "19:00",
-                    "notes": "Songs and stories",
-                    "food_used": 1
-                },
-                {
-                    "activity": "Hiking",
-                    "time": "13:00",
-                    "notes": "",
-                    "food_used": 12,
-                    "campers": [
-                        "Alice",
-                        "Ben",
-                        "Cara",
-                        "Dylan"
-                    ]
-                }
-            ],
-            "2025-06-11": [
-                {
-                    "activity": "Orienteering",
+                    "activity": "Team building",
                     "time": "10:00",
-                    "notes": "Map skills"
+                    "notes": "Great participation",
+                    "food_used": 4,
+                    "campers": [
+                        "Ava Brooks",
+                        "Liam Chen"
+                    ]
                 },
                 {
-                    "activity": "First Aid",
+                    "activity": "Nature walk",
                     "time": "14:00",
-                    "notes": "Basics",
-                    "food_used": 1
+                    "notes": "Identified local flora",
+                    "food_used": 3,
+                    "campers": [
+                        "Noah Patel",
+                        "Mia Lewis"
+                    ]
                 }
             ]
         },
         "daily_food_usage": {
-            "2025-06-10": 12
+            "2025-07-12": 7
         },
         "daily_records": {
-            "2025-06-10": [
-                "Good weather, completed hike.",
-                ""
-            ],
-            "2025-06-11": [
-                "Learned map skills and first aid."
+            "2025-07-12": [
+                "Sunny day, no incidents"
             ]
         },
         "pay_rate": 100,
         "group_chat": [
             {
-                "from": "System",
-                "text": "leader1 has joined the group chat.",
-                "timestamp": "2025-11-28 08:56:57"
+                "from": "leader1",
+                "text": "Arrived on site",
+                "timestamp": "2025-07-12 09:10:00"
             },
             {
-                "from": "System",
-                "text": "leader3 has joined the group chat.",
-                "timestamp": "2025-11-28 08:59:42"
+                "from": "coordinator",
+                "text": "Confirm lunch at 12:30",
+                "timestamp": "2025-07-12 09:30:00"
+            }
+        ],
+        "incidents": [],
+        "imported_csvs": []
+    },
+    {
+        "name": "Cedar Grove Overnight",
+        "location": "East Woods",
+        "camp_type": 2,
+        "start_date": "2025-07-14",
+        "end_date": "2025-07-15",
+        "food_stock": 55,
+        "scout_leaders": [
+            "leader2"
+        ],
+        "campers": [
+            "Sophia King",
+            "Ethan Moore",
+            "Oliver Green",
+            "Emma Davis",
+            "Lucas Wright"
+        ],
+        "campers_info": {
+            "Sophia King": {
+                "dob": "2011-09-14",
+                "emergency": []
             },
-            {
-                "from": "System",
-                "text": "leader1 has joined the group chat.",
-                "timestamp": "2025-11-28 10:27:27"
+            "Ethan Moore": {
+                "dob": "2012-03-01",
+                "emergency": [
+                    "Nut allergy"
+                ]
             },
-            {
-                "from": "leader3",
-                "text": "hello group",
-                "timestamp": "2025-11-29 10:34:20"
+            "Oliver Green": {
+                "dob": "2011-12-11",
+                "emergency": []
             },
-            {
-                "from": "leader3",
-                "text": "hello group",
-                "timestamp": "2025-11-29 11:49:39"
+            "Emma Davis": {
+                "dob": "2012-05-20",
+                "emergency": []
             },
+            "Lucas Wright": {
+                "dob": "2013-01-30",
+                "emergency": []
+            }
+        },
+        "activities": {
+            "2025-07-14": [
+                {
+                    "activity": "Shelter building",
+                    "time": "11:00",
+                    "notes": "All shelters stood overnight",
+                    "food_used": 5,
+                    "campers": [
+                        "Sophia King",
+                        "Emma Davis"
+                    ]
+                },
+                {
+                    "activity": "Campfire songs",
+                    "time": "20:00",
+                    "notes": "High engagement",
+                    "food_used": 4,
+                    "campers": [
+                        "All"
+                    ]
+                }
+            ],
+            "2025-07-15": [
+                {
+                    "activity": "Orienteering",
+                    "time": "09:30",
+                    "notes": "Completed course in 45 mins",
+                    "food_used": 3,
+                    "campers": [
+                        "Lucas Wright",
+                        "Oliver Green"
+                    ]
+                }
+            ]
+        },
+        "daily_food_usage": {
+            "2025-07-14": 9,
+            "2025-07-15": 3
+        },
+        "daily_records": {
+            "2025-07-14": [
+                "Light rain in afternoon"
+            ],
+            "2025-07-15": [
+                "Departed on schedule"
+            ]
+        },
+        "pay_rate": 120,
+        "group_chat": [
             {
-                "from": "leader3",
-                "text": "hello",
-                "timestamp": "2025-11-29 11:49:57"
+                "from": "leader2",
+                "text": "Tents up",
+                "timestamp": "2025-07-14 10:00:00"
             }
         ],
         "incidents": [
             {
-                "date": "2025-06-10",
-                "time": "",
-                "description": "Fell out of a tree",
+                "date": "2025-07-14",
+                "time": "18:10",
+                "description": "Minor scrape during play",
                 "campers": [
-                    "Alice"
-                ]
-            },
-            {
-                "date": "2025-06-11",
-                "time": "13:00",
-                "description": "Got a fever",
-                "campers": [
-                    "Ben"
+                    "Ethan Moore"
                 ]
             }
-        ]
+        ],
+        "imported_csvs": []
     },
     {
-        "name": "Cedar Grove",
-        "location": "East Woods",
-        "camp_type": 1,
-        "start_date": "2025-07-05",
-        "end_date": "2025-07-05",
-        "food_stock": 15,
-        "scout_leaders": [
-            "leader2",
-            "leader3"
-        ],
-        "campers": [
-            "Ella",
-            "Finn",
-            "Grace"
-        ],
-        "campers_info": {},
-        "activities": {
-            "2025-07-05": [
-                {
-                    "activity": "Archery",
-                    "time": "11:00",
-                    "notes": "Safety basics",
-                    "food_used": 1
-                },
-                {
-                    "activity": "Nature Walk",
-                    "time": "15:00",
-                    "notes": "Identified plants"
-                }
-            ]
-        },
-        "daily_food_usage": {
-            "2025-07-05": 1
-        },
-        "daily_records": {
-            "2025-07-05": [
-                "Great engagement, no incidents."
-            ]
-        },
-        "pay_rate": 65,
-        "group_chat": [
-            {
-                "from": "System",
-                "text": "leader1 has joined the group chat.",
-                "timestamp": "2025-11-28 08:56:57"
-            },
-            {
-                "from": "System",
-                "text": "leader3 has joined the group chat.",
-                "timestamp": "2025-11-28 08:59:42"
-            }
-        ],
-        "incidents": []
-    },
-    {
-        "name": "Maple Summit",
-        "location": "Highlands",
+        "name": "Summit Trail Expedition",
+        "location": "High Ridge",
         "camp_type": 3,
-        "start_date": "2025-08-15",
-        "end_date": "2025-08-18",
-        "food_stock": 25,
+        "start_date": "2025-08-01",
+        "end_date": "2025-08-04",
+        "food_stock": 80,
         "scout_leaders": [
-            "leader2",
             "leader3"
         ],
         "campers": [
-            "Hana",
-            "Ivan",
-            "Jon",
-            "Kira",
-            "Liam"
+            "Mason Hill",
+            "Isabella Diaz",
+            "Henry Scott",
+            "Aiden Parker",
+            "Ella Nguyen",
+            "Zoe Carter"
         ],
-        "campers_info": {},
+        "campers_info": {
+            "Jacob Black": {
+                "dob": "18/03/2008",
+                "emergency": [
+                    "Bone fracture"
+                ]
+            },
+            "Bella Swan": {
+                "dob": "27/01/2007",
+                "emergency": [
+                    "Depression"
+                ]
+            },
+            "Edward Cullen": {
+                "dob": "04/10/2011",
+                "emergency": []
+            },
+            "Emily Smith": {
+                "dob": "08/02/2010",
+                "emergency": []
+            }
+        },
         "activities": {
-            "2025-08-15": [
+            "2025-08-01": [
                 {
-                    "activity": "Camp Setup",
-                    "time": "10:00",
-                    "notes": "Pitched tents"
+                    "activity": "Base setup",
+                    "time": "12:00",
+                    "notes": "Camp established at 12:00",
+                    "food_used": 6,
+                    "campers": [
+                        "All"
+                    ]
                 }
             ],
-            "2025-08-16": [
+            "2025-08-02": [
                 {
-                    "activity": "Climbing",
-                    "time": "09:30",
-                    "notes": "Beginner wall",
-                    "food_used": 2
-                },
-                {
-                    "activity": "Crafts",
-                    "time": "14:00",
-                    "notes": "Wood carving"
+                    "activity": "Summit push",
+                    "time": "09:00",
+                    "notes": "Reached ridge by 13:00",
+                    "food_used": 10,
+                    "campers": [
+                        "All"
+                    ]
                 }
             ],
-            "2025-08-17": [
+            "2025-08-03": [
                 {
-                    "activity": "Trail Maintenance",
-                    "time": "10:00",
-                    "notes": "Cleared debris",
-                    "food_used": 1
+                    "activity": "First aid drill",
+                    "time": "16:00",
+                    "notes": "Completed scenarios",
+                    "food_used": 4,
+                    "campers": [
+                        "Ella Nguyen",
+                        "Zoe Carter"
+                    ]
+                }
+            ],
+            "2025-08-04": [
+                {
+                    "activity": "Break camp",
+                    "time": "08:30",
+                    "notes": "Trails cleared",
+                    "food_used": 3,
+                    "campers": []
                 }
             ]
         },
         "daily_food_usage": {
-            "2025-08-16": 2,
-            "2025-08-17": 1
+            "2025-08-01": 6,
+            "2025-08-02": 10,
+            "2025-08-03": 4,
+            "2025-08-04": 3
         },
         "daily_records": {
-            "2025-08-15": [
-                "Setup complete, no issues."
+            "2025-08-01": [
+                "Clear skies"
             ],
-            "2025-08-16": [
-                "Climbing session successful."
+            "2025-08-02": [
+                "High winds on ridge"
             ],
-            "2025-08-17": [
-                "Maintenance done, good teamwork."
+            "2025-08-03": [
+                "All well"
+            ],
+            "2025-08-04": [
+                "Departed"
+            ]
+        },
+        "pay_rate": 150,
+        "group_chat": [],
+        "incidents": [],
+        "imported_csvs": []
+    },
+    {
+        "name": "Lakeside Adventure",
+        "location": "Blue Lake",
+        "camp_type": 2,
+        "start_date": "2025-07-20",
+        "end_date": "2025-07-21",
+        "food_stock": 60,
+        "scout_leaders": [
+            "leader4"
+        ],
+        "campers": [
+            "Chloe Brooks",
+            "Grayson Lee",
+            "Harper Young",
+            "Jack Turner"
+        ],
+        "campers_info": {},
+        "activities": {
+            "2025-07-20": [
+                {
+                    "activity": "Canoeing",
+                    "time": "11:30",
+                    "notes": "Strong paddling",
+                    "food_used": 5,
+                    "campers": [
+                        "Chloe Brooks",
+                        "Grayson Lee"
+                    ]
+                },
+                {
+                    "activity": "Night watch",
+                    "time": "21:00",
+                    "notes": "Rotations set",
+                    "food_used": 2,
+                    "campers": [
+                        "Jack Turner"
+                    ]
+                }
+            ],
+            "2025-07-21": [
+                {
+                    "activity": "Cleanup",
+                    "time": "09:00",
+                    "notes": "All trash packed out",
+                    "food_used": 3,
+                    "campers": [
+                        "All"
+                    ]
+                }
+            ]
+        },
+        "daily_food_usage": {
+            "2025-07-20": 7,
+            "2025-07-21": 3
+        },
+        "daily_records": {
+            "2025-07-20": [
+                "Calm water"
+            ],
+            "2025-07-21": [
+                "Early departure"
             ]
         },
         "pay_rate": 110,
-        "group_chat": [
-            {
-                "from": "System",
-                "text": "leader1 has joined the group chat.",
-                "timestamp": "2025-11-28 08:58:39"
-            },
-            {
-                "from": "System",
-                "text": "leader3 has joined the group chat.",
-                "timestamp": "2025-11-28 08:59:42"
-            }
-        ],
-        "incidents": []
+        "group_chat": [],
+        "incidents": [],
+        "imported_csvs": []
     },
     {
-        "name": "Rivendell",
-        "location": "Misty Mountains",
+        "name": "Coastal Explorers",
+        "location": "Seaview Point",
         "camp_type": 3,
-        "start_date": "2025-10-10",
-        "end_date": "2025-10-11",
-        "food_stock": 15,
+        "start_date": "2025-09-05",
+        "end_date": "2025-09-09",
+        "food_stock": 90,
         "scout_leaders": [
-            "leader1"
+            "leader1",
+            "leader2"
         ],
         "campers": [
-            "cmp_164eef28",
-            "cmp_b9cb1888",
-            "cmp_7ce0b5d0",
-            "cmp_a331f7e5"
+            "Nora Bell",
+            "Owen Gray",
+            "Caleb Ross",
+            "Lily Morgan",
+            "Aria Foster",
+            "Wyatt Reed",
+            "Eli Barnes",
+            "Stella Price"
         ],
         "campers_info": {
-            "cmp_164eef28": {
-                "name": "Emily",
-                "age": "12",
-                "activities": [
-                    "Swimming",
-                    "Climbing",
-                    "Archery"
+            "Beatrice Prior": {
+                "dob": "12/08/2008",
+                "emergency": [
+                    "History of injuries"
                 ]
             },
-            "cmp_b9cb1888": {
-                "name": "Jacob",
-                "age": "10",
-                "activities": [
-                    "Archery"
+            "Jeanine Mathews": {
+                "dob": "03/02/2007",
+                "emergency": []
+            },
+            "Caleb Prior": {
+                "dob": "19/06/2009",
+                "emergency": [
+                    "Type 1 diabetes;Anxiety;COVID;Diptheria"
                 ]
             },
-            "cmp_7ce0b5d0": {
-                "name": "Bella",
-                "age": "11",
-                "activities": [
-                    "Swimming",
-                    "Archery"
+            "Christina Parker": {
+                "dob": "09/11/2007",
+                "emergency": [
+                    "Arm injury"
                 ]
             },
-            "cmp_a331f7e5": {
-                "name": "Edward",
-                "age": "13",
-                "activities": [
-                    "Swimming"
+            "James DaSnake": {
+                "dob": "23/04/2008",
+                "emergency": []
+            },
+            "Drew Turner": {
+                "dob": "31/01/2009",
+                "emergency": []
+            },
+            "Peter Hayes": {
+                "dob": "20/12/2007",
+                "emergency": [
+                    "Behavioural aggression history"
                 ]
+            },
+            "Tobias Eaton": {
+                "dob": "14/07/2010",
+                "emergency": [
+                    "Asthma"
+                ]
+            },
+            "Will Sheriden": {
+                "dob": "01/03/2006",
+                "emergency": []
+            },
+            "Marcus Eaton": {
+                "dob": "03/07/2010",
+                "emergency": []
             }
         },
         "activities": {
-            "2025-10-10": [
+            "2025-09-05": [
                 {
-                    "activity": "Council of elrond",
-                    "time": "",
-                    "notes": "Created the fellowship",
-                    "food_used": 20
+                    "activity": "Beach hike",
+                    "time": "15:00",
+                    "notes": "Shell ID activity",
+                    "food_used": 6,
+                    "campers": [
+                        "All"
+                    ]
+                }
+            ],
+            "2025-09-06": [
+                {
+                    "activity": "Tide pool study",
+                    "time": "10:00",
+                    "notes": "Logged 8 species",
+                    "food_used": 5,
+                    "campers": [
+                        "Nora Bell",
+                        "Owen Gray",
+                        "Lily Morgan"
+                    ]
+                }
+            ],
+            "2025-09-07": [
+                {
+                    "activity": "Overnight bivouac",
+                    "time": "20:00",
+                    "notes": "Stars visible",
+                    "food_used": 8,
+                    "campers": [
+                        "All"
+                    ]
+                }
+            ],
+            "2025-09-08": [
+                {
+                    "activity": "Kayak session",
+                    "time": "14:00",
+                    "notes": "Strong swells",
+                    "food_used": 7,
+                    "campers": [
+                        "Eli Barnes",
+                        "Stella Price"
+                    ]
+                }
+            ],
+            "2025-09-09": [
+                {
+                    "activity": "Pack out",
+                    "time": "09:00",
+                    "notes": "No trace left",
+                    "food_used": 4,
+                    "campers": [
+                        "All"
+                    ]
                 }
             ]
         },
         "daily_food_usage": {
-            "2025-10-10": 20
+            "2025-09-05": 6,
+            "2025-09-06": 5,
+            "2025-09-07": 8,
+            "2025-09-08": 7,
+            "2025-09-09": 4
         },
         "daily_records": {
-            "2025-10-10": [
-                "Created the fellowship"
+            "2025-09-05": [
+                "Windy afternoon"
+            ],
+            "2025-09-06": [
+                "Low tide at 09:40"
+            ],
+            "2025-09-07": [
+                "Clear skies"
+            ],
+            "2025-09-08": [
+                "High swells"
+            ],
+            "2025-09-09": [
+                "Departure"
             ]
         },
-        "pay_rate": 0,
+        "pay_rate": 140,
         "group_chat": [],
         "incidents": [
             {
-                "date": "2025-10-10",
-                "time": "",
-                "description": "Boromir tried to steal the ring",
-                "campers": []
+                "date": "2025-09-08",
+                "time": "15:10",
+                "description": "Mild seasickness reported",
+                "campers": [
+                    "Eli Barnes"
+                ]
             }
-        ]
+        ],
+        "imported_csvs": []
     }
 ]
