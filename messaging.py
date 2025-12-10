@@ -2,6 +2,7 @@
 
 import json
 import os
+import shutil
 from datetime import datetime
 from utils import data_path
 from camp_class import read_from_file, save_to_file
@@ -176,9 +177,29 @@ def pin_message(username: str, other: str, timestamp: Optional[str] = None, pinn
 
 # ---------- core chat logic ----------
 
+def _persist_attachment(path: str) -> Optional[str]:
+    """Copy attachment into data/attachments and return stored path."""
+    if not path:
+        return None
+    if not os.path.exists(path):
+        return None
+    try:
+        attach_dir = data_path("attachments")
+        os.makedirs(attach_dir, exist_ok=True)
+        filename = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{os.path.basename(path)}"
+        dest = os.path.join(attach_dir, filename)
+        shutil.copy(path, dest)
+        # store relative path so repo stays portable
+        rel = os.path.relpath(dest, os.path.dirname(MESSAGES_FILE))
+        return rel
+    except OSError:
+        return None
+
+
 def send_message(sender: str, recipient: str, text: str, *, priority: bool = False,
                  attachment: Optional[str] = None, requires_ack: bool = False,
                  metadata: Optional[Dict[str, Any]] = None):
+    stored_attachment = _persist_attachment(attachment) if attachment else None
     messages = load_messages()
     messages.append({
         "from": sender,
@@ -190,7 +211,7 @@ def send_message(sender: str, recipient: str, text: str, *, priority: bool = Fal
         "requires_ack": requires_ack or priority,
         "acked": False,
         "pinned": False,
-        "attachment": attachment,
+        "attachment": stored_attachment,
         "metadata": metadata or {},
     })
     save_messages(messages)

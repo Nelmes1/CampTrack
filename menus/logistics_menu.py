@@ -141,7 +141,7 @@ def run(users):
             set_pay_rate(camp, rate)
 
         elif choice == 6:
-            notes = load_notifications()
+            notes = load_notifications(username="logistics")
             if not notes:
                 print("\nNo notifications.")
                 continue
@@ -152,7 +152,7 @@ def run(users):
                 lvl = n.get("level", "INFO")
                 print(f"{icon} [{lvl}] [{ts}] {n['message']}")
 
-            mark_all_as_read()
+            mark_all_as_read("logistics")
             
         elif choice == 7:
             messaging_menu("logistics", users)

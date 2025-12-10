@@ -1,8 +1,14 @@
 from datetime import datetime, timedelta
 import json
 import os
-import pandas as pd
-import matplotlib.pyplot as plt
+try:
+    import pandas as pd  # type: ignore
+except ImportError:
+    pd = None
+try:
+    import matplotlib.pyplot as plt  # type: ignore
+except ImportError:
+    plt = None
 from camp_ops import create_camp, edit_camp, delete_camp, get_dates
 from camp_class import Camp, save_to_file, read_from_file
 from features.notifications import add_notification
@@ -13,7 +19,11 @@ def _engagement_score(camp):
     """Simple engagement proxy based on recorded activities and daily reports."""
     activity_events = sum(len(events) for events in camp.activities.values())
     record_entries = sum(len(entries) for entries in camp.daily_records.values())
-    add_notification(f"Activity updated at {camp.name}")
+    add_notification(
+        f"Activity updated at {camp.name}",
+        category="CAMP",
+        context={"camp": camp.name, "type": "camp"},
+    )
     return activity_events + record_entries
 
 
@@ -24,7 +34,11 @@ def top_up_food_data(camp_name, amount):
     for camp in camps:
         if camp.name == camp_name:
             camp.food_stock += amount
-            add_notification(f"Food level increased at {camp_name} by {amount}")
+            add_notification(
+                f"Food level increased at {camp_name} by {amount}",
+                category="FOOD",
+                context={"camp": camp_name, "type": "camp"},
+            )
             save_to_file()
             return {"status": "ok", "camp_name": camp_name, "amount": amount}
     return {"status": "camp_not_found"}
@@ -48,7 +62,11 @@ def set_food_stock_data(camp_name, new_stock):
     for camp in camps:
         if camp.name == camp_name:
             camp.food_stock = new_stock
-            add_notification(f"Food stock set to :{new_stock} at {camp_name}")
+            add_notification(
+                f"Food stock set to :{new_stock} at {camp_name}",
+                category="FOOD",
+                context={"camp": camp_name, "type": "camp"},
+            )
             save_to_file()
             return {"status": "ok", "camp_name": camp_name, "new_stock": new_stock}
     return {"status": "camp_not_found"}
@@ -95,9 +113,27 @@ def compute_food_shortage(camp_name):
 
             total_available = camp.food_stock * camp_duration_days
             required_amount = camper_count * food_per_camper * camp_duration_days
-            status = "shortage" if total_available < required_amount else "ok"
-            if status == "shortage":
-                add_notification(f"Food shortage at {camp.name}! Only {total_available} units left but {required_amount} needed.", level="CRITICAL")
+
+            from features.notifications import add_notification, get_thresholds
+            thresholds = get_thresholds()
+            warn_buffer = thresholds.get("shortage_warning_buffer", 0.15)
+
+            status = "ok"
+            level = None
+            if total_available < required_amount:
+                status = "shortage"
+                level = "CRITICAL"
+            elif total_available < required_amount * (1 + warn_buffer):
+                status = "warning"
+                level = "WARNING"
+
+            if level:
+                add_notification(
+                    f"Food stock alert at {camp.name}: available {total_available}, required {required_amount}.",
+                    level=level,
+                    category="FOOD",
+                    context={"camp": camp.name, "type": "camp"},
+                )
             return {
                 "status": status,
                 "required": required_amount,
@@ -169,6 +205,13 @@ def build_dashboard_data():
             "Pay Rate": getattr(camp, "pay_rate", 0)
         })
 
+    if pd is None:
+        summary = {
+            "Total Campers": total_campers,
+            "Total Leaders": total_leaders,
+        }
+        return data, summary
+
     df = pd.DataFrame(data)
     summary = {
         "Total Campers": total_campers,
@@ -186,7 +229,11 @@ def dashboard():
         return None
 
     print("\n--- Camp Dashboard ---")
-    print(df.to_string(index=False))
+    if pd is None:
+        for row in df:
+            print(row)
+    else:
+        print(df.to_string(index=False))
 
     print("\n--- Summary ---")
     for label, value in summary.items():
@@ -198,6 +245,9 @@ def dashboard():
 def _ensure_dataframe(df):
     if df is None:
         print("No data available for visualisation.")
+        return None
+    if pd is None:
+        print("Install pandas/matplotlib for charts.")
         return None
     if df.empty:
         print("No data available for visualisation.")
