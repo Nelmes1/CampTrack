@@ -33,6 +33,7 @@ from features.scout import (
     activity_stats_data,
     find_camp_by_name,
     record_incident_entry_data,
+    camps_overlap,
 )
 from messaging import get_conversations_for_user, get_conversation, send_message
 
@@ -1509,10 +1510,71 @@ class ScoutWindow(ttk.Frame):
         if not indices:
             messagebox.showinfo("Select Camps", "No camps selected.")
             return
-        res = assign_camps_to_leader(camps, self.username, indices)
+        # Build conflict info between current + new selections
+        existing = [c for c in camps if self.username in c.scout_leaders]
+        new_camps = [camps[i] for i in indices]
+
+        def overlaps(a, b):
+            return camps_overlap(a, b)
+
+        new_new_conflicts = []
+        for i in range(len(new_camps)):
+            for j in range(i + 1, len(new_camps)):
+                if overlaps(new_camps[i], new_camps[j]):
+                    new_new_conflicts.append((new_camps[i].name, new_camps[j].name))
+
+        if new_new_conflicts:
+            pairs = "\n".join([f"- {a} ↔ {b}" for a, b in new_new_conflicts])
+            show_error_toast(self.master, "Conflict", f"Your selected camps overlap each other:\n{pairs}\nPlease adjust your selection.")
+            return
+
+        conflict_pairs = []
+        for ncamp in new_camps:
+            for ecamp in existing:
+                if overlaps(ncamp, ecamp):
+                    conflict_pairs.append((ncamp.name, ecamp.name))
+
+        proceed_indices = indices
+        removed_existing = []
+        skipped_new = []
+
+        if conflict_pairs:
+            lines = "\n".join([f"- New: {n} ↔ Existing: {e}" for n, e in conflict_pairs])
+            msg = (
+                "Some selected camps overlap with your current assignments:\n"
+                f"{lines}\n\n"
+                "Yes: replace overlapping existing assignments with the new ones.\n"
+                "No: keep existing assignments and skip the conflicting new camps.\n"
+                "Cancel: do nothing."
+            )
+            choice = messagebox.askyesnocancel("Conflicts found", msg)
+            if choice is None:
+                return
+            if choice:  # replace existing
+                conflict_existing_names = {e for _, e in conflict_pairs}
+                for camp in existing:
+                    if camp.name in conflict_existing_names and self.username in camp.scout_leaders:
+                        camp.scout_leaders.remove(self.username)
+                        removed_existing.append(camp.name)
+                proceed_indices = indices  # keep all new selections
+            else:  # keep existing, skip conflicting new
+                conflict_new_names = {n for n, _ in conflict_pairs}
+                proceed_indices = [i for i in indices if camps[i].name not in conflict_new_names]
+                skipped_new = [camps[i].name for i in indices if camps[i].name in conflict_new_names]
+                if not proceed_indices:
+                    messagebox.showinfo("Select Camps", "All selected camps conflict with your current assignments; kept existing.")
+                    return
+
+        res = assign_camps_to_leader(camps, self.username, proceed_indices)
         status = res.get("status")
         if status == "ok":
-            messagebox.showinfo("Success", f"Assigned: {', '.join(res.get('selected', []))}")
+            summary = ", ".join(res.get("selected", [])) or "None"
+            extra = ""
+            if removed_existing:
+                extra += f"\nRemoved (replaced): {', '.join(removed_existing)}"
+            if skipped_new:
+                extra += f"\nSkipped (conflict): {', '.join(skipped_new)}"
+            messagebox.showinfo("Success", f"Assigned: {summary}{extra}")
         elif status == "overlap":
             show_error_toast(self.master, "Error", "Selected camps overlap in dates. Please choose non-conflicting camps.")
         elif status == "invalid_index":

@@ -162,7 +162,7 @@ def bulk_assign_campers_from_csv(camp_name, filepath):
 
 
 def assign_camps_to_leader(camps, leader_username, selected_indices):
-    """Pure helper to assign a leader to selected camps and remove from others."""
+    """Assign a leader to selected camps, keeping existing non-conflicting assignments."""
     if not selected_indices:
         return {"status": "no_selection"}
     selected_camp_names = []
@@ -170,21 +170,29 @@ def assign_camps_to_leader(camps, leader_username, selected_indices):
         if idx < 0 or idx >= len(camps):
             return {"status": "invalid_index"}
         selected_camp_names.append(camps[idx].name)
-    # check conflicts
     selected_camps = [camps[i] for i in selected_indices]
-    if camps_conflict(selected_camps):
+
+    # include existing assignments so we don't drop them unintentionally
+    existing_camps = [camp for camp in camps if leader_username in camp.scout_leaders]
+    combined = []
+    seen = set()
+    for camp in existing_camps + selected_camps:
+        if camp.name not in seen:
+            combined.append(camp)
+            seen.add(camp.name)
+
+    # check conflicts across combined assignments
+    if camps_conflict(combined):
         return {"status": "overlap"}
-    # apply assignments
-    for camp in camps:
-        if camp.name in selected_camp_names:
-            if leader_username not in camp.scout_leaders:
-                camp.scout_leaders.append(leader_username)
-        else:
-            if leader_username in camp.scout_leaders:
-                camp.scout_leaders.remove(leader_username)
+
+    # apply assignments: keep existing, add new
+    for camp in selected_camps:
+        if leader_username not in camp.scout_leaders:
+            camp.scout_leaders.append(leader_username)
 
     save_to_file()
-    return {"status": "ok", "selected": selected_camp_names}
+    combined_names = [camp.name for camp in combined]
+    return {"status": "ok", "selected": combined_names}
 
 def assign_camps_to_leader_ui(leader_username):
     camps = read_from_file()
@@ -224,9 +232,9 @@ def assign_camps_to_leader_ui(leader_username):
     elif res["status"] == "invalid_index":
         print("\nInvalid camp selection.")
     elif res["status"] == "overlap":
-        print("You camps you have selected overlap.\nPlease choose camps that do not overlap.")
+        print("Your combined camp assignments overlap.\nPlease choose camps that do not overlap.")
     elif res["status"] == "ok":
-        print(f"{leader_username} has selected these camps to supervise:")
+        print(f"{leader_username} is now supervising these camps:")
         for name in res["selected"]:
             print(name)
         print("\nYour camp selections have been saved")
