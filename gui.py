@@ -516,6 +516,7 @@ class AdminWindow(ttk.Frame):
             btns.pack(fill="x")
             ttk.Button(btns, text="Save", command=submit, style="Primary.TButton").pack(side="left", padx=4, pady=4)
             ttk.Button(btns, text="Cancel", command=dlg.destroy).pack(side="left", padx=4, pady=4)
+            center_in_place(dlg)
             dlg.grab_set()
 
         def delete_user():
@@ -596,6 +597,7 @@ class AdminWindow(ttk.Frame):
             btns.pack(fill="x")
             ttk.Button(btns, text="Save", command=submit, style="Primary.TButton").pack(side="left", padx=4, pady=4)
             ttk.Button(btns, text="Cancel", command=dlg.destroy).pack(side="left", padx=4, pady=4)
+            center_in_place(dlg)
             dlg.grab_set()
 
         def change_role():
@@ -640,6 +642,7 @@ class AdminWindow(ttk.Frame):
             btns.pack(fill="x")
             ttk.Button(btns, text="Save", command=submit, style="Primary.TButton").pack(side="left", padx=4, pady=4)
             ttk.Button(btns, text="Cancel", command=dlg.destroy).pack(side="left", padx=4, pady=4)
+            center_in_place(dlg)
             dlg.grab_set()
 
         # action buttons
@@ -655,6 +658,7 @@ class AdminWindow(ttk.Frame):
         refresh_tree()
         search_var.trace_add("write", lambda *_: refresh_tree())
         search_entry.focus_set()
+        center_in_place(top)
 
     def add_user_ui(self, on_added=None):
         top = tk.Toplevel(self)
@@ -704,6 +708,7 @@ class AdminWindow(ttk.Frame):
             top.destroy()
 
         ttk.Button(frame, text="Add User", command=submit, style="Primary.TButton").pack(fill="x", pady=(4, 0))
+        center_in_place(top)
 
     def edit_user_password_ui(self):
         top = tk.Toplevel(self)
@@ -763,6 +768,7 @@ class AdminWindow(ttk.Frame):
             top.destroy()
 
         ttk.Button(frame, text="Save", command=submit, style="Primary.TButton").pack(fill="x", pady=(4, 0))
+        center_in_place(top)
 
     def delete_user_ui(self):
         top = tk.Toplevel(self)
@@ -815,6 +821,7 @@ class AdminWindow(ttk.Frame):
             top.destroy()
 
         ttk.Button(frame, text="Delete", command=submit, style="Danger.TButton").pack(fill="x", pady=(4, 0))
+        center_in_place(top)
 
     def disable_user_ui(self):
         names = [u['username'] for u in users['admin']]
@@ -846,6 +853,7 @@ class AdminWindow(ttk.Frame):
             top.destroy()
 
         ttk.Button(frame, text="Disable", command=submit, style="Danger.TButton").pack(fill="x", pady=(4, 0))
+        center_in_place(top)
 
     def enable_user_ui(self):
         disabled_usernames = []
@@ -887,6 +895,7 @@ class AdminWindow(ttk.Frame):
             top.destroy()
 
         ttk.Button(frame, text="Enable", command=submit, style="Primary.TButton").pack(fill="x", pady=(4, 0))
+        center_in_place(top)
 
     def messaging_ui(self):
         top = tk.Toplevel(self)
@@ -900,6 +909,8 @@ class AdminWindow(ttk.Frame):
         ttk.Button(frame, text="Direct Messages", command=lambda: open_chat_window(self.master, self.username), style="Primary.TButton").pack(fill="x", pady=4)
         ttk.Button(frame, text="Group Chat", command=lambda: open_group_chat_window(self.master, self.username)).pack(fill="x", pady=4)
         ttk.Button(frame, text="Close", command=top.destroy).pack(fill="x", pady=(8, 0))
+        center_in_place(top)
+        center_in_place(top)
 
     def logout(self):
         root = self.master
@@ -965,6 +976,7 @@ class LogisticsWindow(ttk.Frame):
         ttk.Button(frame, text="Create Camp", command=self.create_camp_ui, style="Primary.TButton").pack(fill="x", pady=4)
         ttk.Button(frame, text="Edit Camp", command=self.edit_camp_ui).pack(fill="x", pady=4)
         ttk.Button(frame, text="Delete Camp", command=self.delete_camp_ui, style="Danger.TButton").pack(fill="x", pady=4)
+        center_in_place(top)
 
     def food_allocation_menu(self):
         top = tk.Toplevel(self)
@@ -977,6 +989,7 @@ class LogisticsWindow(ttk.Frame):
         ttk.Button(frame, text="Set Daily Food Stock", command=self.set_food_stock_ui, style="Primary.TButton").pack(fill="x", pady=4)
         ttk.Button(frame, text="Top-Up Food Stock", command=self.top_up_food_ui).pack(fill="x", pady=4)
         ttk.Button(frame, text="Check Food Shortage", command=self.shortage_ui).pack(fill="x", pady=4)
+        center_in_place(top)
 
     def set_food_stock_ui(self):
         camps = read_from_file()
@@ -1021,6 +1034,7 @@ class LogisticsWindow(ttk.Frame):
                 enter_stock(camp_name)
 
             ttk.Button(frame, text="Next", command=next_step, style="Primary.TButton").pack(fill="x", pady=(8, 0))
+            center_in_place(top)
 
         def enter_stock(camp):
             top = tk.Toplevel(self)
@@ -1046,6 +1060,7 @@ class LogisticsWindow(ttk.Frame):
                 top.destroy()
 
             ttk.Button(frame, text="Save", command=submit, style="Primary.TButton").pack(fill="x", pady=(4, 0))
+            center_in_place(top)
 
         choose_camp()
 
@@ -1092,6 +1107,7 @@ class LogisticsWindow(ttk.Frame):
                 enter_amount(camp_name)
 
             ttk.Button(frame, text="Next", command=next_step, style="Primary.TButton").pack(fill="x", pady=(8, 0))
+            center_in_place(top)
 
         def enter_amount(camp):
             top = tk.Toplevel(self)
@@ -1117,6 +1133,7 @@ class LogisticsWindow(ttk.Frame):
                 top.destroy()
 
             ttk.Button(frame, text="Save", command=submit, style="Primary.TButton").pack(fill="x", pady=(4, 0))
+            center_in_place(top)
 
         choose_camp()
 
@@ -1147,6 +1164,7 @@ class LogisticsWindow(ttk.Frame):
             top.destroy()
 
         ttk.Button(frame, text="Save", command=submit, style="Primary.TButton").pack(fill="x", pady=(4, 0))
+        center_in_place(top)
 
     def shortage_ui(self):
         camp = self.choose_camp_name()
@@ -1181,6 +1199,7 @@ class LogisticsWindow(ttk.Frame):
         text.insert("end", "\n\nSummary:\n")
         for k, v in summary.items():
             text.insert("end", f"{k}: {v}\n")
+        center_in_place(top)
 
     def notifications_ui(self):
         notif_win = tk.Toplevel(self)
@@ -1218,6 +1237,7 @@ class LogisticsWindow(ttk.Frame):
                 listbox.insert("end", f"{status} {level} {timestamp} — {message}")
 
         mark_all_as_read()
+        center_in_place(notif_win)
         
     def visualise_menu(self):
         top = tk.Toplevel(self)
@@ -1233,6 +1253,7 @@ class LogisticsWindow(ttk.Frame):
         ttk.Button(frame, text="Camper Distribution", command=plot_camper_distribution).pack(fill="x", pady=4)
         ttk.Button(frame, text="Leaders per Camp", command=plot_leaders_per_camp).pack(fill="x", pady=4)
         ttk.Button(frame, text="Engagement Overview", command=plot_engagement_scores).pack(fill="x", pady=4)
+        center_in_place(top)
 
     def financial_settings_ui(self):
         self.set_pay_rate_ui()
@@ -1321,6 +1342,7 @@ class LogisticsWindow(ttk.Frame):
             top.destroy()
 
         ttk.Button(frame, text="Create", command=submit, style="Primary.TButton").pack(fill="x", pady=(8, 0))
+        center_in_place(top)
 
     def edit_camp_ui(self):
         camps = read_from_file()
@@ -1445,6 +1467,7 @@ class LogisticsWindow(ttk.Frame):
             top.destroy()
 
         ttk.Button(frame, text="Save changes", command=submit, style="Primary.TButton").pack(fill="x", pady=(8, 0))
+        center_in_place(top)
 
     def delete_camp_ui(self):
         camps = read_from_file()
@@ -1480,6 +1503,7 @@ class LogisticsWindow(ttk.Frame):
             top.destroy()
 
         ttk.Button(frame, text="Delete", command=delete, style="Danger.TButton").pack(fill="x", pady=(8, 0))
+        center_in_place(top)
 
     def messaging_ui(self):
         open_chat_window(self.master, self.username)
@@ -1529,6 +1553,7 @@ class LogisticsWindow(ttk.Frame):
             top.destroy()
 
         ttk.Button(frame, text="Select", command=submit, style="Primary.TButton").pack(fill="x", pady=(8, 0))
+        center_in_place(top)
         top.grab_set()
         top.wait_window()
         return result["camp"]
@@ -1892,6 +1917,7 @@ class ScoutWindow(ttk.Frame):
         camp_var.trace_add("write", refresh_campers)
         campers_list.bind("<<ListboxSelect>>", show_camper_details)
         refresh_campers()
+        center_in_place(top)
 
     def food_req_ui(self):
         camps = read_from_file()
@@ -2055,6 +2081,7 @@ class ScoutWindow(ttk.Frame):
                 show_error_toast(self.master, "Error", status or "Unknown error")
 
         ttk.Button(frame, text="Save Entry", command=submit, style="Primary.TButton").pack(fill="x", pady=(4, 0))
+        center_in_place(top)
 
     def view_activities_ui(self):
         camps = read_from_file()
@@ -2235,6 +2262,7 @@ class ScoutWindow(ttk.Frame):
         if first:
             tree.selection_set(first[0])
             show_details()
+        center_in_place(top)
 
     def record_incidents_ui(self):
         camps = read_from_file()
@@ -2356,7 +2384,8 @@ class ScoutWindow(ttk.Frame):
                 messagebox.showerror("Error", "Could not save incident.")
 
         ttk.Button(frame, text="Save Incident", command=save_incident, style="Primary.TButton").pack(fill="x", pady=(4,0))
-    
+        center_in_place(top)
+
     def view_incidents_ui(self):
         camps = read_from_file()
         if not camps:
@@ -2494,6 +2523,7 @@ class ScoutWindow(ttk.Frame):
         if first:
             tree.selection_set(first[0])
             show_details()
+        center_in_place(top)
 
 
 
@@ -2527,6 +2557,7 @@ class ScoutWindow(ttk.Frame):
             txt = tk.Text(frame, width=80, height=30)
             txt.pack(fill="both", expand=True)
             txt.insert("end", "\n".join(lines_all))
+            center_in_place(popup)
 
         if indices is None:
             return
@@ -2562,6 +2593,7 @@ class ScoutWindow(ttk.Frame):
         text.insert("end", "\n".join(lines))
 
         ttk.Button(body, text="Show all camp stats", command=lambda: render_all(top), style="Primary.TButton").pack(fill="x", pady=(0, 4))
+        center_in_place(top)
 
     def messaging_ui(self):
         top = tk.Toplevel(self)
@@ -2651,6 +2683,7 @@ def select_camp_dialog(title, camps, allow_multiple=False, allow_cancel=False, a
     if allow_view_all:
         tk.Button(btn_frame, text="View all", command=on_view_all).pack(side="left", padx=5)
 
+    center_in_place(top)
     top.grab_set()
     top.wait_window()
     return result["indices"]
@@ -2862,6 +2895,15 @@ def center_window(win, width=500, height=400):
         x = int((screen_width - width) / 2)
         y = int((screen_height - height) / 2)
         win.geometry(f"{width}x{height}+{x}+{y}")
+    except Exception:
+        pass
+
+
+def center_in_place(win):
+    """Center a window using its current size without resizing it."""
+    try:
+        win.update_idletasks()
+        center_window(win, width=win.winfo_width(), height=win.winfo_height())
     except Exception:
         pass
 
