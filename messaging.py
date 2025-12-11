@@ -483,7 +483,12 @@ def open_chat(current_user, other):
         if not thread:
             print("(no messages yet)")
         else:
-            for msg in thread:
+            pinned = [m for m in thread if m.get("pinned")]
+            rest = [m for m in thread if not m.get("pinned")]
+            ordered = pinned + rest
+            if pinned:
+                print("(Pinned messages shown first)")
+            for msg in ordered:
                 who = "You" if msg["from"] == current_user else other
                 flags = []
                 if msg.get("priority"):
@@ -503,7 +508,7 @@ def open_chat(current_user, other):
         print("[3] Search in this chat")
         print("[4] Export chat to file")
         print("[5] Acknowledge pending priority messages")
-        print("[6] Pin/unpin latest message")
+        print("[6] Pin/unpin a message")
         print("[7] Refresh")
         print("[8] Back")
 
@@ -522,12 +527,9 @@ def open_chat(current_user, other):
             else:
                 print("Failed to save.")
         elif choice == "5":
-            updated = acknowledge_conversation(current_user, other)
-            print(f"Acknowledged {updated} message(s).")
+            _ack_selective(current_user, other)
         elif choice == "6":
-            toggled = _toggle_pin(current_user, other)
-            if not toggled:
-                print("No message to pin/unpin.")
+            _select_pin(current_user, other)
         elif choice == "7":
             continue
         elif choice == "8":
@@ -542,11 +544,11 @@ def _ask_priority() -> bool:
 
 
 def _prompt_send(current_user: str, other: str, *, priority: bool):
-    text = input("Message: ").strip()
-    if not text:
+    text = input("Message (leave blank to send attachment only): ").strip()
+    attachment = input("Attachment path (optional, Enter to skip): ").strip() or None
+    if not text and not attachment:
+        print("Nothing to send.")
         return
-    attachment = input("Attachment path (optional, Enter to skip): ").strip()
-    attachment = attachment or None
     send_message(current_user, other, text, priority=priority, attachment=attachment)
 
 
@@ -569,17 +571,62 @@ def _search_chat(current_user: str, other: str):
         print(f"{msg['timestamp']} - {who}: {msg['text']}{extra}")
 
 
-def _toggle_pin(current_user: str, other: str) -> bool:
+def _ack_selective(current_user: str, other: str):
+    """Allow selecting which priority messages to acknowledge."""
+    pending = [
+        msg
+        for msg in get_conversation(current_user, other)
+        if msg.get("requires_ack") and not msg.get("acked") and msg.get("to") == current_user
+    ]
+    if not pending:
+        print("No priority messages to acknowledge.")
+        return
+    print("\nPending priority messages:")
+    for idx, msg in enumerate(pending, start=1):
+        print(f"[{idx}] {msg.get('timestamp','')} — {msg.get('text','')}")
+    choice = input("Enter numbers comma-separated, or 'all' to acknowledge all: ").strip()
+    indices = []
+    if choice.lower() == "all":
+        indices = list(range(1, len(pending) + 1))
+    else:
+        for part in choice.split(","):
+            part = part.strip()
+            if part.isdigit():
+                indices.append(int(part))
+    if not indices:
+        print("No messages acknowledged.")
+        return
+    updated = 0
+    for i in indices:
+        if 1 <= i <= len(pending):
+            m = pending[i - 1]
+            if acknowledge_message(current_user, other, m.get("timestamp", "")):
+                updated += 1
+    print(f"Acknowledged {updated} message(s).")
+
+
+def _select_pin(current_user: str, other: str):
+    """CLI pin selection."""
     thread = get_conversation(current_user, other)
     if not thread:
-        return False
-    latest = thread[-1]
-    now_pinned = not latest.get("pinned", False)
-    ok = pin_message(current_user, other, latest.get("timestamp"), pinned=now_pinned)
-    if ok:
-        state = "Pinned" if now_pinned else "Unpinned"
-        print(f"{state} latest message.")
-    return ok
+        print("No messages to pin.")
+        return
+    print("\nSelect a message to pin/unpin:")
+    for idx, msg in enumerate(thread, start=1):
+        marker = "[PINNED] " if msg.get("pinned") else ""
+        print(f"[{idx}] {marker}{msg.get('timestamp','')} — {msg.get('text','')}")
+    sel = input("Enter number (or press Enter to cancel): ").strip()
+    if not sel.isdigit():
+        return
+    idx = int(sel)
+    if idx < 1 or idx > len(thread):
+        print("Invalid selection.")
+        return
+    target = thread[idx - 1]
+    now_pin = not target.get("pinned", False)
+    if pin_message(current_user, other, target.get("timestamp"), pinned=now_pin):
+        state = "Pinned" if now_pin else "Unpinned"
+        print(f"{state} selected message.")
 
 
 def open_group_chat(current_user, assigned_camps):
@@ -605,19 +652,24 @@ def open_group_chat(current_user, assigned_camps):
                     print("(No messages in the group chat yet.)")
                 else:
                     for msg in group_chat:
-                        print(f"{msg['timestamp']} - {msg['from']}: {msg['text']}")
+                        attach = msg.get("attachment")
+                        attach_str = f" [attachment: {attach}]" if attach else ""
+                        print(f"{msg['timestamp']} - {msg['from']}: {msg['text']}{attach_str}")
                 
                 print("\nOptions:")
-                print("[1] Send a message")
+                print("[1] Send a message/attachment")
                 print("[2] Refresh")
                 print("[3] Back to camp selection")
 
                 choice = input("Choose an option: ").strip()
 
                 if choice == "1":
-                    message = input("Message: ").strip()
-                    if message:
-                        selected_camp.message_group_chat(current_user, message)
+                    message = input("Message (leave blank to send attachment only): ").strip()
+                    attachment = input("Attachment path (optional, Enter to skip): ").strip() or None
+                    if not message and not attachment:
+                        print("Nothing to send.")
+                        continue
+                    selected_camp.message_group_chat(current_user, message or "(attachment)", attachment)
                 elif choice == "2":
                     continue
                 elif choice == "3":
