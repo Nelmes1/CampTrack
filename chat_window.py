@@ -534,9 +534,9 @@ def open_group_chat_window(master, username, role=None):
         if not sel:
             return
         idx = int(sel[0])
-        if idx < 0 or idx >= len(assigned_camps):
+        if idx < 0 or idx >= len(camp_choices):
             return
-        camp = assigned_camps[idx]
+        camp = camp_choices[idx]
         current_camp_name.set(camp.name)
         refresh_group_chat()
 
