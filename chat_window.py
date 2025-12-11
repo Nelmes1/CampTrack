@@ -1,5 +1,9 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog, filedialog
+import os
+import sys
+import subprocess
+import webbrowser
 
 from messaging import (
     get_conversations_for_user,
@@ -9,12 +13,14 @@ from messaging import (
     search_messages,
     export_conversation,
     acknowledge_conversation,
+    acknowledge_message,
     pin_message,
     count_unread_messages,
     mark_conversation_as_read,
 )
 from user_logins import users
 from camp_class import read_from_file
+from utils import data_path
 
 
 def _get_all_usernames():
@@ -241,6 +247,29 @@ def open_chat_window(master, username, role=None):
 
     current_partner = tk.StringVar(value="")
 
+    def _open_attachment(rel_path):
+        """Open attachment file using the OS default handler."""
+        if not rel_path:
+            return
+        base_dir = os.path.dirname(data_path("messages.json"))
+        abs_path = rel_path if os.path.isabs(rel_path) else os.path.join(base_dir, rel_path)
+        if not os.path.exists(abs_path):
+            messagebox.showerror("Attachment", f"File not found:\n{abs_path}")
+            return
+        try:
+            if sys.platform == "darwin":
+                subprocess.Popen(["open", abs_path])
+            elif os.name == "nt":
+                os.startfile(abs_path)  # type: ignore[attr-defined]
+            else:
+                subprocess.Popen(["xdg-open", abs_path])
+        except Exception:
+            # fallback to webbrowser open
+            try:
+                webbrowser.open(abs_path)
+            except Exception as e:
+                messagebox.showerror("Attachment", f"Could not open attachment:\n{e}")
+
     def refresh_chat(partner):
         # mark messages as read first
         mark_conversation_as_read(username, partner)
@@ -253,7 +282,7 @@ def open_chat_window(master, username, role=None):
         if not thread:
             chat_text.insert(tk.END, "(No messages yet – say hi!)\n")
         else:
-            for msg in thread:
+            for idx, msg in enumerate(thread):
                 who = "You" if msg["from"] == username else partner
                 flags = []
                 if msg.get("priority"):
@@ -264,8 +293,17 @@ def open_chat_window(master, username, role=None):
                     flags.append("PINNED")
                 flag_str = f" [{' | '.join(flags)}]" if flags else ""
                 attach = msg.get("attachment")
-                attach_str = f" [attachment: {attach}]" if attach else ""
-                chat_text.insert(tk.END, f"{msg['timestamp']} - {who}: {msg['text']}{flag_str}{attach_str}\n")
+                line = f"{msg['timestamp']} - {who}: {msg['text']}{flag_str}"
+                chat_text.insert(tk.END, line)
+                if attach:
+                    tag = f"attach_{idx}"
+                    display = f" [attachment: {os.path.basename(attach)}]"
+                    start = chat_text.index("end-1c")
+                    chat_text.insert(tk.END, display)
+                    chat_text.tag_add(tag, start, chat_text.index("end-1c"))
+                    chat_text.tag_config(tag, foreground="#7dd3fc", underline=True)
+                    chat_text.tag_bind(tag, "<Button-1>", lambda _e, p=attach: _open_attachment(p))
+                chat_text.insert(tk.END, "\n")
 
         chat_text.config(state="disabled")
         refresh_conversation_list()  # update unread counters
@@ -277,7 +315,8 @@ def open_chat_window(master, username, role=None):
             return
 
         text = entry.get().strip()
-        if not text:
+        attachment_path = attachment_var.get() or None
+        if not text and not attachment_path:
             return
 
         send_message(
@@ -285,7 +324,7 @@ def open_chat_window(master, username, role=None):
             partner,
             text,
             priority=priority_var.get(),
-            attachment=attachment_var.get() or None,
+            attachment=attachment_path,
         )
         entry.delete(0, tk.END)
         priority_var.set(False)
@@ -297,9 +336,60 @@ def open_chat_window(master, username, role=None):
         if not partner:
             messagebox.showinfo("Messaging", "Select a conversation first.")
             return
-        count = acknowledge_conversation(username, partner)
-        messagebox.showinfo("Acknowledged", f"Acknowledged {count} message(s).")
-        refresh_chat(partner)
+        pending = [
+            msg
+            for msg in get_conversation(username, partner)
+            if msg.get("requires_ack") and not msg.get("acked") and msg.get("to") == username
+        ]
+        if not pending:
+            messagebox.showinfo("Acknowledged", "No priority messages to acknowledge.")
+            return
+
+        dlg = tk.Toplevel(convo_win)
+        dlg.title("Acknowledge Messages")
+        dlg.configure(bg=convo_win.cget("bg"))
+        outer = ttk.Frame(dlg, padding=12, style="Card.TFrame")
+        outer.pack(fill="both", expand=True)
+        ttk.Label(outer, text=f"Priority messages from {partner}", style="Header.TLabel").pack(anchor="w", pady=(0, 6))
+        ttk.Label(outer, text="Select one or more to acknowledge.", style="Subtitle.TLabel").pack(anchor="w", pady=(0, 6))
+
+        lb = tk.Listbox(
+            outer,
+            selectmode="extended",
+            height=min(10, len(pending)),
+            bg="#0b1729",
+            fg="#e5e7eb",
+            selectbackground="#10b981",
+            highlightthickness=0,
+            relief="flat",
+        )
+        lb.pack(fill="both", expand=True, pady=(4, 8))
+        for msg in pending:
+            ts = msg.get("timestamp", "")
+            txt = msg.get("text", "")
+            lb.insert(tk.END, f"{ts} — {txt}")
+
+        def do_ack(selected_all=False):
+            indices = range(len(pending)) if selected_all else lb.curselection()
+            if not indices:
+                messagebox.showinfo("Acknowledge", "Select at least one message.")
+                return
+            updated = 0
+            for i in indices:
+                m = pending[int(i)]
+                if acknowledge_message(username, partner, m.get("timestamp", "")):
+                    updated += 1
+            messagebox.showinfo("Acknowledge", f"Acknowledged {updated} message(s).")
+            dlg.destroy()
+            refresh_chat(partner)
+
+        btn_row = ttk.Frame(outer, style="Card.TFrame")
+        btn_row.pack(fill="x", pady=(0, 4))
+        ttk.Button(btn_row, text="Ack Selected", style="Primary.TButton", command=lambda: do_ack(False)).pack(side="left", padx=(0, 6))
+        ttk.Button(btn_row, text="Ack All", command=lambda: do_ack(True)).pack(side="left")
+        ttk.Button(btn_row, text="Cancel", command=dlg.destroy).pack(side="right")
+        center_in_place(dlg)
+        dlg.grab_set()
 
     def pin_latest():
         partner = current_partner.get()
@@ -489,6 +579,12 @@ def open_group_chat_window(master, username, role=None):
     msg_entry = ttk.Entry(right, style="App.TEntry")
     msg_entry.pack(fill="x", pady=(0, 6))
 
+    attach_var = tk.StringVar(value="")
+    attach_row = ttk.Frame(right, style="Card.TFrame")
+    attach_row.pack(fill="x", pady=(0, 4))
+    ttk.Button(attach_row, text="Attach", command=lambda: choose_attachment()).pack(side="left", padx=(0, 6))
+    ttk.Label(attach_row, textvariable=attach_var, style="Subtitle.TLabel", width=40).pack(side="left", anchor="w")
+
     current_camp_name = tk.StringVar(value="")
 
     def _get_camp_by_name(name):
@@ -545,6 +641,13 @@ def open_group_chat_window(master, username, role=None):
 
     camp_listbox.bind("<<ListboxSelect>>", on_camp_select)
 
+    def choose_attachment():
+        path = filedialog.askopenfilename(title="Select attachment (optional)")
+        if path:
+            attach_var.set(path)
+        else:
+            attach_var.set("")
+
     def send_group_message(event=None):
         name = current_camp_name.get()
         if not name:
@@ -557,7 +660,9 @@ def open_group_chat_window(master, username, role=None):
             messagebox.showinfo("Group Chat", "Select a camp first.")
             return
         text = msg_entry.get().strip()
-        if not text:
+        attachment_path = attach_var.get() or None
+        if not text and not attachment_path:
+            messagebox.showinfo("Group Chat", "Enter a message or attach a file.")
             return
 
         camp = _get_camp_by_name(name)
@@ -565,8 +670,9 @@ def open_group_chat_window(master, username, role=None):
             messagebox.showerror("Error", "Camp not found; it may have been deleted.")
             return
 
-        camp.message_group_chat(username, text)
+        camp.message_group_chat(username, text or "(attachment)", attachment_path)
         msg_entry.delete(0, tk.END)
+        attach_var.set("")
         refresh_group_chat()
 
     ttk.Button(right, text="Send to Group", style="Primary.TButton", command=send_group_message).pack(fill="x")

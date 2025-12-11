@@ -60,12 +60,13 @@ class Camp:
             self.daily_records[date] = []
         self.daily_records[date].append(notes)
 
-    def message_group_chat(self, from_user, message_text):
+    def message_group_chat(self, from_user, message_text, attachment=None):
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         message = {
             "from": from_user,
             "text": message_text,
-            "timestamp": timestamp
+            "timestamp": timestamp,
+            "attachment": attachment,
         }
         self.group_chat.append(message)
         save_to_file()
