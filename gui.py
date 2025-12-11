@@ -2682,6 +2682,10 @@ class ScoutWindow(ttk.Frame):
 
         time_entry = add_entry("Time (optional)")
 
+        ttk.Label(frame, text="Severity", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
+        severity_var = tk.StringVar(value="Medium")
+        ttk.Combobox(frame, values=["Low", "Medium", "High", "Critical"], textvariable=severity_var, state="readonly").pack(fill="x", pady=(0, 8))
+
         ttk.Label(frame, text="Incident Description", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
         notes_text = tk.Text(frame, height=4, bg="#0b1729", fg=THEME_FG, highlightthickness=0, relief="flat",insertbackground=THEME_FG)
         notes_text.pack(fill="both", expand=True, pady=(0, 8))
@@ -2698,11 +2702,22 @@ class ScoutWindow(ttk.Frame):
         camp_var.trace_add("write", refresh_campers_list)
         refresh_campers_list()
 
+        ttk.Label(frame, text="Follow-up tasks (optional)", style="FieldLabel.TLabel").pack(anchor="w", pady=(8, 2))
+        follow_entry = ttk.Entry(frame, style="App.TEntry")
+        follow_entry.pack(fill="x", pady=(0, 6))
+
+        ttk.Label(frame, text="Reminder date (YYYY-MM-DD, optional)", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
+        reminder_entry = ttk.Entry(frame, style="App.TEntry")
+        reminder_entry.pack(fill="x", pady=(0, 8))
+
         def save_incident():
             camp_name = camp_var.get()
             date = date_var.get()
             description = notes_text.get("1.0", "end").strip()
             time_val = time_entry.get().strip()
+            severity = severity_var.get()
+            follow_up = follow_entry.get().strip()
+            reminder = reminder_entry.get().strip()
 
             if not date:
                 show_error_toast(self.master, "Error", "Please select a date.")
@@ -2714,7 +2729,17 @@ class ScoutWindow(ttk.Frame):
             selected = campers_listbox.curselection()
             camper_names = [campers_listbox.get(i) for i in selected]
 
-            res = record_incident_entry_data(camp_name, date, description, camper_names, time_val)
+            res = record_incident_entry_data(
+                camp_name,
+                date,
+                description,
+                camper_names,
+                time_val,
+                severity,
+                follow_up,
+                "Open",
+                reminder,
+            )
             if res.get("status") == "ok":
                 messagebox.showinfo("Saved", "Incident recorded.")
                 top.destroy()
@@ -2747,6 +2772,20 @@ class ScoutWindow(ttk.Frame):
         if not camp.incidents:
             messagebox.showinfo("Incidents", f"No incidents recorded for {camp.name}.")
             return
+        # Reminder alert for open incidents
+        today = datetime.now().date()
+        due = []
+        for inc in camp.incidents:
+            if inc.get("status", "Open") != "Open":
+                continue
+            r = inc.get("reminder_date")
+            try:
+                if r and datetime.strptime(r, "%Y-%m-%d").date() <= today:
+                    due.append(inc)
+            except Exception:
+                continue
+        if due:
+            messagebox.showinfo("Incidents", f"{len(due)} open incident(s) have reached their reminder date.")
 
         top = tk.Toplevel(self)
         top.title(f"Incidents - {camp.name}")
@@ -2755,10 +2794,12 @@ class ScoutWindow(ttk.Frame):
         frame = ttk.Frame(top, style="Card.TFrame")  # FIXED parent here
         frame.pack(fill="both", expand=True, padx=8, pady=(0, 8))
 
-        columns = {"date": "Date", "description": "Description", "campers": "Campers"}
+        columns = {"date": "Date", "severity": "Severity", "status": "Status", "description": "Description", "campers": "Campers"}
         col_cfg = {
             "date": {"width": 90, "anchor": "w"},
-            "description": {"width": 240, "anchor": "w"},
+            "severity": {"width": 90, "anchor": "center"},
+            "status": {"width": 90, "anchor": "center"},
+            "description": {"width": 220, "anchor": "w"},
             "campers": {"width": 180, "anchor": "w"},
         }
         tree, details_text, item_details = self._build_detail_table(frame, columns, col_cfg)
@@ -2769,8 +2810,10 @@ class ScoutWindow(ttk.Frame):
             time_val = inc.get("time", "") or ""
             camper_list = inc.get("campers", [])
             camper_str = ", ".join(camper_list) if camper_list else "none"
+            severity = inc.get("severity", "Medium")
+            status = inc.get("status", "Open")
 
-            item_id = tree.insert("", "end", values=(date, desc, camper_str))
+            item_id = tree.insert("", "end", values=(date, severity, status, desc, camper_str))
             item_details[item_id] = inc  
 
 
@@ -2783,9 +2826,16 @@ class ScoutWindow(ttk.Frame):
             info = item_details.get(item, {})
             details_text.delete("1.0", "end")
             time_val = info.get("time","")
+            follow = info.get("follow_up", "")
+            status = info.get("status", "Open")
+            reminder = info.get("reminder_date", "")
+            resolved_at = info.get("resolved_at", "")
+            severity = info.get("severity", "Medium")
 
             lines = []
             lines.append(f"Date: {info.get('date', '')}")
+            lines.append(f"Severity: {severity}")
+            lines.append(f"Status: {status}")
             lines.append("")
             lines.append("Time:")
             lines.append(time_val)
@@ -2796,6 +2846,15 @@ class ScoutWindow(ttk.Frame):
             campers_str = ", ".join(campers) if campers else "none"
             lines.append("")
             lines.append(f"Campers involved: {campers_str}")
+            lines.append("")
+            lines.append("Follow-up:")
+            lines.append(follow or "None")
+            if reminder:
+                lines.append("")
+                lines.append(f"Reminder: {reminder}")
+            if resolved_at:
+                lines.append("")
+                lines.append(f"Resolved at: {resolved_at}")
 
             details_text.insert("end", "\n".join(lines))
 
@@ -2804,7 +2863,31 @@ class ScoutWindow(ttk.Frame):
         if first:
             tree.selection_set(first[0])
             show_details()
-        
+
+        def mark_resolved():
+            sel = tree.selection()
+            if not sel:
+                show_error_toast(self.master, "Error", "Please select an incident.")
+                return
+            item_id = sel[0]
+            info = item_details.get(item_id)
+            if not info:
+                return
+            if info.get("status") == "Resolved":
+                messagebox.showinfo("Incident", "Already resolved.")
+                return
+            info["status"] = "Resolved"
+            info["resolved_at"] = datetime.now().strftime("%Y-%m-%d %H:%M")
+            save_to_file()
+            tree.item(item_id, values=(
+                info.get("date", ""),
+                info.get("severity", "Medium"),
+                info.get("status", "Resolved"),
+                info.get("description", ""),
+                ", ".join(info.get("campers", [])) or "none",
+            ))
+            show_details()
+
         def delete_selected():
             sel = tree.selection()
             if not sel:
@@ -2839,6 +2922,7 @@ class ScoutWindow(ttk.Frame):
                 show_details()
 
         ttk.Button(frame, text="Delete Selected Incident", command=delete_selected, style="Danger.TButton",).pack(fill="x", pady=(4, 4))
+        ttk.Button(frame, text="Mark Resolved", command=mark_resolved, style="Primary.TButton").pack(fill="x", pady=(0, 6))
         first = tree.get_children()
         if first:
             tree.selection_set(first[0])

@@ -624,7 +624,8 @@ def activity_participation_data(camp):
             })
         return {"status": "ok", "entries": summary}
 
-def record_incident_entry_data(camp_name, date, description, campers_involved, time=None):
+def record_incident_entry_data(camp_name, date, description, campers_involved, time=None,
+                               severity="Medium", follow_up="", status="Open", reminder_date=""):
     camp = find_camp_by_name(camp_name)
     if camp is None:
         return {"status":"camp_not_found"}
@@ -637,6 +638,11 @@ def record_incident_entry_data(camp_name, date, description, campers_involved, t
         "time": time or "",
         "description": description,
         "campers" : campers_involved,
+        "severity": severity or "Medium",
+        "follow_up": follow_up or "",
+        "status": status or "Open",
+        "reminder_date": reminder_date or "",
+        "resolved_at": "",
     }
     camp.incidents.append(incident)
     add_notification(
