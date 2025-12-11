@@ -1,4 +1,5 @@
 from user_logins import users, save_logins, disabled_logins, enable_login
+from features.notifications import add_notification
 from utils import get_int
 
 
@@ -271,3 +272,92 @@ def enable_user():
         enable_login(username_to_enable)
         print(f"\n User '{username_to_enable}' enabled successfully!")
         break
+
+
+def change_username():
+    """Change a user's username (scout leader/logistics/admin) if unique."""
+    roles = ["admin", "scout leader", "logistics coordinator"]
+    print("\n--- Change Username ---")
+    print("[1] Admin\n[2] Scout Leader\n[3] Logistics Coordinator")
+    role_choice = get_int("Pick role: ", 1, 3)
+    role = roles[role_choice - 1]
+
+    if not users[role]:
+        print("\nNo users found for that role.")
+        return
+
+    print(f"\nSelect {role} to rename:")
+    for idx, u in enumerate(users[role], start=1):
+        print(f"[{idx}] {u['username']}")
+    sel = get_int("Choice: ", 1, len(users[role]))
+    target = users[role][sel - 1]
+
+    new_name = input("New username (blank to cancel): ").strip()
+    if not new_name:
+        print("Cancelled.")
+        return
+
+    existing = {u['username'] for u in users['admin']}
+    existing |= {u['username'] for u in users['scout leader']}
+    existing |= {u['username'] for u in users['logistics coordinator']}
+    if new_name in existing:
+        print("Username already exists. Try again.")
+        return
+
+    old_name = target['username']
+    target['username'] = new_name
+
+    # update disabled list if present
+    try:
+        with open('disabled_logins.txt', 'r') as f:
+            disabled_raw = f.read().strip(',')
+    except FileNotFoundError:
+        disabled_raw = ""
+    disabled_set = {x for x in disabled_raw.split(',') if x}
+    if old_name in disabled_set:
+        disabled_set.remove(old_name)
+        disabled_set.add(new_name)
+        with open('disabled_logins.txt', 'w') as f:
+            f.write(",".join(sorted(disabled_set)))
+
+    save_logins()
+    add_notification(f"Username changed from {old_name} to {new_name}", category="SYSTEM")
+    print(f"\nRenamed {old_name} to {new_name}.")
+
+
+def change_role():
+    """Move a user between scout leader and logistics coordinator."""
+    print("\n--- Change Role ---")
+    print("[1] Move Scout Leader -> Logistics\n[2] Move Logistics -> Scout Leader")
+    choice = get_int("Pick option: ", 1, 2)
+
+    if choice == 1:
+        source = "scout leader"
+        target = "logistics coordinator"
+    else:
+        source = "logistics coordinator"
+        target = "scout leader"
+
+    if not users[source]:
+        print(f"\nNo users in {source}.")
+        return
+
+    print(f"\nSelect {source} to move to {target}:")
+    for idx, u in enumerate(users[source], start=1):
+        print(f"[{idx}] {u['username']}")
+    sel = get_int("Choice: ", 1, len(users[source]))
+    user_rec = users[source][sel - 1]
+
+    # ensure no duplicate in target
+    if any(u['username'] == user_rec['username'] for u in users[target]):
+        print("\nA user with that username already exists in the target role.")
+        return
+
+    users[source].remove(user_rec)
+    users[target].append(user_rec)
+    save_logins()
+    add_notification(
+        f"User {user_rec['username']} moved from {source} to {target}",
+        category="SYSTEM",
+    )
+    print(f"\nMoved {user_rec['username']} from {source} to {target}.")

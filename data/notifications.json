@@ -5,7 +5,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Food shortage at Rivendell! Only 2 units left but 800 needed.",
@@ -13,7 +15,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "camp Rivendell edited",
@@ -21,7 +25,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Pay rate set to: 100 at Pine Ridge",
@@ -29,7 +35,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Pay rate set to: 25 at Cedar Grove",
@@ -37,7 +45,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Incident recorded at Rivendell",
@@ -45,7 +55,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Pay rate set to: 65 at Cedar Grove",
@@ -53,7 +65,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Campers assigned to Cedar Grove",
@@ -61,7 +75,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "[Admin: admin] Changed password for user 'joe'",
@@ -69,7 +85,9 @@
         "level": "WARNING",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "[Admin: admin] Changed password for user 'joe'",
@@ -77,7 +95,9 @@
         "level": "WARNING",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "[Admin: admin] Changed password for user 'joe'",
@@ -85,7 +105,9 @@
         "level": "WARNING",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Camp pine created",
@@ -93,7 +115,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Camp Pine3 created",
@@ -101,7 +125,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Camp Pine3 deleted",
@@ -109,7 +135,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -117,7 +145,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -125,7 +155,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -133,7 +165,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -141,7 +175,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -149,7 +185,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -157,7 +195,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -165,7 +205,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -173,7 +215,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -181,7 +225,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -189,7 +235,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -197,7 +245,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -205,7 +255,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -213,7 +265,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -221,7 +275,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -229,7 +285,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -237,7 +295,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -245,7 +305,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -253,7 +315,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -261,7 +325,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -269,7 +335,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -277,7 +345,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -285,7 +355,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -293,7 +365,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -301,7 +375,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -309,7 +385,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -317,7 +395,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -325,7 +405,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -333,7 +415,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -341,7 +425,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -349,7 +435,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -357,7 +445,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -365,7 +455,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -373,7 +465,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -381,7 +475,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -389,7 +485,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -397,7 +495,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -405,7 +505,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -413,7 +515,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -421,7 +525,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -429,7 +535,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -437,7 +545,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -445,7 +555,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -453,7 +565,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -461,7 +575,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -469,7 +585,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -477,7 +595,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -485,7 +605,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -493,7 +615,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -501,7 +625,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -509,7 +635,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -517,7 +645,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -525,7 +655,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -533,7 +665,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -541,7 +675,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -549,7 +685,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -557,7 +695,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -565,7 +705,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -573,7 +715,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -581,7 +725,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -589,7 +735,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -597,7 +745,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -605,7 +755,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -613,7 +765,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -621,7 +775,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -629,7 +785,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -637,7 +795,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -645,7 +805,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -653,7 +815,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -661,7 +825,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -669,7 +835,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -677,7 +845,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -685,7 +855,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -693,7 +865,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -701,7 +875,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -709,7 +885,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -717,7 +895,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -725,7 +905,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -733,7 +915,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -741,7 +925,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -749,7 +935,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -757,7 +945,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -765,7 +955,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -773,7 +965,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -781,7 +975,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -789,7 +985,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -797,7 +995,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -805,7 +1005,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -813,7 +1015,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -821,7 +1025,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -829,7 +1035,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -837,7 +1045,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -845,7 +1055,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -853,7 +1065,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -861,7 +1075,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -869,7 +1085,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -877,7 +1095,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -885,7 +1105,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -893,7 +1115,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -901,7 +1125,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -909,7 +1135,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -917,7 +1145,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -925,7 +1155,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -933,7 +1165,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -941,7 +1175,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -949,7 +1185,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -957,7 +1195,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -965,7 +1205,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -973,7 +1215,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -981,7 +1225,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -989,7 +1235,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -997,7 +1245,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -1005,7 +1255,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -1013,7 +1265,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -1021,7 +1275,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -1029,7 +1285,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -1037,7 +1295,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -1045,7 +1305,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -1053,7 +1315,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -1061,7 +1325,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -1069,7 +1335,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -1077,7 +1345,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -1085,7 +1355,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -1093,7 +1365,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -1101,7 +1375,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -1109,7 +1385,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -1117,7 +1395,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -1125,7 +1405,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -1133,7 +1415,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -1141,7 +1425,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -1149,7 +1435,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -1157,7 +1445,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -1165,7 +1455,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -1173,7 +1465,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -1181,7 +1475,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -1189,7 +1485,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -1197,7 +1495,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -1205,7 +1505,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -1213,7 +1515,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -1221,7 +1525,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -1229,7 +1535,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -1237,7 +1545,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -1245,7 +1555,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -1253,7 +1565,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -1261,7 +1575,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -1269,7 +1585,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -1277,7 +1595,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -1285,7 +1605,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -1293,7 +1615,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -1301,7 +1625,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -1309,7 +1635,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -1317,7 +1645,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -1325,7 +1655,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -1333,7 +1665,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -1341,7 +1675,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -1349,7 +1685,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -1357,7 +1695,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -1365,7 +1705,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -1373,7 +1715,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -1381,7 +1725,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -1389,7 +1735,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -1397,7 +1745,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -1405,7 +1755,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -1413,7 +1765,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -1421,7 +1775,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -1429,7 +1785,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -1437,7 +1795,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -1445,7 +1805,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -1453,7 +1815,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -1461,7 +1825,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -1469,7 +1835,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -1477,7 +1845,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -1485,7 +1855,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -1493,7 +1865,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -1501,7 +1875,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -1509,7 +1885,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -1517,7 +1895,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -1525,7 +1905,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -1533,7 +1915,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -1541,7 +1925,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -1549,7 +1935,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -1557,7 +1945,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -1565,7 +1955,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -1573,7 +1965,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -1581,7 +1975,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -1589,7 +1985,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -1597,7 +1995,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -1605,7 +2005,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -1613,7 +2015,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -1621,7 +2025,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -1629,7 +2035,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -1637,7 +2045,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -1645,7 +2055,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -1653,7 +2065,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -1661,7 +2075,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -1669,7 +2085,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -1677,7 +2095,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -1685,7 +2105,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -1693,7 +2115,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -1701,7 +2125,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -1709,7 +2135,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -1717,7 +2145,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -1725,7 +2155,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -1733,7 +2165,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -1741,7 +2175,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -1749,7 +2185,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -1757,7 +2195,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -1765,7 +2205,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -1773,7 +2215,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -1781,7 +2225,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -1789,7 +2235,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -1797,7 +2245,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -1805,7 +2255,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -1813,7 +2265,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -1821,7 +2275,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -1829,7 +2285,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -1837,7 +2295,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -1845,7 +2305,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -1853,7 +2315,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -1861,7 +2325,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -1869,7 +2335,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -1877,7 +2345,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -1885,7 +2355,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -1893,7 +2365,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -1901,7 +2375,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -1909,7 +2385,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -1917,7 +2395,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -1925,7 +2405,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -1933,7 +2415,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -1941,7 +2425,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -1949,7 +2435,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -1957,7 +2445,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -1965,7 +2455,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -1973,7 +2465,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -1981,7 +2475,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -1989,7 +2485,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -1997,7 +2495,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -2005,7 +2505,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -2013,7 +2515,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -2021,7 +2525,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -2029,7 +2535,9 @@
         "level": "INFO",
         "category": "GENERAL",
         "context": {},
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Pine Ridge Base",
@@ -2040,7 +2548,9 @@
             "camp": "Pine Ridge Base",
             "type": "camp"
         },
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
@@ -2051,7 +2561,9 @@
             "camp": "Cedar Grove Overnight",
             "type": "camp"
         },
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
@@ -2062,7 +2574,9 @@
             "camp": "Summit Trail Expedition",
             "type": "camp"
         },
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Lakeside Adventure",
@@ -2073,7 +2587,9 @@
             "camp": "Lakeside Adventure",
             "type": "camp"
         },
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
     },
     {
         "message": "Activity updated at Coastal Explorers",
@@ -2084,6 +2600,73 @@
             "camp": "Coastal Explorers",
             "type": "camp"
         },
-        "read_by": []
+        "read_by": [
+            "logistics"
+        ]
+    },
+    {
+        "message": "Activity updated at Pine Ridge Base",
+        "timestamp": "2025-12-11 09:05",
+        "level": "INFO",
+        "category": "CAMP",
+        "context": {
+            "camp": "Pine Ridge Base",
+            "type": "camp"
+        },
+        "read_by": [
+            "logistics"
+        ]
+    },
+    {
+        "message": "Activity updated at Cedar Grove Overnight",
+        "timestamp": "2025-12-11 09:05",
+        "level": "INFO",
+        "category": "CAMP",
+        "context": {
+            "camp": "Cedar Grove Overnight",
+            "type": "camp"
+        },
+        "read_by": [
+            "logistics"
+        ]
+    },
+    {
+        "message": "Activity updated at Summit Trail Expedition",
+        "timestamp": "2025-12-11 09:05",
+        "level": "INFO",
+        "category": "CAMP",
+        "context": {
+            "camp": "Summit Trail Expedition",
+            "type": "camp"
+        },
+        "read_by": [
+            "logistics"
+        ]
+    },
+    {
+        "message": "Activity updated at Lakeside Adventure",
+        "timestamp": "2025-12-11 09:05",
+        "level": "INFO",
+        "category": "CAMP",
+        "context": {
+            "camp": "Lakeside Adventure",
+            "type": "camp"
+        },
+        "read_by": [
+            "logistics"
+        ]
+    },
+    {
+        "message": "Activity updated at Coastal Explorers",
+        "timestamp": "2025-12-11 09:05",
+        "level": "INFO",
+        "category": "CAMP",
+        "context": {
+            "camp": "Coastal Explorers",
+            "type": "camp"
+        },
+        "read_by": [
+            "logistics"
+        ]
     }
 ]

@@ -457,6 +457,34 @@ def view_activity_stats():
         print(f"\nTotal food used across recorded activities: {stats['total_food_used']} units")
 
 
+def incident_summary():
+    camps = read_from_file()
+    if not camps:
+        print("\nNo camps exist yet.")
+        return
+
+    print("\n--- Existing Camps ---")
+    for i, camp in enumerate(camps, start=1):
+        print(f"{i}. {camp.name}")
+    choice = get_int("\nSelect a camp to view incidents: ", 1, len(camps))
+    camp = camps[choice - 1]
+
+    incidents = incidents_for_camp_data(camp)
+    if not incidents:
+        print(f"\nNo incidents recorded for {camp.name}.")
+        return
+
+    print(f"\nIncidents for {camp.name}:")
+    for inc in incidents:
+        date = inc.get("date", "")
+        time = inc.get("time", "")
+        desc = inc.get("description", "")
+        campers = inc.get("campers", [])
+        campers_str = ", ".join(campers) if campers else "none"
+        extra_time = f" @ {time}" if time else ""
+        print(f"- {date}{extra_time}: {desc} (Campers: {campers_str})")
+
+
 def activity_participation_data(camp):
     if not camp.activities:
         return {"status": "no_activities", "entries": []}

@@ -3,6 +3,8 @@ from features.admin import (
     add_user,
     edit_user_password,
     delete_user,
+    change_username,
+    change_role,
     disable_user,
     enable_user,
 )
@@ -15,12 +17,14 @@ def run():
         print('\nChoose [1] to View all users'
               '\nChoose [2] to Add a new user'
               "\nChoose [3] to Edit a user's password"
-              '\nChoose [4] to Delete a user'
-              '\nChoose [5] to Disable a user'
-              '\nChoose [6] to Enable a user'
-              '\nChoose [7] to Messaging'
-              '\nChoose [8] to Logout')
-        choice = get_int("Input your option: ", 1, 8)
+              '\nChoose [4] to Change a username'
+              '\nChoose [5] to Change a role (leader/logistics)'
+              '\nChoose [6] to Delete a user'
+              '\nChoose [7] to Disable a user'
+              '\nChoose [8] to Enable a user'
+              '\nChoose [9] to Messaging'
+              '\nChoose [10] to Logout')
+        choice = get_int("Input your option: ", 1, 10)
 
         if choice == 1:
             list_users()
@@ -32,20 +36,26 @@ def run():
             edit_user_password()
 
         elif choice == 4:
-            delete_user()
+            change_username()
 
         elif choice == 5:
-            disable_user()
+            change_role()
 
         elif choice == 6:
-            enable_user()
+            delete_user()
 
         elif choice == 7:
+            disable_user()
+
+        elif choice == 8:
+            enable_user()
+
+        elif choice == 9:
             from messaging import messaging_menu
             from user_logins import users
             messaging_menu("admin", users)
 
-        elif choice == 8:
+        elif choice == 10:
             print('╔═══════════════╗\n║   CampTrack   ║\n╚═══════════════╝')
             print('\nWelcome to CampTrack! Please select a user.')
             return

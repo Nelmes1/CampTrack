@@ -10,6 +10,7 @@ from features.scout import (
     show_money_per_camp,
     show_total_money,
     view_activity_stats,
+    incident_summary,
 )
 
 
@@ -42,8 +43,9 @@ def run(leader_username):
                   '\nChoose [2] to See Details for all Existing Camps'
                   '\nChoose [3] to See Money a Specific Camp Earned'
                   '\nChoose [4] to See Total Money Earned'
-                  '\nChoose [5] to See Activity Summary')
-            choice = get_int('Input your option: ', 1, 5)
+                  '\nChoose [5] to See Activity Summary'
+                  '\nChoose [6] to See Incident Summary')
+            choice = get_int('Input your option: ', 1, 6)
 
             if choice == 1:
                 show_engagement_scores()
@@ -59,6 +61,9 @@ def run(leader_username):
 
             if choice == 5:
                 view_activity_stats()
+
+            if choice == 6:
+                incident_summary()
 
         elif choice == 6:
             from user_logins import users
