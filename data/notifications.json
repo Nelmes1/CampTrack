@@ -1,31 +1,39 @@
 [
     {
-        "message": "Food stock low at Cedar Grove Overnight (<=10 units)",
-        "timestamp": "2025-12-10 09:00",
-        "level": "WARNING",
+        "message": "Food stock alert at Pine Ridge Base: projected shortfall.",
+        "timestamp": "2025-12-11 12:26",
+        "level": "ALERT",
+        "category": "FOOD",
+        "context": {
+            "camp": "Pine Ridge Base",
+            "type": "camp"
+        },
+        "read_by": [],
+        "deleted_by": [
+            "admin"
+        ],
+        "read": false
+    },
+    {
+        "message": "Food topped up at Cedar Grove Overnight (+20).",
+        "timestamp": "2025-12-11 12:26",
+        "level": "SUCCESS",
         "category": "FOOD",
         "context": {
             "camp": "Cedar Grove Overnight",
             "type": "camp"
         },
-        "read_by": []
+        "read_by": [],
+        "deleted_by": [
+            "admin"
+        ],
+        "read": false
     },
     {
-        "message": "Shortage risk for Lakeside Adventure (requires 18, available 10)",
-        "timestamp": "2025-12-10 09:05",
-        "level": "CRITICAL",
-        "category": "FOOD",
-        "context": {
-            "camp": "Lakeside Adventure",
-            "type": "camp"
-        },
-        "read_by": []
-    },
-    {
-        "message": "Incident logged at Summit Trail Expedition",
-        "timestamp": "2025-12-10 09:20",
+        "message": "Resource update posted for Summit Trail Expedition.",
+        "timestamp": "2025-12-11 12:26",
         "level": "INFO",
-        "category": "CAMP",
+        "category": "RESOURCE",
         "context": {
             "camp": "Summit Trail Expedition",
             "type": "camp"

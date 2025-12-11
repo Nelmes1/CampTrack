@@ -31,6 +31,7 @@ from features.notifications import (
     mark_all_as_read,
     add_notification,
     clear_notifications,
+    delete_notifications_for_user,
     count_unread,
     mute_category,
     unmute_category,
@@ -64,6 +65,7 @@ THEME_ACCENT_ACTIVE = "#43a047"
 THEME_ACCENT_PRESSED = "#388e3c"
 THEME_BORDER = "#1f2d44"
 SPACING = {"xs": 4, "sm": 8, "md": 12, "lg": 18, "xl": 24}
+LOGISTICS_NOTIF_CATEGORIES = {"FOOD", "RESOURCE"}  # coordinator sees resource/shortage alerts only
 
 
 def _read_disabled_usernames():
@@ -161,7 +163,7 @@ def _init_nav_with_badge(owner, username, role, sections, notif_filter=None):
     return content, nav
 
 
-def open_notifications_window(master, refresh_badge_cb=None, filter_fn=None, username=None):
+def open_notifications_window(master, refresh_badge_cb=None, filter_fn=None, username=None, show_buffer_control=False):
     """Reusable notifications window with filters, search, grouping, and actions."""
     notif_win = tk.Toplevel(master)
     notif_win.title("Notifications")
@@ -178,8 +180,9 @@ def open_notifications_window(master, refresh_badge_cb=None, filter_fn=None, use
     controls.pack(fill="x", pady=(0, 6))
     ttk.Label(controls, text="Level:", style="FieldLabel.TLabel").pack(side="left")
     level_var = tk.StringVar(value="ALL")
-    ttk.Combobox(controls, values=["ALL", "INFO", "WARNING", "ERROR", "CRITICAL"], textvariable=level_var, state="readonly", width=12).pack(side="left", padx=(4, 12))
-    unread_only = tk.BooleanVar(value=False)
+    ttk.Combobox(controls, values=["ALL", "SUCCESS", "INFO", "ALERT", "CRITICAL"], textvariable=level_var, state="readonly", width=12).pack(side="left", padx=(4, 12))
+    # Default to showing unread first so cleared items stay hidden unless user opts in.
+    unread_only = tk.BooleanVar(value=True if username else False)
     ttk.Checkbutton(controls, text="Unread only", variable=unread_only).pack(side="left")
     group_var = tk.BooleanVar(value=False)
     ttk.Checkbutton(controls, text="Group similar", variable=group_var).pack(side="left", padx=(8, 0))
@@ -194,7 +197,8 @@ def open_notifications_window(master, refresh_badge_cb=None, filter_fn=None, use
     ttk.Button(action_bar, text="Open Context", command=lambda: open_context()).pack(side="left", padx=(0, 6))
     ttk.Button(action_bar, text="Mute Category 1h", command=lambda: mute_selected(60)).pack(side="left", padx=(0, 6))
     ttk.Button(action_bar, text="Unmute Category", command=lambda: mute_selected(0)).pack(side="left", padx=(0, 6))
-    ttk.Button(action_bar, text="Set Warning Buffer", command=lambda: set_buffer()).pack(side="left", padx=(0, 6))
+    if show_buffer_control:
+        ttk.Button(action_bar, text="Set Warning Buffer", command=lambda: set_buffer()).pack(side="left", padx=(0, 6))
     ttk.Button(action_bar, text="Clear All", command=lambda: clear_all()).pack(side="left", padx=(0, 6))
 
     lb_frame = ttk.Frame(frame, style="Card.TFrame")
@@ -213,9 +217,6 @@ def open_notifications_window(master, refresh_badge_cb=None, filter_fn=None, use
     scrollbar.pack(side="right", fill="y", padx=(0, 4), pady=4)
 
     current_items = []
-
-    def icon_for(level):
-        return {"INFO": "ℹ", "WARNING": "⚠", "ERROR": "!", "CRITICAL": "‼"}.get(level, "•")
 
     def refresh_list():
         nonlocal current_items
@@ -247,9 +248,8 @@ def open_notifications_window(master, refresh_badge_cb=None, filter_fn=None, use
             else:
                 for (lvl, cat, msg), info in grouped.items():
                     count = info["count"]
-                    status = "mixed" if count > 1 else ("✓" if info["sample"].get("read") else "•")
-                    icon = icon_for(lvl)
-                    line = f"{icon} {lvl} {cat} x{count} — {msg}"
+                    prefix = f"*{cat.upper()}* : *{lvl.upper()}*"
+                    line = f"{prefix} x{count} - {msg}"
                     listbox.insert("end", line)
                     current_items.append({"group": True, "count": count, **info["sample"]})
         else:
@@ -258,13 +258,13 @@ def open_notifications_window(master, refresh_badge_cb=None, filter_fn=None, use
                 listbox.insert("end", "No notifications.")
             else:
                 for n in filtered:
-                    status = "✓" if n.get("read") else "•"
                     timestamp = n.get("timestamp", "")
                     message = n.get("message", "")
                     level = n.get("level", "INFO")
                     cat = n.get("category", "GENERAL")
-                    icon = icon_for(level)
-                    listbox.insert("end", f"{status} {icon} [{level}/{cat}] {timestamp} — {message}")
+                    prefix = f"*{cat.upper()}* : *{level.upper()}*"
+                    line = f"{prefix} - {timestamp} - {message}" if timestamp else f"{prefix} - {message}"
+                    listbox.insert("end", line)
 
     def mark_all():
         if username:
@@ -287,10 +287,15 @@ def open_notifications_window(master, refresh_badge_cb=None, filter_fn=None, use
     def clear_all():
         if not messagebox.askyesno("Confirm", "Clear all notifications?"):
             return
-        clear_notifications()
+        if not username:
+            show_error_toast(master, "Clear", "No user context available.")
+            return
+        delete_notifications_for_user(username)
+        unread_only.set(True)
         if refresh_badge_cb:
             refresh_badge_cb()
         refresh_list()
+        messagebox.showinfo("Notifications", "All notifications cleared for you.")
 
     def get_selected():
         sel = listbox.curselection()
@@ -586,6 +591,7 @@ class AdminWindow(ttk.Frame):
             refresh_badge_cb=self._refresh_notification_badge,
             filter_fn=self._notif_filter,
             username=self.username,
+            show_buffer_control=False,
         )
 
     def list_users_ui(self):
@@ -1160,6 +1166,7 @@ class AdminWindow(ttk.Frame):
             refresh_badge_cb=self._refresh_notification_badge,
             filter_fn=self._notif_filter,
             username=self.username,
+            show_buffer_control=True,
         )
 
     def logout(self):
@@ -1190,12 +1197,13 @@ class LogisticsWindow(ttk.Frame):
             ("Messaging", self.messaging_ui),
             ("Logout", self.logout),
         ]
+        logistics_notif_filter = lambda n: n.get("category") in LOGISTICS_NOTIF_CATEGORIES
         content, nav = _init_nav_with_badge(
             self,
             username,
             "Logistics Coordinator",
             sections,
-            notif_filter=None,  # coordinator sees all
+            notif_filter=logistics_notif_filter,
         )
         self._sections = sections
 
