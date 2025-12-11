@@ -1149,8 +1149,8 @@ class AdminWindow(ttk.Frame):
         frame.pack(fill="both", expand=True, padx=12, pady=12)
         ttk.Label(frame, text="Messaging", style="Header.TLabel").pack(anchor="w", pady=(0, 6))
         ttk.Separator(frame).pack(fill="x", pady=(0, 8))
-        ttk.Button(frame, text="Direct Messages", command=lambda: open_chat_window(self.master, self.username), style="Primary.TButton").pack(fill="x", pady=4)
-        ttk.Button(frame, text="Group Chat", command=lambda: open_group_chat_window(self.master, self.username)).pack(fill="x", pady=4)
+        ttk.Button(frame, text="Direct Messages", command=lambda: open_chat_window(self.master, self.username, role="admin"), style="Primary.TButton").pack(fill="x", pady=4)
+        ttk.Button(frame, text="Group Chat", command=lambda: open_group_chat_window(self.master, self.username, role="admin")).pack(fill="x", pady=4)
         ttk.Button(frame, text="Close", command=top.destroy).pack(fill="x", pady=(8, 0))
         center_in_place(top)
 
@@ -1777,7 +1777,7 @@ class LogisticsWindow(ttk.Frame):
         center_in_place(top)
 
     def messaging_ui(self):
-        open_chat_window(self.master, self.username)
+        open_chat_window(self.master, self.username, role="logistics coordinator")
 
     def choose_camp_name(self, title="Select a camp", subtitle=None):
         camps = read_from_file()
@@ -2898,8 +2898,8 @@ class ScoutWindow(ttk.Frame):
         frame.pack(fill="both", expand=True, padx=12, pady=12)
         ttk.Label(frame, text="Messaging", style="Header.TLabel").pack(anchor="w", pady=(0, 6))
         ttk.Separator(frame).pack(fill="x", pady=(0, 8))
-        ttk.Button(frame, text="Direct Messages", command=lambda: open_chat_window(self.master, self.username), style="Primary.TButton").pack(fill="x", pady=4)
-        ttk.Button(frame, text="Group Chat", command=lambda: open_group_chat_window(self.master, self.username)).pack(fill="x", pady=4)
+        ttk.Button(frame, text="Direct Messages", command=lambda: open_chat_window(self.master, self.username, role="scout leader"), style="Primary.TButton").pack(fill="x", pady=4)
+        ttk.Button(frame, text="Group Chat", command=lambda: open_group_chat_window(self.master, self.username, role="scout leader")).pack(fill="x", pady=4)
         ttk.Button(frame, text="Close", command=top.destroy).pack(fill="x", pady=(8, 0))
 
     def logout(self):
