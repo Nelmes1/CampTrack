@@ -2076,7 +2076,11 @@ class ScoutWindow(ttk.Frame):
         top = tk.Toplevel(self)
         top.title("Manage Campers")
         top.configure(bg=THEME_BG)
-        center_window(top, width=720, height=560)
+        top.transient(self)
+        top.grab_set()
+        top.focus()
+        top.minsize(720,800)
+        center_window(top,width=720,height=800)
         frame = ttk.Frame(top, padding=14, style="Card.TFrame")
         frame.pack(fill="both", expand=True, padx=12, pady=12)
 
@@ -2110,7 +2114,7 @@ class ScoutWindow(ttk.Frame):
         path_entry.pack(fill="x", pady=(0, 4))
 
         def browse():
-            fp = filedialog.askopenfilename(title="Select campers CSV", filetypes=[("CSV files", "*.csv")])
+            fp = filedialog.askopenfilename(parent=top, title="Select campers CSV", filetypes=[("CSV files", "*.csv")])
             if fp:
                 path_var.set(fp)
 
@@ -2319,14 +2323,17 @@ class ScoutWindow(ttk.Frame):
         table_frame = ttk.Frame(parent, style="Card.TFrame")
         table_frame.pack(fill="both", expand=True)
 
-        tree = ttk.Treeview(table_frame, columns=columns, show="headings", height=10)
+        col_keys = list(columns.keys())
+
+        tree = ttk.Treeview(table_frame, columns=col_keys, show="headings", height=10)
         tree.pack(side="left", fill="both", expand=True)
 
         scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=tree.yview)
         tree.configure(yscrollcommand=scrollbar.set)
         scrollbar.pack(side="right", fill="y")
 
-        for key, heading in columns.items():
+        for key in col_keys:
+            heading = columns[key]
             tree.heading(key, text=heading)
             conf = col_config.get(key, {})
             tree.column(key, width=conf.get("width", 120), anchor=conf.get("anchor", "w"))
@@ -2401,7 +2408,7 @@ class ScoutWindow(ttk.Frame):
         time_entry = add_entry("Time (optional)")
 
         ttk.Label(frame, text="Notes / Special Achievements", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
-        notes_text = tk.Text(frame, height=4, bg="#0b1729", fg=THEME_FG, highlightthickness=0, relief="flat")
+        notes_text = tk.Text(frame, height=4, bg="#0b1729", fg=THEME_FG, highlightthickness=0, relief="flat", insertbackground=THEME_FG)
         notes_text.pack(fill="both", expand=True, pady=(0, 8))
 
         ttk.Label(frame, text="Food units used (optional)", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
@@ -2658,7 +2665,7 @@ class ScoutWindow(ttk.Frame):
         time_entry = add_entry("Time (optional)")
 
         ttk.Label(frame, text="Incident Description", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
-        notes_text = tk.Text(frame, height=4, bg="#0b1729", fg=THEME_FG, highlightthickness=0, relief="flat")
+        notes_text = tk.Text(frame, height=4, bg="#0b1729", fg=THEME_FG, highlightthickness=0, relief="flat",insertbackground=THEME_FG)
         notes_text.pack(fill="both", expand=True, pady=(0, 8))
 
         ttk.Label(frame, text="Campers involved (optional)", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))

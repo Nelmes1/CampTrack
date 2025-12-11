@@ -13,7 +13,11 @@
             "Ava Brooks",
             "Liam Chen",
             "Noah Patel",
-            "Mia Lewis"
+            "Mia Lewis",
+            "Emily Smith",
+            "Jacob Black",
+            "Bella Swan",
+            "Edward Cullen"
         ],
         "campers_info": {
             "Ava Brooks": {
@@ -34,6 +38,26 @@
             },
             "Mia Lewis": {
                 "dob": "2013-02-16",
+                "emergency": []
+            },
+            "Emily Smith": {
+                "dob": "08/02/2010",
+                "emergency": []
+            },
+            "Jacob Black": {
+                "dob": "18/03/2008",
+                "emergency": [
+                    "Bone fracture"
+                ]
+            },
+            "Bella Swan": {
+                "dob": "27/01/2007",
+                "emergency": [
+                    "Depression"
+                ]
+            },
+            "Edward Cullen": {
+                "dob": "04/10/2011",
                 "emergency": []
             }
         },
@@ -82,7 +106,16 @@
                 "timestamp": "2025-07-12 09:30:00"
             }
         ],
-        "incidents": [],
+        "incidents": [
+            {
+                "date": "2025-07-12",
+                "time": "12:00",
+                "description": "Fell out of boat",
+                "campers": [
+                    "Noah Patel"
+                ]
+            }
+        ],
         "imported_csvs": []
     },
     {

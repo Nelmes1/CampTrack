@@ -38,39 +38,69 @@
             "camp": "Summit Trail Expedition",
             "type": "camp"
         },
-        "read_by": [],
-        "deleted_by": [
-            "admin"
-        ],
-        "read": false
+        "read_by": []
     },
     {
-        "message": "Admin created demo users for testing.",
-        "timestamp": "2025-12-11 12:26",
+        "message": "Activity added at Pine Ridge Base",
+        "timestamp": "2025-12-10 09:30",
         "level": "INFO",
-        "category": "USER",
-        "context": {
-            "type": "system"
-        },
-        "read_by": [],
-        "deleted_by": [
-            "admin"
-        ],
-        "read": false
-    },
-    {
-        "message": "Critical incident drill scheduled for Lakeside Adventure tomorrow.",
-        "timestamp": "2025-12-11 12:26",
-        "level": "CRITICAL",
         "category": "CAMP",
         "context": {
-            "camp": "Lakeside Adventure",
+            "camp": "Pine Ridge Base",
             "type": "camp"
         },
-        "read_by": [],
-        "deleted_by": [
-            "admin"
-        ],
-        "read": false
+        "read_by": []
+    },
+    {
+        "message": "Pay rate updated: 140 at Coastal Explorers",
+        "timestamp": "2025-12-10 09:45",
+        "level": "INFO",
+        "category": "PAY",
+        "context": {
+            "camp": "Coastal Explorers",
+            "type": "camp"
+        },
+        "read_by": []
+    },
+    {
+        "message": "New group chat activity in Coastal Explorers",
+        "timestamp": "2025-12-10 10:00",
+        "level": "INFO",
+        "category": "MESSAGE",
+        "context": {
+            "camp": "Coastal Explorers",
+            "type": "camp"
+        },
+        "read_by": []
+    },
+    {
+        "message": "Dashboard refreshed by logistics",
+        "timestamp": "2025-12-10 10:45",
+        "level": "INFO",
+        "category": "SYSTEM",
+        "context": {},
+        "read_by": []
+    },
+    {
+        "message": "No new campers were added to Pine Ridge Base.",
+        "timestamp": "2025-12-11 12:24",
+        "level": "INFO",
+        "category": "CAMP",
+        "context": {
+            "camp": "Pine Ridge Base",
+            "type": "camp"
+        },
+        "read_by": []
+    },
+    {
+        "message": "No new campers were added to Pine Ridge Base.",
+        "timestamp": "2025-12-11 12:29",
+        "level": "INFO",
+        "category": "CAMP",
+        "context": {
+            "camp": "Pine Ridge Base",
+            "type": "camp"
+        },
+        "read_by": []
     }
 ]
