@@ -432,9 +432,12 @@ def open_group_chat_window(master, username, role=None):
     outer.pack(fill="both", expand=True)
 
     ttk.Label(outer, text="Camp Group Chats", style="Header.TLabel").pack(anchor="w", pady=(0, 4))
-    ttk.Label(outer, text="Select a camp you supervise to view/send messages.", style="Subtitle.TLabel").pack(
-        anchor="w", pady=(0, 6)
+    subtitle = (
+        "Select a camp to view/send messages."
+        if role in ("admin", "logistics coordinator")
+        else "Select a camp you supervise to view/send messages."
     )
+    ttk.Label(outer, text=subtitle, style="Subtitle.TLabel").pack(anchor="w", pady=(0, 6))
 
     main = ttk.Frame(outer, style="Card.TFrame")
     main.pack(fill="both", expand=True, pady=(4, 0))
@@ -544,6 +547,12 @@ def open_group_chat_window(master, username, role=None):
 
     def send_group_message(event=None):
         name = current_camp_name.get()
+        if not name:
+            # try to pick current selection if not yet set
+            sel = camp_listbox.curselection()
+            if sel and 0 <= sel[0] < len(camp_choices):
+                name = camp_choices[int(sel[0])].name
+                current_camp_name.set(name)
         if not name:
             messagebox.showinfo("Group Chat", "Select a camp first.")
             return
