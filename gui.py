@@ -26,7 +26,6 @@ from features.logistics import (
     plot_leaders_per_camp,
     plot_engagement_scores,
 )
-from features.calendar import generate_schedule_events, find_conflicts
 from features.notifications import (
     load_notifications,
     mark_all_as_read,
@@ -339,114 +338,6 @@ def open_notifications_window(master, refresh_badge_cb=None, filter_fn=None, use
     center_in_place(notif_win)
 
 
-def open_schedule_window(master, username, role):
-    """Global schedule view for camps and activities."""
-    win = tk.Toplevel(master)
-    win.title("Camp Schedule")
-    win.configure(bg=THEME_BG)
-    center_window(win, width=960, height=620)
-
-    frame = ttk.Frame(win, padding=12, style="Card.TFrame")
-    frame.pack(fill="both", expand=True)
-
-    ttk.Label(frame, text="Camp Schedule", style="Header.TLabel").pack(anchor="w", pady=(0, 6))
-    ttk.Label(frame, text="Camps and activities on a timeline.", style="Subtitle.TLabel").pack(anchor="w", pady=(0, 6))
-    ttk.Separator(frame).pack(fill="x", pady=(0, 8))
-
-    # Filters
-    controls = ttk.Frame(frame, style="Card.TFrame")
-    controls.pack(fill="x", pady=(0, 6))
-    ttk.Label(controls, text="Show:", style="FieldLabel.TLabel").pack(side="left")
-    scope_var = tk.StringVar(value="all")
-    ttk.Combobox(
-        controls,
-        values=["all", "next 7 days", "next 30 days"],
-        textvariable=scope_var,
-        state="readonly",
-        width=14,
-    ).pack(side="left", padx=(4, 10))
-    ttk.Label(controls, text="Search:", style="FieldLabel.TLabel").pack(side="left")
-    search_var = tk.StringVar(value="")
-    ttk.Entry(controls, textvariable=search_var, style="App.TEntry", width=24).pack(side="left", padx=(4, 10))
-    ttk.Button(controls, text="Refresh", command=lambda: refresh()).pack(side="left")
-
-    # Table
-    columns = ("Date", "Type", "Camp", "Detail", "Leaders", "Location")
-    tree = ttk.Treeview(frame, columns=columns, show="headings", height=16)
-    for col, width in zip(columns, (120, 100, 180, 260, 180, 120)):
-        tree.heading(col, text=col)
-        tree.column(col, width=width, anchor="w")
-    tree.pack(fill="both", expand=True, pady=(6, 0))
-
-    vsb = ttk.Scrollbar(frame, orient="vertical", command=tree.yview)
-    tree.configure(yscrollcommand=vsb.set)
-    vsb.pack(side="right", fill="y")
-
-    events = generate_schedule_events(include_activities=True)
-
-    def filtered_events():
-        evts = list(events)
-        # Scope by role
-        if role == "scout leader":
-            evts = [e for e in evts if username in e.get("leaders", [])]
-        # Time window
-        scope = scope_var.get()
-        now = datetime.now()
-        if scope == "next 7 days":
-            cutoff = now + timedelta(days=7)
-            evts = [e for e in evts if e["start"] <= cutoff]
-        elif scope == "next 30 days":
-            cutoff = now + timedelta(days=30)
-            evts = [e for e in evts if e["start"] <= cutoff]
-        # Search
-        q = search_var.get().lower().strip()
-        if q:
-            evts = [
-                e
-                for e in evts
-                if q in e["camp"].lower()
-                or q in e["detail"].lower()
-                or q in e.get("location", "").lower()
-            ]
-        return evts
-
-    def refresh():
-        tree.delete(*tree.get_children())
-        f_events = filtered_events()
-        conflicts = find_conflicts(f_events)
-        for idx, e in enumerate(f_events):
-            date_label = e["start"].strftime("%Y-%m-%d")
-            ev_type = "Camp" if e["type"] == "camp" else "Activity"
-            leaders = ", ".join(e.get("leaders") or []) or "—"
-            conflict_note = ""
-            if conflicts.get(idx):
-                conflict_note = f" (Conflict: {', '.join(conflicts[idx])})"
-            meta = e.get("metadata") or {}
-            if e["type"] == "camp":
-                window = f"{e['start'].strftime('%d %b')} \u2192 {e['end'].strftime('%d %b')}"
-                detail = f"{meta.get('camp_type_label', 'Camp')} | {window} | Campers: {meta.get('campers', 0)}"
-            else:
-                detail = f"Activity: {e['detail']}"
-            item_id = tree.insert(
-                "",
-                "end",
-                values=(
-                    date_label,
-                    ev_type + conflict_note,
-                    e["camp"],
-                    detail,
-                    leaders,
-                    e.get("location", "—"),
-                ),
-            )
-            if conflicts.get(idx):
-                tree.item(item_id, tags=("conflict",))
-        tree.tag_configure("conflict", foreground="#f87171")  # red text
-
-    refresh()
-    center_in_place(win)
-
-
 def _unread_count(filter_fn=None, username=None):
     notes = load_notifications(username=username)
     if filter_fn:
@@ -640,7 +531,6 @@ class AdminWindow(ttk.Frame):
             [
                 ("Dashboard", self._focus_dashboard),
                 ("User Management", self.list_users_ui),
-                ("Schedule", self.schedule_ui),
                 ("Notifications", self.notifications_ui),
                 ("Messaging", self.messaging_ui),
                 ("Logout", self.logout),
@@ -675,29 +565,32 @@ class AdminWindow(ttk.Frame):
         main.columnconfigure(0, weight=1)
         main.columnconfigure(1, weight=1)
 
-        user_frame = ttk.LabelFrame(main, text="User Management", padding=SPACING["md"], style="Card.TFrame")
-        user_frame.grid(row=0, column=0, sticky="nsew", padx=(0, SPACING["md"]), pady=(0, SPACING["md"]))
-        for text, cmd in [
-            ("View all users", self.list_users_ui),
-        ]:
-            btn_style = "TButton"
-            ttk.Button(user_frame, text=text, command=cmd, style=btn_style).pack(fill="x", pady=2)
+        # --- USER MANAGEMENT CARD ---
+        user_frame = ttk.Frame(main, style="Card.TFrame", padding=SPACING["lg"])
+        user_frame.grid(row=0,column=0,sticky="nsew",padx=(0, SPACING["md"]),pady=(0, SPACING["md"]))
+        user_frame.columnconfigure(0, weight=1)
+        ttk.Label(user_frame,text="User Management",style="Header.TLabel").grid(row=0, column=0, sticky="w")
+        ttk.Label(user_frame,text="Manage user accounts, roles, and permissions.",style="Subtitle.TLabel").grid(row=1, column=0, sticky="w", pady=(0, SPACING["md"]))
+        ttk.Button(user_frame,text="View All Users",command=self.list_users_ui,style="Primary.TButton").grid(row=2, column=0, sticky="ew")
+        
+        # --- QUICK ACTIONS CARD ---
+        qa_frame = ttk.Frame(main, style="Card.TFrame", padding=SPACING["lg"])
+        qa_frame.grid(row=0,column=1,sticky="nsew",pady=(0, SPACING["md"]))
+        qa_frame.columnconfigure(0, weight=1)
+        ttk.Label(qa_frame,text="Quick Actions",style="Header.TLabel").grid(row=0, column=0, sticky="w")
+        ttk.Label(qa_frame,text="Shortcuts to common admin tools.",style="Subtitle.TLabel").grid(row=1, column=0, sticky="w", pady=(0, SPACING["md"]))
 
-        other = ttk.LabelFrame(main, text="Quick Actions", padding=SPACING["md"], style="Card.TFrame")
-        other.grid(row=0, column=1, sticky="nsew", pady=(0, SPACING["md"]))
-        ttk.Label(other, text="Messaging", style="Header.TLabel").pack(anchor="w")
-        ttk.Label(other, text="Open direct and group chats.", style="Subtitle.TLabel").pack(anchor="w", pady=(0, SPACING["sm"]))
-        ttk.Button(other, text="Open Messaging", command=self.messaging_ui, style="Primary.TButton").pack(fill="x", pady=(0, SPACING["md"]))
-        ttk.Button(other, text="Open Schedule", command=self.schedule_ui).pack(fill="x", pady=(0, SPACING["md"]))
-        ttk.Separator(other).pack(fill="x", pady=(SPACING["sm"], SPACING["sm"]))
-        ttk.Button(other, text="Logout", command=self.logout, style="Danger.TButton").pack(fill="x")
-
+        # Messaging section
+        ttk.Label(qa_frame,text="Messaging",style="Subheader.TLabel").grid(row=2, column=0, sticky="w", pady=(0, SPACING["xs"]))
+        ttk.Button(qa_frame,text="Open Messaging",command=self.messaging_ui,style="Primary.TButton").grid(row=3, column=0, sticky="ew", pady=(0, SPACING["md"]))
+        ttk.Separator(qa_frame).grid(row=4, column=0, sticky="ew", pady=SPACING["sm"])
+        
+        # Logout button
+        ttk.Button(qa_frame,text="Logout",command=self.logout,style="Danger.TButton").grid(row=5, column=0, sticky="ew")
+                
     def _focus_dashboard(self):
         # Admin dashboard is the default view; show a quick note so the nav click feels responsive.
         messagebox.showinfo("Dashboard", "You’re already on the admin dashboard.")
-
-    def schedule_ui(self):
-        open_schedule_window(self, self.username, role="admin")
 
     def notifications_ui(self):
         open_notifications_window(
@@ -1307,7 +1200,6 @@ class LogisticsWindow(ttk.Frame):
             ("Food Allocation", self.food_allocation_menu),
             ("Financial Settings", self.financial_settings_ui),
             ("Visualise Data", self.visualise_menu),
-            ("Schedule", self.schedule_ui),
             ("Notifications", self.notifications_ui),
             ("Messaging", self.messaging_ui),
             ("Logout", self.logout),
@@ -1344,32 +1236,35 @@ class LogisticsWindow(ttk.Frame):
         _pill(summary, "Campers", str(campers_total), "Across all camps")
         _pill(summary, "Leaders", str(leaders_assigned), "Assigned to camps")
 
-        # GRID
+        # === GRID ===
         main = ttk.Frame(content, style="App.TFrame")
         main.grid(row=2, column=0, sticky="nsew")
         main.columnconfigure(0, weight=1)
         main.columnconfigure(1, weight=1)
 
-        camp_frame = ttk.LabelFrame(main, text="Camp Management", padding=SPACING["md"], style="Card.TFrame")
-        camp_frame.grid(row=0, column=0, sticky="nsew", padx=(0, SPACING["md"]), pady=(0, SPACING["md"]))
-        ttk.Label(camp_frame, text="Create, edit, or delete camps.", style="Subtitle.TLabel").pack(anchor="w", pady=(0, SPACING["sm"]))
-        for text, cmd in [
-            ("Manage Camps", self.manage_camps_menu),
-            ("Food Allocation", self.food_allocation_menu),
-            ("Financial Settings", self.financial_settings_ui),
-        ]:
-            btn_style = "Primary.TButton" if "Manage" in text else "TButton"
-            ttk.Button(camp_frame, text=text, command=cmd, style=btn_style).pack(fill="x", pady=4)
+        # === CAMP MANAGEMENT CARD ===
+        camp_frame = ttk.Frame(main, style="Card.TFrame", padding=SPACING["lg"])
+        camp_frame.grid(row=0, column=0, sticky="nsew",padx=(0, SPACING["md"]), pady=(0, SPACING["md"]))
+        ttk.Label(camp_frame,text="Camp Management",style="Header.TLabel",).pack(anchor="w")
+        ttk.Label(camp_frame,text="Create, edit, or delete camps. Adjust food allocation and pay rates.",style="Subtitle.TLabel").pack(anchor="w", pady=(0, SPACING["md"]))
+        ttk.Button(camp_frame,text="Manage Camps",command=self.manage_camps_menu,style="Primary.TButton").pack(fill="x", pady=4)
+        ttk.Button(camp_frame,text="Food Allocation",command=self.food_allocation_menu,style="TButton").pack(fill="x", pady=4)
+        ttk.Button(camp_frame,text="Financial Settings",command=self.financial_settings_ui,style="TButton").pack(fill="x", pady=4)
 
-        viz_frame = ttk.LabelFrame(main, text="Insights & Notifications", padding=SPACING["md"], style="Card.TFrame")
-        viz_frame.grid(row=0, column=1, sticky="nsew", pady=(0, SPACING["md"]))
-        for text, cmd in [
-            ("Dashboard", self.dashboard_ui),
-            ("Visualise Data", self.visualise_menu),
-            ("Notifications", self.notifications_ui),
-            ("Messaging", self.messaging_ui),
-        ]:
-            ttk.Button(viz_frame, text=text, command=cmd).pack(fill="x", pady=4)
+        # === INSIGHTS & NOTIFICATIONS CARD ===
+        viz_frame = ttk.Frame(main, style="Card.TFrame", padding=SPACING["lg"])
+        viz_frame.grid(row=0, column=1, sticky="nsew",pady=(0, SPACING["md"]))
+        ttk.Label(viz_frame,text="Insights & Notifications",style="Header.TLabel").pack(anchor="w")
+        ttk.Label(viz_frame,text="Visualise data, check messages, and review notifications.",style="Subtitle.TLabel").pack(anchor="w", pady=(0, SPACING["md"]))
+        ttk.Button(viz_frame,text="Dashboard",command=self.dashboard_ui,style="TButton").pack(fill="x", pady=4)
+        ttk.Button(viz_frame,text="Visualise Data",command=self.visualise_menu,style="TButton").pack(fill="x", pady=4)
+        ttk.Button(viz_frame,text="Notifications",command=self.notifications_ui,style="TButton").pack(fill="x", pady=4)
+        ttk.Button(viz_frame,text="Messaging",command=self.messaging_ui,style="TButton").pack(fill="x", pady=4)
+
+        # === LOGOUT STRIP ===
+        logout_frame = ttk.Frame(content, style="App.TFrame")
+        logout_frame.grid(row=3, column=0, sticky="ew", pady=(SPACING["sm"], 0))
+        ttk.Button(logout_frame,text="Logout",command=self.logout,style="Danger.TButton").pack(side="right")
 
         logout_frame = ttk.Frame(content, style="App.TFrame")
         logout_frame.grid(row=3, column=0, sticky="ew", pady=(SPACING["sm"], 0))
@@ -1647,9 +1542,6 @@ class LogisticsWindow(ttk.Frame):
 
     def financial_settings_ui(self):
         self.set_pay_rate_ui()
-
-    def schedule_ui(self):
-        open_schedule_window(self, self.username, role="logistics coordinator")
 
     def create_camp_ui(self):
         top = tk.Toplevel(self)
@@ -1986,7 +1878,6 @@ class ScoutWindow(ttk.Frame):
                 ("View Stats", self.stats_ui),
                 ("View Activities", self.view_activities_ui),
                 ("View Incidents", self.view_incidents_ui),
-                ("Schedule", self.schedule_ui),
                 ("Notifications", self.notifications_ui),
                 ("Messaging", self.messaging_ui),
                 ("Logout", self.logout),
@@ -2028,31 +1919,34 @@ class ScoutWindow(ttk.Frame):
         main.columnconfigure(0, weight=1)
         main.columnconfigure(1, weight=1)
 
-        actions = ttk.LabelFrame(main, text="Camp Actions", padding=SPACING["md"], style="Card.TFrame")
-        actions.grid(row=0, column=0, sticky="nsew", padx=(0, SPACING["md"]), pady=(0, SPACING["md"]))
-        ttk.Label(actions, text="Select camps, import campers, and set food needs.", style="Subtitle.TLabel").pack(anchor="w", pady=(0, SPACING["sm"]))
-        for text, cmd in [
-            ("Select Camp(s) to Supervise", self.select_camps_ui),
-            ("Stop Supervising Camp(s)", self.unsupervise_camps_ui),
-            ("Manage Campers", self.bulk_assign_ui),
-            ("Set Food per Camper", self.food_req_ui),
-        ]:
-            btn_style = "Primary.TButton" if "Select camps" in text else "TButton"
-            ttk.Button(actions, text=text, command=cmd, style=btn_style).pack(fill="x", pady=4)
+        # CAMP ACTIONS CARD
+        actions = ttk.Frame(main, style="Card.TFrame", padding=SPACING["lg"])
+        actions.grid(row=0, column=0, sticky="nsew",padx=(0, SPACING["md"]), pady=(0, SPACING["md"]))
+        ttk.Label(actions,text="Camp Actions",style="Header.TLabel").pack(anchor="w")
+        ttk.Label(actions,text="Select camps, import campers, and configure food needs.",style="Subtitle.TLabel").pack(anchor="w", pady=(0, SPACING["md"]))
+        ttk.Button(actions,text="Select Camp(s) to Supervise",command=self.select_camps_ui,style="Primary.TButton").pack(fill="x", pady=4)
+        ttk.Button(actions,text="Stop Supervising Camp(s)",command=self.unsupervise_camps_ui,style="TButton").pack(fill="x", pady=4)
+        ttk.Button(actions,text="Manage Campers",command=self.bulk_assign_ui,style="TButton").pack(fill="x", pady=4)
+        ttk.Button(actions,text="Set Food per Camper",command=self.food_req_ui,style="TButton").pack(fill="x", pady=4)
 
-        stats_frame = ttk.LabelFrame(main, text="Record & Review", padding=SPACING["md"], style="Card.TFrame")
-        stats_frame.grid(row=0, column=1, sticky="nsew", pady=(0, SPACING["md"]))
+        # RECORD & REVIEW CARD
+        stats_frame = ttk.Frame(main, style="Card.TFrame", padding=SPACING["lg"])
+        stats_frame.grid(row=0, column=1, sticky="nsew",pady=(0, SPACING["md"]))
+        ttk.Label(stats_frame,text="Record & Review",style="Header.TLabel").pack(anchor="w")
+        ttk.Label(stats_frame,text="Log activities and incidents, and review camp data.",style="Subtitle.TLabel").pack(anchor="w", pady=(0, SPACING["md"]))
         for text, cmd in [
             ("Record Activity", self.record_activity_ui),
             ("Record Incident", self.record_incidents_ui),
             ("View Stats", self.stats_ui),
             ("View Camp Activities", self.view_activities_ui),
             ("View Incidents", self.view_incidents_ui),
-            ("Schedule", self.schedule_ui),
-            ("Messaging", self.messaging_ui),
-        ]:
-            ttk.Button(stats_frame, text=text, command=cmd).pack(fill="x", pady=4)
+            ("Messaging", self.messaging_ui),]:
+            ttk.Button(stats_frame, text=text, command=cmd, style="TButton").pack(fill="x", pady=4)
 
+        # LOGOUT STRIP
+        logout_frame = ttk.Frame(content, style="App.TFrame")
+        logout_frame.grid(row=3, column=0, sticky="ew", pady=(SPACING["sm"], 0))
+        ttk.Button(logout_frame,text="Logout",command=self.logout,style="Danger.TButton").pack(side="right")
         logout_frame = ttk.Frame(content, style="App.TFrame")
         logout_frame.grid(row=3, column=0, sticky="ew", pady=(SPACING["sm"], 0))
         ttk.Button(logout_frame, text="Logout", command=self.logout, style="Danger.TButton").pack(side="right")
@@ -2072,9 +1966,6 @@ class ScoutWindow(ttk.Frame):
     def group_chat_ui(self):
         from chat_window import open_group_chat_window
         open_group_chat_window(self, self.username)
-
-    def schedule_ui(self):
-        open_schedule_window(self, self.username, role="scout leader")
 
     def select_camps_ui(self):
         camps = read_from_file()
