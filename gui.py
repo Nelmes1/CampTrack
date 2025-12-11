@@ -54,6 +54,7 @@ from features.scout import (
     camps_overlap,
 )
 from messaging import get_conversations_for_user, get_conversation, send_message
+from features.reporting import export_camp_pack
 
 LOGO_GREEN = "#487C56"       # match logo green
 THEME_BG = "#0b1f36"         # window background
@@ -689,6 +690,7 @@ class AdminWindow(ttk.Frame):
         ttk.Label(other, text="Open direct and group chats.", style="Subtitle.TLabel").pack(anchor="w", pady=(0, SPACING["sm"]))
         ttk.Button(other, text="Open Messaging", command=self.messaging_ui, style="Primary.TButton").pack(fill="x", pady=(0, SPACING["md"]))
         ttk.Button(other, text="Open Schedule", command=self.schedule_ui).pack(fill="x", pady=(0, SPACING["md"]))
+        ttk.Button(other, text="Export Camp Pack", command=self.export_camp_pack_ui).pack(fill="x", pady=(0, SPACING["md"]))
         ttk.Separator(other).pack(fill="x", pady=(SPACING["sm"], SPACING["sm"]))
         ttk.Button(other, text="Logout", command=self.logout, style="Danger.TButton").pack(fill="x")
 
@@ -698,6 +700,25 @@ class AdminWindow(ttk.Frame):
 
     def schedule_ui(self):
         open_schedule_window(self, self.username, role="admin")
+
+    def export_camp_pack_ui(self):
+        camps = read_from_file()
+        if not camps:
+            messagebox.showinfo("Export", "No camps exist.")
+            return
+        indices = select_camp_dialog("Select camp to export", camps, allow_multiple=False, allow_cancel=True)
+        if not indices:
+            return
+        camp = camps[indices[0]]
+        target_dir = filedialog.askdirectory(title="Select folder to save pack")
+        if not target_dir:
+            return
+        try:
+            paths = export_camp_pack(camp.name, target_dir)
+            msg = "Exported:\n" + "\n".join(paths.values())
+            messagebox.showinfo("Export", msg)
+        except Exception as e:
+            show_error_toast(self.master, "Export", f"Failed to export: {e}")
 
     def notifications_ui(self):
         open_notifications_window(
@@ -1643,10 +1664,27 @@ class LogisticsWindow(ttk.Frame):
         ttk.Button(frame, text="Camper Distribution", command=plot_camper_distribution).pack(fill="x", pady=4)
         ttk.Button(frame, text="Leaders per Camp", command=plot_leaders_per_camp).pack(fill="x", pady=4)
         ttk.Button(frame, text="Engagement Overview", command=plot_engagement_scores).pack(fill="x", pady=4)
+        ttk.Button(frame, text="Export Camp Pack", command=self.export_camp_pack_ui).pack(fill="x", pady=4)
         center_in_place(top)
 
     def financial_settings_ui(self):
         self.set_pay_rate_ui()
+
+    def export_camp_pack_ui(self):
+        camp = self.choose_camp_name(title="Export Camp Pack", subtitle="Choose a camp to export")
+        if not camp:
+            return
+        target_dir = filedialog.askdirectory(title="Select folder to save pack")
+        if not target_dir:
+            return
+        try:
+            paths = export_camp_pack(camp, target_dir)
+            msg = "Exported:\n" + "\n".join(paths.values())
+            messagebox.showinfo("Export", msg)
+        except ValueError as e:
+            show_error_toast(self.master, "Export", str(e))
+        except Exception as e:
+            show_error_toast(self.master, "Export", f"Failed to export: {e}")
 
     def schedule_ui(self):
         open_schedule_window(self, self.username, role="logistics coordinator")
