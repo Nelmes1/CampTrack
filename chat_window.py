@@ -183,7 +183,6 @@ def open_chat_window(master, username, role=None):
 
         msg_entry = ttk.Entry(outer, style="App.TEntry")
         msg_entry.pack(fill="x", pady=(6, 6))
-        msg_entry.insert(0, "Announcement…")
 
         priority_flag = tk.BooleanVar(value=False)
         ttk.Checkbutton(outer, text="Priority (requires ACK)", variable=priority_flag).pack(anchor="w", pady=(0, 6))
@@ -282,7 +281,12 @@ def open_chat_window(master, username, role=None):
         if not thread:
             chat_text.insert(tk.END, "(No messages yet – say hi!)\n")
         else:
-            for idx, msg in enumerate(thread):
+            pinned = [m for m in thread if m.get("pinned")]
+            rest = [m for m in thread if not m.get("pinned")]
+            ordered = pinned + rest
+            if pinned:
+                chat_text.insert(tk.END, "(Pinned messages shown first)\n")
+            for idx, msg in enumerate(ordered):
                 who = "You" if msg["from"] == username else partner
                 flags = []
                 if msg.get("priority"):
@@ -391,7 +395,7 @@ def open_chat_window(master, username, role=None):
         center_in_place(dlg)
         dlg.grab_set()
 
-    def pin_latest():
+    def pin_message_dialog():
         partner = current_partner.get()
         if not partner:
             messagebox.showinfo("Messaging", "Select a conversation first.")
@@ -400,12 +404,51 @@ def open_chat_window(master, username, role=None):
         if not thread:
             messagebox.showinfo("Messaging", "No messages to pin.")
             return
-        latest = thread[-1]
-        now_pin = not latest.get("pinned", False)
-        if pin_message(username, partner, latest.get("timestamp"), pinned=now_pin):
-            state = "Pinned" if now_pin else "Unpinned"
-            messagebox.showinfo("Pin", f"{state} latest message.")
-        refresh_chat(partner)
+
+        dlg = tk.Toplevel(convo_win)
+        dlg.title("Pin a message")
+        dlg.configure(bg=convo_win.cget("bg"))
+        outer = ttk.Frame(dlg, padding=12, style="Card.TFrame")
+        outer.pack(fill="both", expand=True)
+        ttk.Label(outer, text=f"Select message to pin (conversation with {partner})", style="Header.TLabel").pack(anchor="w", pady=(0, 6))
+        ttk.Label(outer, text="Pinned messages will appear at the top.", style="Subtitle.TLabel").pack(anchor="w", pady=(0, 6))
+
+        lb = tk.Listbox(
+            outer,
+            selectmode="single",
+            height=min(12, len(thread)),
+            bg="#0b1729",
+            fg="#e5e7eb",
+            selectbackground="#10b981",
+            highlightthickness=0,
+            relief="flat",
+        )
+        lb.pack(fill="both", expand=True, pady=(4, 8))
+        for msg in thread:
+            ts = msg.get("timestamp", "")
+            txt = msg.get("text", "")
+            marker = "[PINNED] " if msg.get("pinned") else ""
+            lb.insert(tk.END, f"{marker}{ts} — {txt}")
+
+        def do_pin():
+            sel = lb.curselection()
+            if not sel:
+                messagebox.showinfo("Pin", "Select a message to pin/unpin.")
+                return
+            m = thread[int(sel[0])]
+            now_pin = not m.get("pinned", False)
+            if pin_message(username, partner, m.get("timestamp"), pinned=now_pin):
+                state = "Pinned" if now_pin else "Unpinned"
+                messagebox.showinfo("Pin", f"{state} selected message.")
+            dlg.destroy()
+            refresh_chat(partner)
+
+        btn_row = ttk.Frame(outer, style="Card.TFrame")
+        btn_row.pack(fill="x", pady=(0, 4))
+        ttk.Button(btn_row, text="Pin/Unpin Selected", style="Primary.TButton", command=do_pin).pack(side="left", padx=(0, 6))
+        ttk.Button(btn_row, text="Cancel", command=dlg.destroy).pack(side="right")
+        center_in_place(dlg)
+        dlg.grab_set()
 
     def export_current_chat():
         partner = current_partner.get()
@@ -480,7 +523,7 @@ def open_chat_window(master, username, role=None):
     ttk.Button(actions, text="Search", command=lambda: search_in_chat()).pack(side="left", padx=(0, 6))
     ttk.Button(actions, text="Export", command=lambda: export_current_chat()).pack(side="left", padx=(0, 6))
     ttk.Button(actions, text="Ack Priority", command=lambda: ack_priority()).pack(side="left", padx=(0, 6))
-    ttk.Button(actions, text="Pin/Unpin", command=lambda: pin_latest()).pack(side="left", padx=(0, 6))
+    ttk.Button(actions, text="Pin/Unpin", command=lambda: pin_message_dialog()).pack(side="left", padx=(0, 6))
 
     entry.bind("<Return>", send_current_message)
 
