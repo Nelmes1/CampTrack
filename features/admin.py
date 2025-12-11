@@ -326,17 +326,18 @@ def change_username():
 
 
 def change_role():
-    """Move a user between scout leader and logistics coordinator."""
+    """Move a user between roles (admin, scout leader, logistics coordinator)."""
+    roles = ["admin", "scout leader", "logistics coordinator"]
     print("\n--- Change Role ---")
-    print("[1] Move Scout Leader -> Logistics\n[2] Move Logistics -> Scout Leader")
-    choice = get_int("Pick option: ", 1, 2)
+    print("[1] Admin\n[2] Scout Leader\n[3] Logistics Coordinator")
+    source_idx = get_int("Move from (pick a role): ", 1, 3) - 1
+    target_idx = get_int("Move to (pick a role): ", 1, 3) - 1
+    source = roles[source_idx]
+    target = roles[target_idx]
 
-    if choice == 1:
-        source = "scout leader"
-        target = "logistics coordinator"
-    else:
-        source = "logistics coordinator"
-        target = "scout leader"
+    if source == target:
+        print("\nSource and target roles are the same.")
+        return
 
     if not users[source]:
         print(f"\nNo users in {source}.")
@@ -348,7 +349,6 @@ def change_role():
     sel = get_int("Choice: ", 1, len(users[source]))
     user_rec = users[source][sel - 1]
 
-    # ensure no duplicate in target
     if any(u['username'] == user_rec['username'] for u in users[target]):
         print("\nA user with that username already exists in the target role.")
         return

@@ -11,14 +11,16 @@ from features.logistics import (
     plot_engagement_scores,
     set_pay_rate,
 )
-from features.notifications import load_notifications, mark_all_as_read
+from features.notifications import load_notifications, mark_all_as_read, count_unread
 from camp_class import read_from_file
 from utils import get_int
 
 
 def run(users):
     while True:
-        print('\nLogisitics Coordiator Menu')
+        unread = count_unread("logistics")
+        badge = f" (unread notifications: {unread})" if unread else ""
+        print(f'\nLogisitics Coordiator Menu{badge}')
         print('\nChoose [1] to Manage and Create Camps'
               '\nChoose [2] to Manage Food Allocation'
               "\nChoose [3] to View Camp Dashboard"
@@ -141,18 +143,25 @@ def run(users):
             set_pay_rate(camp, rate)
 
         elif choice == 6:
-            notes = load_notifications(username="logistics")
+            level = input("Filter by level (INFO/WARNING/ERROR/CRITICAL or leave blank): ").strip().upper()
+            level = level if level in {"INFO", "WARNING", "ERROR", "CRITICAL"} else None
+            username = input("View as which user? (enter username or leave blank for logistics): ").strip() or "logistics"
+            unread_only = input("Show unread only? (y/N): ").strip().lower() == "y"
+
+            notes = load_notifications(username=username, unread_only=unread_only)
+            if level:
+                notes = [n for n in notes if n.get("level") == level]
             if not notes:
                 print("\nNo notifications.")
                 continue
             print("\n--- Notifications ---")
             for n in notes:
-                icon = "✓" if n.get("read") else "•"
+                icon = "✓" if username in n.get("read_by", []) else "•"
                 ts = n.get("timestamp", "unknown time")
                 lvl = n.get("level", "INFO")
-                print(f"{icon} [{lvl}] [{ts}] {n['message']}")
+                print(f"{icon} [{lvl}] [{ts}] {n.get('message','')}")
 
-            mark_all_as_read("logistics")
+            mark_all_as_read(username)
             
         elif choice == 7:
             messaging_menu("logistics", users)

@@ -2,6 +2,10 @@ import os
 import json
 import csv
 from datetime import datetime, timedelta
+try:
+    from dateutil import parser as date_parser
+except ImportError:
+    date_parser = None
 
 from camp_class import Camp, save_to_file, read_from_file
 from utils import get_int, data_path
@@ -35,6 +39,25 @@ def save_selected_camps(leader_username, selected_camp_names):
             if leader_username in camp.scout_leaders:
                 camp.scout_leaders.remove(leader_username)
     save_to_file()
+
+
+def parse_date_cli(prompt):
+    """Prompt for a date with flexible formats."""
+    while True:
+        text = input(prompt).strip()
+        if text.lower() == "n":
+            return None
+        if date_parser:
+            try:
+                return date_parser.parse(text, fuzzy=True).date().strftime("%Y-%m-%d")
+            except Exception:
+                pass
+        for fmt in ("%Y-%m-%d", "%d-%m-%Y", "%d/%m/%Y", "%d %b %Y", "%d %B %Y"):
+            try:
+                return datetime.strptime(text, fmt).date().strftime("%Y-%m-%d")
+            except ValueError:
+                continue
+        print("Invalid date. Try formats like 2025-10-10, 10 Oct 2025, or 10/10/2025. (n to cancel)")
 
 
 def view_leader_camp_assignments():
@@ -341,14 +364,9 @@ def record_daily_activity():
     print(f"\nAdding activities/notes for: {camp.name}")
 
     while True:
-        new_date = input("Enter the date (YYYY-MM-DD) or type n to exit: ").strip()
-        if new_date.lower() == "n":
+        new_date = parse_date_cli("Enter the date (e.g. 2025-10-10 or 10 Oct 2025) or type n to exit: ")
+        if new_date is None:
             break
-        try:
-            datetime.strptime(new_date, "%Y-%m-%d")
-        except ValueError:
-            print("Invalid date. Use YYYY-MM-DD (e.g., 2024-06-15).")
-            continue
 
         activity_name = input("Activity name (optional, press enter to skip): ").strip()
         activity_time = input("Time (optional, e.g. 14:00): ").strip()
@@ -455,6 +473,105 @@ def view_activity_stats():
 
     if stats["total_food_used"] is not None:
         print(f"\nTotal food used across recorded activities: {stats['total_food_used']} units")
+
+    # money earned view
+    money_this_camp = camp.pay_rate * len(camp.campers)
+    total_money = total_money_earned_value()
+    print(f"\nMoney earned for {camp.name}: ${money_this_camp}")
+    print(f"Total money earned across your camps: ${total_money}")
+
+
+def view_activity_list():
+    camps = read_from_file()
+    if not camps:
+        print("\nNo camps exist yet.")
+        return
+
+    print("\n--- Existing Camps ---")
+    for i, camp in enumerate(camps, start=1):
+        print(f"{i}. {camp.name}")
+    choice = get_int("\nSelect a camp to view activities: ", 1, len(camps))
+    camp = camps[choice - 1]
+
+    if not camp.activities:
+        print(f"\nNo activities recorded for {camp.name}.")
+        return
+
+    rows = []
+    for date in sorted(camp.activities.keys()):
+        for entry in camp.activities[date]:
+            rows.append((date, entry))
+
+    for idx, (date, entry) in enumerate(rows, start=1):
+        act = entry.get("activity", "unspecified")
+        time = entry.get("time", "")
+        notes = entry.get("notes", "")
+        campers = entry.get("campers", [])
+        campers_str = ", ".join(campers) if campers else "none"
+        print(f"\n[{idx}] {date} {('@ ' + time) if time else ''} - {act}")
+        print(f"Campers: {campers_str}")
+        food = entry.get("food_used")
+        if food is not None:
+            print(f"Food used: {food}")
+        print(f"Notes: {notes}")
+
+    delete_choice = input("\nDelete an entry? (enter number or press Enter to skip): ").strip()
+    if delete_choice.isdigit():
+        idx = int(delete_choice)
+        if 1 <= idx <= len(rows):
+            date, entry = rows[idx - 1]
+            try:
+                camp.activities[date].remove(entry)
+                if not camp.activities[date]:
+                    del camp.activities[date]
+                save_to_file()
+                print("Entry deleted.")
+            except ValueError:
+                print("Could not delete entry.")
+        else:
+            print("Invalid selection.")
+
+
+def view_incident_list():
+    camps = read_from_file()
+    if not camps:
+        print("\nNo camps exist yet.")
+        return
+
+    print("\n--- Existing Camps ---")
+    for i, camp in enumerate(camps, start=1):
+        print(f"{i}. {camp.name}")
+    choice = get_int("\nSelect a camp to view incidents: ", 1, len(camps))
+    camp = camps[choice - 1]
+
+    incidents = incidents_for_camp_data(camp)
+    if not incidents:
+        print(f"\nNo incidents recorded for {camp.name}.")
+        return
+
+    for idx, inc in enumerate(incidents, start=1):
+        date = inc.get("date", "")
+        time = inc.get("time", "")
+        desc = inc.get("description", "")
+        campers = inc.get("campers", [])
+        campers_str = ", ".join(campers) if campers else "none"
+        extra_time = f" @ {time}" if time else ""
+        print(f"\n[{idx}] {date}{extra_time}: {desc}")
+        print(f"Campers: {campers_str}")
+
+    delete_choice = input("\nDelete an incident? (enter number or press Enter to skip): ").strip()
+    if delete_choice.isdigit():
+        idx = int(delete_choice)
+        if 1 <= idx <= len(incidents):
+            inc = incidents[idx - 1]
+            try:
+                camp.incidents.remove(inc)
+                save_to_file()
+                print("Incident deleted.")
+            except ValueError:
+                print("Could not delete incident.")
+        else:
+            print("Invalid selection.")
 
 
 def incident_summary():
@@ -623,6 +740,47 @@ def activity_stats_data(camp):
         "per_date": per_date,
         "total_food_used": total_food,
     }
+
+
+def stats_summary_all():
+    camps = read_from_file()
+    if not camps:
+        print("\nNo camps exist.")
+        return
+    print("\n--- Camp Stats ---")
+    for camp in camps:
+        _print_camp_stats(camp)
+        print("")
+
+
+def stats_summary_one():
+    camps = read_from_file()
+    if not camps:
+        print("\nNo camps exist.")
+        return
+    print("\n--- Existing Camps ---")
+    for i, camp in enumerate(camps, start=1):
+        print(f"{i}. {camp.name}")
+    choice = get_int("\nSelect a camp: ", 1, len(camps))
+    camp = camps[choice - 1]
+    _print_camp_stats(camp)
+
+
+def _print_camp_stats(camp):
+    scores = dict(engagement_scores_data())
+    money_map = dict(money_earned_per_camp_data())
+    stats = activity_stats_data(camp)
+    incidents = len(getattr(camp, "incidents", []))
+    print(f"{camp.name} ({camp.location}) {camp.start_date} -> {camp.end_date}")
+    print(f"Type: {camp.camp_type} | Engagement: {scores.get(camp.name, 'N/A')}")
+    if camp.name in money_map:
+        print(f"Money earned: ${money_map[camp.name]}")
+    if stats["status"] == "ok":
+        total_food = stats['total_food_used'] if stats['total_food_used'] is not None else 0
+        print(f"Activities: {stats['total_entries']} | Food used: {total_food}")
+    else:
+        print("Activities: none")
+    print(f"Incidents recorded: {incidents}")
 
 
 def bulk_assign_campers():

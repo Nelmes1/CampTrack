@@ -2668,5 +2668,70 @@
         "read_by": [
             "logistics"
         ]
+    },
+    {
+        "message": "Activity updated at Pine Ridge Base",
+        "timestamp": "2025-12-11 09:19",
+        "level": "INFO",
+        "category": "CAMP",
+        "context": {
+            "camp": "Pine Ridge Base",
+            "type": "camp"
+        },
+        "read_by": [
+            "logistics"
+        ]
+    },
+    {
+        "message": "Activity updated at Cedar Grove Overnight",
+        "timestamp": "2025-12-11 09:19",
+        "level": "INFO",
+        "category": "CAMP",
+        "context": {
+            "camp": "Cedar Grove Overnight",
+            "type": "camp"
+        },
+        "read_by": [
+            "logistics"
+        ]
+    },
+    {
+        "message": "Activity updated at Summit Trail Expedition",
+        "timestamp": "2025-12-11 09:19",
+        "level": "INFO",
+        "category": "CAMP",
+        "context": {
+            "camp": "Summit Trail Expedition",
+            "type": "camp"
+        },
+        "read_by": [
+            "logistics"
+        ]
+    },
+    {
+        "message": "Activity updated at Lakeside Adventure",
+        "timestamp": "2025-12-11 09:19",
+        "level": "INFO",
+        "category": "CAMP",
+        "context": {
+            "camp": "Lakeside Adventure",
+            "type": "camp"
+        },
+        "read_by": [
+            "logistics"
+        ]
+    },
+    {
+        "message": "Activity updated at Coastal Explorers",
+        "timestamp": "2025-12-11 09:19",
+        "level": "INFO",
+        "category": "CAMP",
+        "context": {
+            "camp": "Coastal Explorers",
+            "type": "camp"
+        },
+        "read_by": [
+            "logistics"
+        ]
     }
 ]

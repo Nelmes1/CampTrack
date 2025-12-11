@@ -8,12 +8,15 @@ from features.admin import (
     disable_user,
     enable_user,
 )
+from features.notifications import count_unread
 from utils import get_int
 
 
 def run():
     while True:
-        print('\nAdministrator Menu')
+        unread = count_unread("admin")
+        badge = f" (unread notifications: {unread})" if unread else ""
+        print(f'\nAdministrator Menu{badge}')
         print('\nChoose [1] to View all users'
               '\nChoose [2] to Add a new user'
               "\nChoose [3] to Edit a user's password"
