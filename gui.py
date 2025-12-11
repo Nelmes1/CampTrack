@@ -2448,6 +2448,10 @@ class ScoutWindow(ttk.Frame):
             sel = campers_listbox.curselection()
             selected_campers = [campers_listbox.get(i) for i in sel]
 
+            if (not activity_name and not activity_time and not notes and food_units is None and not selected_campers):
+                show_error_toast(self.master, "Error", "Please fill in at least one field (activity, time, notes, food units or campers)")
+                return
+            
             res = record_activity_entry_data(
                 camp_name,
                 date,
@@ -2687,10 +2691,10 @@ class ScoutWindow(ttk.Frame):
             time_val = time_entry.get().strip()
 
             if not date:
-                messagebox.showerror("Error", "Please select a date.")
+                show_error_toast(self.master, "Error", "Please select a date.")
                 return
             if not description:
-                messagebox.showerror("Error", "Please enter a description.")
+                show_error_toast(self.master, "Error", "Please enter a description.")
                 return
 
             selected = campers_listbox.curselection()
