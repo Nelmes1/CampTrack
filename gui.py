@@ -53,6 +53,7 @@ from features.scout import (
     camps_overlap,
 )
 from messaging import get_conversations_for_user, get_conversation, send_message
+from features.reporting import export_camp_pack
 
 LOGO_GREEN = "#487C56"       # match logo green
 THEME_BG = "#0b1f36"         # window background
@@ -1538,6 +1539,7 @@ class LogisticsWindow(ttk.Frame):
         ttk.Button(frame, text="Camper Distribution", command=plot_camper_distribution).pack(fill="x", pady=4)
         ttk.Button(frame, text="Leaders per Camp", command=plot_leaders_per_camp).pack(fill="x", pady=4)
         ttk.Button(frame, text="Engagement Overview", command=plot_engagement_scores).pack(fill="x", pady=4)
+        ttk.Button(frame, text="Export Camp Pack", command=self.export_camp_pack_ui).pack(fill="x", pady=4)
         center_in_place(top)
 
     def financial_settings_ui(self):
