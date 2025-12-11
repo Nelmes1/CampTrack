@@ -2068,6 +2068,9 @@ class ScoutWindow(ttk.Frame):
         top = tk.Toplevel(self)
         top.title("Manage Campers")
         top.configure(bg=THEME_BG)
+        top.transient(self)
+        top.grab_set()
+        top.focus()
         top.minsize(720,800)
         center_window(top,width=720,height=800)
         frame = ttk.Frame(top, padding=14, style="Card.TFrame")
@@ -2103,7 +2106,7 @@ class ScoutWindow(ttk.Frame):
         path_entry.pack(fill="x", pady=(0, 4))
 
         def browse():
-            fp = filedialog.askopenfilename(title="Select campers CSV", filetypes=[("CSV files", "*.csv")])
+            fp = filedialog.askopenfilename(parent=top, title="Select campers CSV", filetypes=[("CSV files", "*.csv")])
             if fp:
                 path_var.set(fp)
 
