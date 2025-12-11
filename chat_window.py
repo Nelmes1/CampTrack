@@ -215,11 +215,9 @@ def open_chat_window(master, username, role=None):
 
     ttk.Button(left_frame, text="Broadcast", command=start_broadcast).pack(fill="x", pady=(6, 0))
 
-    # Group chats only for scout leaders (your design choice)
-    if role == "scout leader":
-        ttk.Button(left_frame, text="Group Chats", command=lambda: open_group_chat_window(master, username)).pack(
-            fill="x", pady=(6, 0)
-        )
+    ttk.Button(left_frame, text="Group Chats", command=lambda: open_group_chat_window(master, username, role)).pack(
+        fill="x", pady=(6, 0)
+    )
 
     # -------- RIGHT: chat history + input --------
     right_frame = ttk.Frame(main, style="Card.TFrame")
@@ -411,8 +409,8 @@ def open_chat_window(master, username, role=None):
     listbox.bind("<<ListboxSelect>>", on_select)
 
 
-def open_group_chat_window(master, username):
-    """Separate window: group chats for camps supervised by this scout leader."""
+def open_group_chat_window(master, username, role=None):
+    """Separate window: group chats. Admin/logistics see all camps; leaders see assigned camps."""
     win = tk.Toplevel(master)
     win.title(f"Group Chats – {username}")
     try:
@@ -461,11 +459,14 @@ def open_group_chat_window(master, username):
     camp_listbox.configure(yscrollcommand=camp_scroll.set)
     camp_scroll.pack(side="left", fill="y", pady=(4, 0))
 
-    # Gather camps supervised by this leader
+    # Gather camps
     all_camps = read_from_file()
-    assigned_camps = [c for c in all_camps if username in c.scout_leaders]
+    if role in ("admin", "logistics coordinator"):
+        camp_choices = all_camps
+    else:
+        camp_choices = [c for c in all_camps if username in c.scout_leaders]
 
-    for c in assigned_camps:
+    for c in camp_choices:
         camp_listbox.insert(tk.END, c.name)
 
     # RIGHT: group chat display
