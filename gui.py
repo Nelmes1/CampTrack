@@ -66,9 +66,6 @@ THEME_BORDER = "#1f2d44"
 SPACING = {"xs": 4, "sm": 8, "md": 12, "lg": 18, "xl": 24}
 
 
-_GIF_CACHE = {}
-
-
 def _read_disabled_usernames():
     try:
         with open('disabled_logins.txt', 'r') as file:
@@ -96,69 +93,15 @@ def _inline_error(frame, message):
     return lbl
 
 
-def _load_gif_frames_raw(name):
-    """Return list of raw RGBA frames for a gif, cached."""
-    if name in _GIF_CACHE:
-        return _GIF_CACHE[name]
-    if Image is None:
-        _GIF_CACHE[name] = []
-        return []
-    path = os.path.join(os.path.dirname(__file__), name)
-    frames = []
-    if os.path.exists(path):
-        try:
-            im = Image.open(path)
-            while True:
-                frames.append(im.copy().convert("RGBA"))
-                im.seek(im.tell() + 1)
-        except EOFError:
-            pass
-        except Exception:
-            frames = []
-    _GIF_CACHE[name] = frames
-    return frames
-
-
-def _attach_gif_background(container, gif_name="campfire.gif", delay=100, start_delay=100):
-    """Attach a full-window animated gif to a container."""
-    container.bg_label = tk.Label(container, bd=0, highlightthickness=0)
-    container.bg_label.place(relx=0, rely=0, relwidth=1, relheight=1)
-    container.bg_label.configure(bg=THEME_BG)
-    container.bg_label.lower()
-    container._bg_frames_raw = _load_gif_frames_raw(gif_name)
-    container._bg_frame_index = 0
-    container._bg_photo = None
-    container._bg_last_size = None
-    container._bg_resized_cache = {}
-
-    def render(index):
-        if not container._bg_frames_raw:
-            return
-        w = max(container.winfo_width(), container.winfo_reqwidth(), 1)
-        h = max(container.winfo_height(), container.winfo_reqheight(), 1)
-        if w == 1 and h == 1:
-            container.after(30, lambda: render(index))
-            return
-        size_key = (w, h)
-        if size_key != container._bg_last_size:
-            resized = [ImageTk.PhotoImage(frame.resize((w, h), Image.LANCZOS)) for frame in container._bg_frames_raw]
-            container._bg_resized_cache[size_key] = resized
-            container._bg_last_size = size_key
-        frames = container._bg_resized_cache.get(size_key)
-        if frames:
-            frame = frames[index % len(frames)]
-            container.bg_label.configure(image=frame)
-
-    def animate():
-        if not container._bg_frames_raw:
-            return
-        render(container._bg_frame_index)
-        container._bg_frame_index = (container._bg_frame_index + 1) % max(1, len(container._bg_frames_raw))
-        container.after(delay, animate)
-
-    if container._bg_frames_raw:
-        render(0)
-        container.after(start_delay, animate)
+def build_button_row(parent, buttons, style="Card.TFrame", padx=4, pady=4):
+    """Create a horizontal row of buttons. buttons: list of (text, command, style_name)."""
+    row = ttk.Frame(parent, style=style)
+    row.pack(fill="x")
+    for text, cmd, btn_style in buttons:
+        ttk.Button(row, text=text, command=cmd, style=btn_style or "TButton").pack(
+            side="left", padx=padx, pady=pady
+        )
+    return row
 
 
 def _build_shell(master, username, role, sections):
@@ -197,6 +140,25 @@ def _build_shell(master, username, role, sections):
     content.columnconfigure(0, weight=1)
     content.rowconfigure(1, weight=1)
     return content, nav, nav_buttons, nav_map
+
+
+def _init_nav_with_badge(owner, username, role, sections, notif_filter=None):
+    """Build nav shell, wire notification badge updater, and return (content, nav)."""
+    content, nav, nav_buttons, nav_map = _build_shell(owner, username, role, sections)
+    owner._nav_buttons = nav_buttons
+    owner._nav_map = nav_map
+    owner._notif_filter = notif_filter
+
+    def refresh_badge():
+        unread = count_unread(username, filter_fn=owner._notif_filter)
+        btn = owner._nav_map.get("Notifications")
+        if not btn:
+            return
+        btn.config(text="Notifications" if unread == 0 else f"Notifications ({unread})")
+
+    owner._refresh_notification_badge = refresh_badge
+    owner._refresh_notification_badge()
+    return content, nav
 
 
 def open_notifications_window(master, refresh_badge_cb=None, filter_fn=None, username=None):
@@ -446,17 +408,6 @@ class LoginWindow(ttk.Frame):
         self.master = master
         self.pack(fill="both", expand=True)
 
-        # --- Animated background ---
-        self.bg_label = tk.Label(self, bd=0, highlightthickness=0)
-        self.bg_label.place(relx=0, rely=0, relwidth=1, relheight=1)
-        self.bg_label.configure(bg=THEME_BG)
-        self.bg_frames = []
-        self.bg_frame_index = 0
-        self._load_campfire_frames()
-        if self.bg_frames:
-            # delay start so login shows theme bg momentarily
-            self.after(100, self._animate_background)
-
         # center the login form in a padded, fixed-width container
         card = ttk.Frame(self, padding=24, width=420, style="Card.TFrame")
         card.place(relx=0.5, rely=0.5, anchor="center")
@@ -520,38 +471,6 @@ class LoginWindow(ttk.Frame):
             style="Primary.TButton",
         ).grid(row=row, column=0, pady=(16, 0), sticky="ew")
 
-    def _load_campfire_frames(self):
-        """Load frames from campfire.gif into self.bg_frames."""
-        gif_path = os.path.join(os.path.dirname(__file__), "campfire.gif")
-        if not os.path.exists(gif_path):
-            return
-        try:
-            im = Image.open(gif_path)
-        except Exception:
-            return
-
-        frames = []
-        try:
-            while True:
-                frame = im.copy()
-                w = max(self.master.winfo_screenwidth(), 800)
-                h = max(self.master.winfo_screenheight(), 700)
-                frame = frame.resize((w, h), Image.LANCZOS)
-                frames.append(ImageTk.PhotoImage(frame))
-                im.seek(im.tell() + 1)
-        except EOFError:
-            pass
-        self.bg_frames = frames
-
-    def _animate_background(self):
-        """Loop through GIF frames on the background label."""
-        if not self.bg_frames:
-            return
-        frame = self.bg_frames[self.bg_frame_index]
-        self.bg_label.configure(image=frame)
-        self.bg_frame_index = (self.bg_frame_index + 1) % len(self.bg_frames)
-        self.after(80, self._animate_background)
-
     def attempt_login(self):
         state_info = capture_window_state(self.master)
 
@@ -598,10 +517,9 @@ class AdminWindow(ttk.Frame):
     def __init__(self, master, username):
         super().__init__(master, padding=0, style="App.TFrame")
         self.username = username
-        _attach_gif_background(self, gif_name="campfire1.gif", start_delay=500)
         self.pack(fill="both", expand=True)
 
-        content, nav, self._nav_buttons, self._nav_map = _build_shell(
+        content, nav = _init_nav_with_badge(
             self,
             username,
             "Administrator",
@@ -612,12 +530,8 @@ class AdminWindow(ttk.Frame):
                 ("Messaging", self.messaging_ui),
                 ("Logout", self.logout),
             ],
+            notif_filter=None,  # admin sees all levels
         )
-        # admin sees critical/error by default
-        self._notif_filter = lambda n: n.get("level") in {"CRITICAL", "ERROR"}
-        # admin sees critical/error by default
-        self._notif_filter = lambda n: n.get("level") in {"CRITICAL", "ERROR"}
-        self._refresh_notification_badge()
 
         # HERO
         hero = ttk.Frame(content, style="Card.TFrame", padding=SPACING["lg"])
@@ -663,19 +577,16 @@ class AdminWindow(ttk.Frame):
         ttk.Button(other, text="Logout", command=self.logout, style="Danger.TButton").pack(fill="x")
 
     def _focus_dashboard(self):
-        # placeholder hook to align with nav; already on dashboard
-        pass
-
-    def _refresh_notification_badge(self):
-        unread = count_unread(self.username, filter_fn=self._notif_filter)
-        btn = self._nav_map.get("Notifications")
-        if not btn:
-            return
-        label = "Notifications" if unread == 0 else f"Notifications ({unread})"
-        btn.config(text=label)
+        # Admin dashboard is the default view; show a quick note so the nav click feels responsive.
+        messagebox.showinfo("Dashboard", "You’re already on the admin dashboard.")
 
     def notifications_ui(self):
-        open_notifications_window(self, refresh_badge_cb=self._refresh_notification_badge)
+        open_notifications_window(
+            self,
+            refresh_badge_cb=self._refresh_notification_badge,
+            filter_fn=self._notif_filter,
+            username=self.username,
+        )
 
     def list_users_ui(self):
         top = tk.Toplevel(self)
@@ -735,244 +646,260 @@ class AdminWindow(ttk.Frame):
         tree.bind("<Configure>", refresh_scrollbar)
         tree.after_idle(refresh_scrollbar)
 
-        def load_disabled_set():
-            s = set()
-            try:
-                with open('disabled_logins.txt', 'r') as file:
-                    disabled_login = file.read().strip(',')
-                    if disabled_login:
-                        s = {x for x in disabled_login.split(',') if x}
-            except FileNotFoundError:
-                pass
-            return s
+        class UserListController:
+            def __init__(self, parent, tree, search_var, refresh_scroll_cb):
+                self.parent = parent
+                self.tree = tree
+                self.search_var = search_var
+                self.refresh_scroll_cb = refresh_scroll_cb
 
-        def save_disabled_set(s):
-            with open('disabled_logins.txt', 'w') as f:
-                f.write(",".join(sorted(s)))
+            def load_disabled_set(self):
+                try:
+                    with open('disabled_logins.txt', 'r') as file:
+                        disabled_login = file.read().strip(',')
+                        if disabled_login:
+                            return {x for x in disabled_login.split(',') if x}
+                except FileNotFoundError:
+                    pass
+                return set()
 
-        def add_row(role, user, ds):
-            status = "Disabled" if user['username'] in ds else "Active"
-            tree.insert("", "end", values=(role, user['username'], user['password'], status))
+            def save_disabled_set(self, s):
+                with open('disabled_logins.txt', 'w') as f:
+                    f.write(",".join(sorted(s)))
 
-        def refresh_tree():
-            for child in tree.get_children():
-                tree.delete(child)
-            ds = load_disabled_set()
-            term = search_var.get().strip().lower()
+            def ensure_unique_username(self, name):
+                existing = {u['username'] for u in users['admin']}
+                existing |= {u['username'] for u in users['scout leader']}
+                existing |= {u['username'] for u in users['logistics coordinator']}
+                return name not in existing
 
-            def matches(role_label, username):
-                status = "Disabled" if username in ds else "Active"
-                if not term:
-                    return True
-                text = f"{role_label} {username} {status}".lower()
-                return term in text
+            def add_row(self, role, user, ds):
+                status = "Disabled" if user['username'] in ds else "Active"
+                self.tree.insert("", "end", values=(role, user['username'], user['password'], status))
 
-            for admin in users['admin']:
-                if matches("Admin", admin['username']):
-                    add_row("Admin", admin, ds)
-            for role in ['scout leader', 'logistics coordinator']:
-                for user in users[role]:
-                    role_label = role.title()
-                    if matches(role_label, user['username']):
-                        add_row(role_label, user, ds)
-            if len(tree.get_children()) == 0:
-                msg = "No users found." if not term else "No matches for search."
-                tree.insert("", "end", values=("—", msg, "", ""))
-            refresh_scrollbar()
-            tree.after_idle(refresh_scrollbar)
+            def refresh_tree(self, *_):
+                for child in self.tree.get_children():
+                    self.tree.delete(child)
+                ds = self.load_disabled_set()
+                term = self.search_var.get().strip().lower()
 
-        def get_selected():
-            sel = tree.selection()
-            if not sel:
-                show_error_toast(self.master, "Error", "Please select a user.")
-                return None
-            vals = tree.item(sel[0], "values")
-            if not vals or vals[0] == "—":
-                show_error_toast(self.master, "Error", "Please select a valid user.")
-                return None
-            return {"role": vals[0], "username": vals[1], "password": vals[2], "item": sel[0]}
+                def matches(role_label, username):
+                    status = "Disabled" if username in ds else "Active"
+                    if not term:
+                        return True
+                    text = f"{role_label} {username} {status}".lower()
+                    return term in text
 
-        def ensure_unique_username(name):
-            existing = {u['username'] for u in users['admin']}
-            existing |= {u['username'] for u in users['scout leader']}
-            existing |= {u['username'] for u in users['logistics coordinator']}
-            return name not in existing
+                for admin in users['admin']:
+                    if matches("Admin", admin['username']):
+                        self.add_row("Admin", admin, ds)
+                for role in ['scout leader', 'logistics coordinator']:
+                    for user in users[role]:
+                        role_label = role.title()
+                        if matches(role_label, user['username']):
+                            self.add_row(role_label, user, ds)
+                if len(self.tree.get_children()) == 0:
+                    msg = "No users found." if not term else "No matches for search."
+                    self.tree.insert("", "end", values=("—", msg, "", ""))
+                self.refresh_scroll_cb()
+                self.tree.after_idle(self.refresh_scroll_cb)
 
-        def edit_password():
-            sel = get_selected()
-            if not sel:
-                return
-            dlg = tk.Toplevel(self)
-            dlg.title("Edit Password")
-            dlg.configure(bg=THEME_BG)
-            center_window(dlg, width=520, height=360)
-            frame = ttk.Frame(dlg, padding=14, style="Card.TFrame")
-            frame.pack(fill="both", expand=True, padx=12, pady=12)
-            ttk.Label(frame, text=f"Edit password for {sel['username']}", style="Header.TLabel").pack(anchor="w", pady=(0, 6))
-            ttk.Separator(frame).pack(fill="x", pady=(0, 8))
-            ttk.Label(frame, text="New password", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
-            pwd_entry = ttk.Entry(frame, style="App.TEntry", show="*")
-            pwd_entry.pack(fill="x", pady=(0, 10))
+            def get_selected(self):
+                sel = self.tree.selection()
+                if not sel:
+                    show_error_toast(self.parent.master, "Error", "Please select a user.")
+                    return None
+                vals = self.tree.item(sel[0], "values")
+                if not vals or vals[0] == "—":
+                    show_error_toast(self.parent.master, "Error", "Please select a valid user.")
+                    return None
+                return {"role": vals[0], "username": vals[1], "password": vals[2], "item": sel[0]}
 
-            def submit():
-                new_pwd = pwd_entry.get()
-                role_key = sel['role'].lower()
-                for u in users[role_key]:
-                    if u['username'] == sel['username']:
-                        u['password'] = new_pwd
-                        break
-                save_logins()
-                add_notification(
-                    f"[Admin: {self.username}] Changed password for user '{sel['username']}'",
-                    level="WARNING")
-                refresh_tree()
-                dlg.destroy()
-
-            btns = ttk.Frame(frame, style="Card.TFrame")
-            btns.pack(fill="x")
-            ttk.Button(btns, text="Save", command=submit, style="Primary.TButton").pack(side="left", padx=4, pady=4)
-            ttk.Button(btns, text="Cancel", command=dlg.destroy).pack(side="left", padx=4, pady=4)
-            center_in_place(dlg)
-            dlg.grab_set()
-
-        def delete_user():
-            sel = get_selected()
-            if not sel:
-                return
-            if not messagebox.askyesno("Delete", f"Delete user {sel['username']}?"):
-                return
-            role_key = sel['role'].lower()
-            users[role_key] = [u for u in users[role_key] if u['username'] != sel['username']]
-            # also remove from disabled list if present
-            ds = load_disabled_set()
-            if sel['username'] in ds:
-                ds.remove(sel['username'])
-                save_disabled_set(ds)
-            add_notification(
-                f"[Admin: {self.username}] Deleted user '{sel['username']}'",
-                level="CRITICAL")
-            save_logins()
-            refresh_tree()
-
-        def toggle_disable(enable=False):
-            sel = get_selected()
-            if not sel:
-                return
-            ds = load_disabled_set()
-            if enable:
-                if sel['username'] in ds:
-                    ds.remove(sel['username'])
-                    save_disabled_set(ds)
-                enable_login(sel['username'])
-            else:
-                disabled_logins(sel['username'])
-                ds.add(sel['username'])
-                save_disabled_set(ds)
-            refresh_tree()
-
-        def change_username():
-            sel = get_selected()
-            if not sel:
-                return
-            dlg = tk.Toplevel(self)
-            dlg.title("Change Username")
-            dlg.configure(bg=THEME_BG)
-            center_window(dlg, width=520, height=360)
-            frame = ttk.Frame(dlg, padding=14, style="Card.TFrame")
-            frame.pack(fill="both", expand=True, padx=12, pady=12)
-            ttk.Label(frame, text=f"Change username for {sel['username']}", style="Header.TLabel").pack(anchor="w", pady=(0, 6))
-            ttk.Separator(frame).pack(fill="x", pady=(0, 8))
-            ttk.Label(frame, text="New username", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
-            name_entry = ttk.Entry(frame, style="App.TEntry")
-            name_entry.insert(0, sel['username'])
-            name_entry.pack(fill="x", pady=(0, 10))
-
-            def submit():
-                new_name = name_entry.get().strip()
-                if not new_name:
-                    show_error_toast(self.master, "Error", "Username cannot be blank.")
+            def edit_password(self):
+                sel = self.get_selected()
+                if not sel:
                     return
-                if not ensure_unique_username(new_name):
-                    show_error_toast(self.master, "Error", "Username already exists.")
-                    return
-                role_key = sel['role'].lower()
-                for u in users[role_key]:
-                    if u['username'] == sel['username']:
-                        u['username'] = new_name
-                        break
-                ds = load_disabled_set()
-                if sel['username'] in ds:
-                    ds.remove(sel['username'])
-                    ds.add(new_name)
-                    save_disabled_set(ds)
-                save_logins()
-                refresh_tree()
-                dlg.destroy()
+                dlg = tk.Toplevel(self.parent)
+                dlg.title("Edit Password")
+                dlg.configure(bg=THEME_BG)
+                center_window(dlg, width=520, height=360)
+                frame_inner = ttk.Frame(dlg, padding=14, style="Card.TFrame")
+                frame_inner.pack(fill="both", expand=True, padx=12, pady=12)
+                ttk.Label(frame_inner, text=f"Edit password for {sel['username']}", style="Header.TLabel").pack(anchor="w", pady=(0, 6))
+                ttk.Separator(frame_inner).pack(fill="x", pady=(0, 8))
+                ttk.Label(frame_inner, text="New password", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
+                pwd_entry = ttk.Entry(frame_inner, style="App.TEntry", show="*")
+                pwd_entry.pack(fill="x", pady=(0, 10))
 
-            btns = ttk.Frame(frame, style="Card.TFrame")
-            btns.pack(fill="x")
-            ttk.Button(btns, text="Save", command=submit, style="Primary.TButton").pack(side="left", padx=4, pady=4)
-            ttk.Button(btns, text="Cancel", command=dlg.destroy).pack(side="left", padx=4, pady=4)
-            center_in_place(dlg)
-            dlg.grab_set()
-
-        def change_role():
-            sel = get_selected()
-            if not sel:
-                return
-            current = sel['role'].lower()
-            roles = ["admin", "scout leader", "logistics coordinator"]
-            dlg = tk.Toplevel(self)
-            dlg.title("Change Role")
-            dlg.configure(bg=THEME_BG)
-            center_window(dlg, width=520, height=360)
-            frame = ttk.Frame(dlg, padding=14, style="Card.TFrame")
-            frame.pack(fill="both", expand=True, padx=12, pady=12)
-            ttk.Label(frame, text=f"Change role for {sel['username']}", style="Header.TLabel").pack(anchor="w", pady=(0, 6))
-            ttk.Separator(frame).pack(fill="x", pady=(0, 8))
-            ttk.Label(frame, text="New role", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
-            role_var = tk.StringVar(value=current)
-            ttk.OptionMenu(frame, role_var, current, *roles).pack(fill="x", pady=(0, 10))
-
-            def submit():
-                choice = role_var.get()
-                if choice == current:
-                    dlg.destroy()
-                    return
-                if any(u['username'] == sel['username'] for u in users[choice]):
-                    show_error_toast(self.master, "Error", "Username already exists in target role.")
-                    return
-                user_rec = None
-                for u in users[current]:
-                    if u['username'] == sel['username']:
-                        user_rec = u
-                        break
-                if user_rec:
-                    users[current] = [u for u in users[current] if u['username'] != sel['username']]
-                    users[choice].append(user_rec)
+                def submit():
+                    new_pwd = pwd_entry.get()
+                    role_key = sel['role'].lower()
+                    for u in users[role_key]:
+                        if u['username'] == sel['username']:
+                            u['password'] = new_pwd
+                            break
                     save_logins()
-                    refresh_tree()
-                dlg.destroy()
+                    add_notification(
+                        f"[Admin: {self.parent.username}] Changed password for user '{sel['username']}'",
+                        level="WARNING")
+                    self.refresh_tree()
+                    dlg.destroy()
 
-            btns = ttk.Frame(frame, style="Card.TFrame")
-            btns.pack(fill="x")
-            ttk.Button(btns, text="Save", command=submit, style="Primary.TButton").pack(side="left", padx=4, pady=4)
-            ttk.Button(btns, text="Cancel", command=dlg.destroy).pack(side="left", padx=4, pady=4)
-            center_in_place(dlg)
-            dlg.grab_set()
+                build_button_row(
+                    frame_inner,
+                    [
+                        ("Save", submit, "Primary.TButton"),
+                        ("Cancel", dlg.destroy, None),
+                    ],
+                )
+                center_in_place(dlg)
+                dlg.grab_set()
+
+            def delete_user(self):
+                sel = self.get_selected()
+                if not sel:
+                    return
+                if not messagebox.askyesno("Delete", f"Delete user {sel['username']}?"):
+                    return
+                role_key = sel['role'].lower()
+                users[role_key] = [u for u in users[role_key] if u['username'] != sel['username']]
+                ds = self.load_disabled_set()
+                if sel['username'] in ds:
+                    ds.remove(sel['username'])
+                    self.save_disabled_set(ds)
+                add_notification(
+                    f"[Admin: {self.parent.username}] Deleted user '{sel['username']}'",
+                    level="CRITICAL")
+                save_logins()
+                self.refresh_tree()
+
+            def toggle_disable(self, enable=False):
+                sel = self.get_selected()
+                if not sel:
+                    return
+                ds = self.load_disabled_set()
+                if enable:
+                    if sel['username'] in ds:
+                        ds.remove(sel['username'])
+                        self.save_disabled_set(ds)
+                    enable_login(sel['username'])
+                else:
+                    disabled_logins(sel['username'])
+                    ds.add(sel['username'])
+                    self.save_disabled_set(ds)
+                self.refresh_tree()
+
+            def change_username(self):
+                sel = self.get_selected()
+                if not sel:
+                    return
+                dlg = tk.Toplevel(self.parent)
+                dlg.title("Change Username")
+                dlg.configure(bg=THEME_BG)
+                center_window(dlg, width=520, height=360)
+                frame_inner = ttk.Frame(dlg, padding=14, style="Card.TFrame")
+                frame_inner.pack(fill="both", expand=True, padx=12, pady=12)
+                ttk.Label(frame_inner, text=f"Change username for {sel['username']}", style="Header.TLabel").pack(anchor="w", pady=(0, 6))
+                ttk.Separator(frame_inner).pack(fill="x", pady=(0, 8))
+                ttk.Label(frame_inner, text="New username", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
+                name_entry = ttk.Entry(frame_inner, style="App.TEntry")
+                name_entry.insert(0, sel['username'])
+                name_entry.pack(fill="x", pady=(0, 10))
+
+                def submit():
+                    new_name = name_entry.get().strip()
+                    if not new_name:
+                        show_error_toast(self.parent.master, "Error", "Username cannot be blank.")
+                        return
+                    if not self.ensure_unique_username(new_name):
+                        show_error_toast(self.parent.master, "Error", "Username already exists.")
+                        return
+                    role_key = sel['role'].lower()
+                    for u in users[role_key]:
+                        if u['username'] == sel['username']:
+                            u['username'] = new_name
+                            break
+                    ds = self.load_disabled_set()
+                    if sel['username'] in ds:
+                        ds.remove(sel['username'])
+                        ds.add(new_name)
+                        self.save_disabled_set(ds)
+                    save_logins()
+                    self.refresh_tree()
+                    dlg.destroy()
+
+                build_button_row(
+                    frame_inner,
+                    [
+                        ("Save", submit, "Primary.TButton"),
+                        ("Cancel", dlg.destroy, None),
+                    ],
+                )
+                center_in_place(dlg)
+                dlg.grab_set()
+
+            def change_role(self):
+                sel = self.get_selected()
+                if not sel:
+                    return
+                current = sel['role'].lower()
+                roles = ["admin", "scout leader", "logistics coordinator"]
+                dlg = tk.Toplevel(self.parent)
+                dlg.title("Change Role")
+                dlg.configure(bg=THEME_BG)
+                center_window(dlg, width=520, height=360)
+                frame_inner = ttk.Frame(dlg, padding=14, style="Card.TFrame")
+                frame_inner.pack(fill="both", expand=True, padx=12, pady=12)
+                ttk.Label(frame_inner, text=f"Change role for {sel['username']}", style="Header.TLabel").pack(anchor="w", pady=(0, 6))
+                ttk.Separator(frame_inner).pack(fill="x", pady=(0, 8))
+                ttk.Label(frame_inner, text="New role", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
+                role_var = tk.StringVar(value=current)
+                ttk.OptionMenu(frame_inner, role_var, current, *roles).pack(fill="x", pady=(0, 10))
+
+                def submit():
+                    choice = role_var.get()
+                    if choice == current:
+                        dlg.destroy()
+                        return
+                    if any(u['username'] == sel['username'] for u in users[choice]):
+                        show_error_toast(self.parent.master, "Error", "Username already exists in target role.")
+                        return
+                    user_rec = None
+                    for u in users[current]:
+                        if u['username'] == sel['username']:
+                            user_rec = u
+                            break
+                    if user_rec:
+                        users[current] = [u for u in users[current] if u['username'] != sel['username']]
+                        users[choice].append(user_rec)
+                        save_logins()
+                        self.refresh_tree()
+                    dlg.destroy()
+
+                build_button_row(
+                    frame_inner,
+                    [
+                        ("Save", submit, "Primary.TButton"),
+                        ("Cancel", dlg.destroy, None),
+                    ],
+                )
+                center_in_place(dlg)
+                dlg.grab_set()
+
+        controller = UserListController(self, tree, search_var, refresh_scrollbar)
 
         # action buttons
         btn_frame = ttk.Frame(frame, style="Card.TFrame")
         btn_frame.pack(fill="x", pady=(8, 0))
-        ttk.Button(btn_frame, text="Edit Password", command=edit_password).pack(side="left", padx=4, pady=2)
-        ttk.Button(btn_frame, text="Change Username", command=change_username).pack(side="left", padx=4, pady=2)
-        ttk.Button(btn_frame, text="Change Role", command=change_role).pack(side="left", padx=4, pady=2)
-        ttk.Button(btn_frame, text="Disable", command=lambda: toggle_disable(False), style="Danger.TButton").pack(side="left", padx=4, pady=2)
-        ttk.Button(btn_frame, text="Enable", command=lambda: toggle_disable(True)).pack(side="left", padx=4, pady=2)
-        ttk.Button(btn_frame, text="Delete", command=delete_user, style="Danger.TButton").pack(side="left", padx=4, pady=2)
+        ttk.Button(btn_frame, text="Edit Password", command=controller.edit_password).pack(side="left", padx=4, pady=2)
+        ttk.Button(btn_frame, text="Change Username", command=controller.change_username).pack(side="left", padx=4, pady=2)
+        ttk.Button(btn_frame, text="Change Role", command=controller.change_role).pack(side="left", padx=4, pady=2)
+        ttk.Button(btn_frame, text="Disable", command=lambda: controller.toggle_disable(False), style="Danger.TButton").pack(side="left", padx=4, pady=2)
+        ttk.Button(btn_frame, text="Enable", command=lambda: controller.toggle_disable(True)).pack(side="left", padx=4, pady=2)
+        ttk.Button(btn_frame, text="Delete", command=controller.delete_user, style="Danger.TButton").pack(side="left", padx=4, pady=2)
 
-        refresh_tree()
-        search_var.trace_add("write", lambda *_: refresh_tree())
+        controller.refresh_tree()
+        search_var.trace_add("write", controller.refresh_tree)
         search_entry.focus_set()
         center_in_place(top)
 
@@ -1226,7 +1153,6 @@ class AdminWindow(ttk.Frame):
         ttk.Button(frame, text="Group Chat", command=lambda: open_group_chat_window(self.master, self.username)).pack(fill="x", pady=4)
         ttk.Button(frame, text="Close", command=top.destroy).pack(fill="x", pady=(8, 0))
         center_in_place(top)
-        center_in_place(top)
 
     def notifications_ui(self):
         open_notifications_window(
@@ -1235,14 +1161,6 @@ class AdminWindow(ttk.Frame):
             filter_fn=self._notif_filter,
             username=self.username,
         )
-
-    def _refresh_notification_badge(self):
-        unread = _unread_count(filter_fn=self._notif_filter, username=self.username)
-        btn = self._nav_map.get("Notifications")
-        if not btn:
-            return
-        label = "Notifications" if unread == 0 else f"Notifications ({unread})"
-        btn.config(text=label)
 
     def logout(self):
         root = self.master
@@ -1259,7 +1177,6 @@ class LogisticsWindow(ttk.Frame):
     def __init__(self, master, username):
         super().__init__(master, padding=0, style="App.TFrame")
         self.username = username
-        _attach_gif_background(self, gif_name="campfire1.gif", delay=140, start_delay=500)
         master.minsize(1040, 820)
         self.pack(fill="both", expand=True)
 
@@ -1273,15 +1190,14 @@ class LogisticsWindow(ttk.Frame):
             ("Messaging", self.messaging_ui),
             ("Logout", self.logout),
         ]
-        content, nav, self._nav_buttons, self._nav_map = _build_shell(
+        content, nav = _init_nav_with_badge(
             self,
             username,
             "Logistics Coordinator",
             sections,
+            notif_filter=None,  # coordinator sees all
         )
         self._sections = sections
-        self._notif_filter = None  # coordinator sees all
-        self._refresh_notification_badge()
 
         # HERO
         hero = ttk.Frame(content, style="Card.TFrame", padding=SPACING["lg"])
@@ -1339,14 +1255,6 @@ class LogisticsWindow(ttk.Frame):
     def _focus_dashboard(self):
         # placeholder to match nav selection; content already visible
         pass
-
-    def _refresh_notification_badge(self):
-        unread = count_unread(self.username, filter_fn=self._notif_filter)
-        btn = self._nav_map.get("Notifications")
-        if not btn:
-            return
-        label = "Notifications" if unread == 0 else f"Notifications ({unread})"
-        btn.config(text=label)
 
     def manage_camps_menu(self):
         top = tk.Toplevel(self)
@@ -1591,7 +1499,12 @@ class LogisticsWindow(ttk.Frame):
         center_in_place(top)
 
     def notifications_ui(self):
-        open_notifications_window(self, refresh_badge_cb=self._refresh_notification_badge)
+        open_notifications_window(
+            self,
+            refresh_badge_cb=self._refresh_notification_badge,
+            filter_fn=self._notif_filter,
+            username=self.username,
+        )
         
     def visualise_menu(self):
         top = tk.Toplevel(self)
@@ -1931,11 +1844,10 @@ class ScoutWindow(ttk.Frame):
     def __init__(self, master, username):
         super().__init__(master, padding=0, style="App.TFrame")
         self.username = username
-        _attach_gif_background(self, gif_name="campfire1.gif", delay=140, start_delay=500)
         master.minsize(1040, 820)
         self.pack(fill="both", expand=True)
 
-        content, nav, self._nav_buttons, self._nav_map = _build_shell(
+        content, nav = _init_nav_with_badge(
             self,
             username,
             "Scout Leader",
@@ -1952,6 +1864,7 @@ class ScoutWindow(ttk.Frame):
                 ("Messaging", self.messaging_ui),
                 ("Logout", self.logout),
             ],
+            notif_filter=None,  # set after we know supervised camps
         )
         # Scout sees notifications for camps they supervise
         camps = read_from_file()
@@ -2019,14 +1932,6 @@ class ScoutWindow(ttk.Frame):
     def _focus_dashboard(self):
         # placeholder to align with nav; content already visible
         pass
-
-    def _refresh_notification_badge(self):
-        unread = count_unread(self.username, filter_fn=self._notif_filter)
-        btn = self._nav_map.get("Notifications")
-        if not btn:
-            return
-        label = "Notifications" if unread == 0 else f"Notifications ({unread})"
-        btn.config(text=label)
 
     def notifications_ui(self):
         open_notifications_window(
@@ -2341,6 +2246,98 @@ class ScoutWindow(ttk.Frame):
         refresh_campers()
         center_in_place(top)
 
+    # --- Shared helpers for scout actions ---
+    def _camp_date_picker(self, parent, supervised):
+        """Build camp + date selectors and return (camp_var, date_var, get_camp_fn)."""
+        ttk.Label(parent, text="Camp", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
+        camp_var = tk.StringVar(value=supervised[0].name)
+        ttk.OptionMenu(parent, camp_var, supervised[0].name, *[c.name for c in supervised]).pack(fill="x", pady=(0, 8))
+
+        ttk.Label(parent, text="Date", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
+        date_var = tk.StringVar()
+        date_menu = ttk.OptionMenu(parent, date_var, "")
+        date_menu.pack(fill="x", pady=(0, 8))
+
+        def get_selected_camp():
+            name = camp_var.get()
+            for c in supervised:
+                if c.name == name:
+                    return c
+            return supervised[0]
+
+        def refresh_dates(*_):
+            camp_obj = get_selected_camp()
+            try:
+                start = datetime.strptime(camp_obj.start_date, "%Y-%m-%d").date()
+                end = datetime.strptime(camp_obj.end_date, "%Y-%m-%d").date()
+            except ValueError:
+                dates = []
+            else:
+                dates = []
+                d = start
+                while d <= end:
+                    dates.append(d.isoformat())
+                    d += timedelta(days=1)
+
+            menu = date_menu["menu"]
+            menu.delete(0, "end")
+            if dates:
+                for d_str in dates:
+                    menu.add_command(label=d_str, command=lambda v=d_str: date_var.set(v))
+                date_var.set(dates[0])
+            else:
+                date_var.set("")
+
+        camp_var.trace_add("write", refresh_dates)
+        refresh_dates()
+        return camp_var, date_var, get_selected_camp
+
+    def _campers_listbox(self, parent):
+        listbox = tk.Listbox(
+            parent,
+            selectmode="extended",
+            height=6,
+            bg="#0b1729",
+            fg=THEME_FG,
+            selectbackground=THEME_ACCENT,
+            highlightthickness=0,
+            relief="flat",
+        )
+        listbox.pack(fill="both", expand=True, pady=(0, 8))
+        return listbox
+
+    def _build_detail_table(self, parent, columns, col_config):
+        """Create a tree + details text pane; return (tree, details_text, item_details)."""
+        table_frame = ttk.Frame(parent, style="Card.TFrame")
+        table_frame.pack(fill="both", expand=True)
+
+        tree = ttk.Treeview(table_frame, columns=columns, show="headings", height=10)
+        tree.pack(side="left", fill="both", expand=True)
+
+        scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=tree.yview)
+        tree.configure(yscrollcommand=scrollbar.set)
+        scrollbar.pack(side="right", fill="y")
+
+        for key, heading in columns.items():
+            tree.heading(key, text=heading)
+            conf = col_config.get(key, {})
+            tree.column(key, width=conf.get("width", 120), anchor=conf.get("anchor", "w"))
+
+        details_frame = ttk.LabelFrame(parent, text="Details", padding=8, style="Card.TFrame")
+        details_frame.pack(fill="both", expand=True, pady=(4, 0))
+        details_text = tk.Text(
+            details_frame,
+            height=8,
+            bg="#0b1729",
+            fg=THEME_FG,
+            wrap="word",
+            highlightthickness=0,
+            relief="flat",
+        )
+        details_text.pack(fill="both", expand=True)
+
+        return tree, details_text, {}
+
     def food_req_ui(self):
         camps = read_from_file()
         if not camps:
@@ -2382,47 +2379,7 @@ class ScoutWindow(ttk.Frame):
         ttk.Label(frame, text="Record daily activity", style="Header.TLabel").pack(pady=(0, 6))
         ttk.Separator(frame).pack(fill="x", pady=(0, 8))
 
-        ttk.Label(frame, text="Camp", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
-        camp_var = tk.StringVar(value=supervised[0].name)
-        ttk.OptionMenu(frame, camp_var, supervised[0].name, *[c.name for c in supervised]).pack(fill="x", pady=(0, 8))
-
-        def get_selected_camp():
-            name = camp_var.get()
-            for c in supervised:
-                if c.name == name:
-                    return c
-            return supervised[0]
-
-        ttk.Label(frame, text="Date", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
-        date_var = tk.StringVar()
-        date_menu = ttk.OptionMenu(frame, date_var, "")
-        date_menu.pack(fill="x", pady=(0, 8))
-
-        def refresh_dates(*args):
-            camp_obj = get_selected_camp()
-            try:
-                start = datetime.strptime(camp_obj.start_date, "%Y-%m-%d").date()
-                end = datetime.strptime(camp_obj.end_date, "%Y-%m-%d").date()
-            except ValueError:
-                dates = []
-            else:
-                dates = []
-                d = start
-                while d <= end:
-                    dates.append(d.isoformat())
-                    d += timedelta(days=1)
-
-            menu = date_menu["menu"]
-            menu.delete(0, "end")
-            if dates:
-                for d_str in dates:
-                    menu.add_command(label=d_str, command=lambda v=d_str: date_var.set(v))
-                date_var.set(dates[0])
-            else:
-                date_var.set("")
-
-        camp_var.trace_add("write", refresh_dates)
-        refresh_dates()
+        camp_var, date_var, get_selected_camp = self._camp_date_picker(frame, supervised)
 
         def add_entry(label, initial=""):
             ttk.Label(frame, text=label, style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
@@ -2444,24 +2401,14 @@ class ScoutWindow(ttk.Frame):
         food_entry.pack(fill="x", pady=(0, 10))
 
         ttk.Label(frame, text="Campers in this activity (optional)", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
-        campers_listbox = tk.Listbox(
-            frame,
-            selectmode="extended",
-            height=6,
-            bg="#0b1729",
-            fg=THEME_FG,
-            selectbackground=THEME_ACCENT,
-            highlightthickness=0,
-            relief="flat",
-        )
-        campers_listbox.pack(fill="both", expand=True, pady=(0, 8))
+        campers_listbox = self._campers_listbox(frame)
 
         def refresh_campers_list(*args):
             campers_listbox.delete(0, "end")
             camp_obj = get_selected_camp()
-            # Here camp_obj.campers is your list of camper names for that camp
             for name in camp_obj.campers:
                 campers_listbox.insert("end", name)
+
         camp_var.trace_add("write", refresh_campers_list)
         refresh_campers_list()
         
@@ -2538,30 +2485,22 @@ class ScoutWindow(ttk.Frame):
         frame.pack(fill="both", expand=True)
 
         ttk.Label(frame, text=f"Activities for {camp.name}", style="Header.TLabel").pack(anchor="w", pady=(0, 0))
-        table_frame = ttk.Frame(frame, style="Card.TFrame")
-        table_frame.pack(fill="both", expand=True)
 
-        columns = ("date", "time", "activity", "num_campers", "campers")
-        tree = ttk.Treeview(table_frame, columns=columns, show="headings", height=10,)
-        tree.pack(side="left", fill="both", expand=True)
-
-        scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=tree.yview)
-        tree.configure(yscrollcommand=scrollbar.set)
-        scrollbar.pack(side="right", fill="y")
-
-        tree.heading("date", text="Date")
-        tree.heading("time", text="Time")
-        tree.heading("activity", text="Activity")
-        tree.heading("num_campers", text="# Campers")
-        tree.heading("campers", text="Campers")
-
-        tree.column("date", width=100, anchor="w")
-        tree.column("time", width=70, anchor="w")
-        tree.column("activity", width=140, anchor="w")
-        tree.column("num_campers", width=80, anchor="center")
-        tree.column("campers", width=220, anchor="w")
-
-        item_details = {}
+        columns = {
+            "date": "Date",
+            "time": "Time",
+            "activity": "Activity",
+            "num_campers": "# Campers",
+            "campers": "Campers",
+        }
+        col_cfg = {
+            "date": {"width": 100, "anchor": "w"},
+            "time": {"width": 70, "anchor": "w"},
+            "activity": {"width": 140, "anchor": "w"},
+            "num_campers": {"width": 80, "anchor": "center"},
+            "campers": {"width": 220, "anchor": "w"},
+        }
+        tree, details_text, item_details = self._build_detail_table(frame, columns, col_cfg)
 
         for date in sorted(camp.activities.keys()):
             entries = camp.activities.get(date, [])
@@ -2593,12 +2532,6 @@ class ScoutWindow(ttk.Frame):
                     "campers": camper_list,
                     "food_used": food_used,
                 }
-        details_frame = ttk.LabelFrame(frame, text="Details", padding=8, style="Card.TFrame")
-        details_frame.pack(fill="both", expand=True, pady=(4, 0))
-
-        details_text = tk.Text(details_frame, height=8, bg="#0b1729", fg=THEME_FG, wrap="word", highlightthickness=0, relief="flat",)
-        details_text.pack(fill="both", expand=True)
-
         def show_details(event=None):
             sel = tree.selection()
             if not sel:
@@ -2704,47 +2637,7 @@ class ScoutWindow(ttk.Frame):
         ttk.Label(frame, text="Record Incident", style="Header.TLabel").pack(pady=(0, 6))
         ttk.Separator(frame).pack(fill="x", pady=(0, 8))
 
-        ttk.Label(frame, text="Camp", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
-        camp_var = tk.StringVar(value=supervised[0].name)
-        ttk.OptionMenu(frame, camp_var, supervised[0].name, *[c.name for c in supervised]).pack(fill="x", pady=(0, 8))
-
-        def get_selected_camp():
-            name = camp_var.get()
-            for camp in supervised:
-                if camp.name == name:
-                    return camp
-            return supervised[0]
-        
-        ttk.Label(frame, text="Date", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
-        date_var = tk.StringVar()
-        date_menu = ttk.OptionMenu(frame, date_var, "")
-        date_menu.pack(fill="x", pady=(0, 8))
-
-        def refresh_dates(*args):
-            camp_obj = get_selected_camp()
-            try:
-                start = datetime.strptime(camp_obj.start_date, "%Y-%m-%d").date()
-                end = datetime.strptime(camp_obj.end_date, "%Y-%m-%d").date()
-            except ValueError:
-                dates = []
-            else:
-                dates = []
-                d = start
-                while d <= end:
-                    dates.append(d.isoformat())
-                    d += timedelta(days=1)
-
-            menu = date_menu["menu"]
-            menu.delete(0, "end")
-            if dates:
-                for d_str in dates:
-                    menu.add_command(label=d_str, command=lambda v=d_str: date_var.set(v))
-                date_var.set(dates[0])
-            else:
-                date_var.set("")
-
-        camp_var.trace_add("write", refresh_dates)
-        refresh_dates()
+        camp_var, date_var, get_selected_camp = self._camp_date_picker(frame, supervised)
 
         def add_entry(label, initial=""):
             ttk.Label(frame, text=label, style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
@@ -2761,17 +2654,7 @@ class ScoutWindow(ttk.Frame):
         notes_text.pack(fill="both", expand=True, pady=(0, 8))
 
         ttk.Label(frame, text="Campers involved (optional)", style="FieldLabel.TLabel").pack(anchor="w", pady=(0, 2))
-        campers_listbox = tk.Listbox(
-            frame,
-            selectmode="extended",
-            height=6,
-            bg="#0b1729",
-            fg=THEME_FG,
-            selectbackground=THEME_ACCENT,
-            highlightthickness=0,
-            relief="flat",
-        )
-        campers_listbox.pack(fill="both", expand=True, pady=(0, 8))
+        campers_listbox = self._campers_listbox(frame)
     
         def refresh_campers_list(*args):
             campers_listbox.delete(0, "end")
@@ -2838,26 +2721,14 @@ class ScoutWindow(ttk.Frame):
         ttk.Label(top, text=f"Incidents for {camp.name}", style= "Header.TLabel").pack(anchor="w", padx=9, pady=(8,4))
         frame = ttk.Frame(top, style="Card.TFrame")  # FIXED parent here
         frame.pack(fill="both", expand=True, padx=8, pady=(0, 8))
-        table_frame = ttk.Frame(frame, style="Card.TFrame")
-        table_frame.pack(fill="both", expand=True)
 
-        columns = ("date", "description", "campers")
-        tree = ttk.Treeview(table_frame, columns=columns, show="headings", height=10)
-        tree.pack(side="left", fill="both", expand=True)
-
-        scrollbar = tk.Scrollbar(table_frame, orient="vertical", command=tree.yview)
-        tree.configure(yscrollcommand=scrollbar.set)
-        scrollbar.pack(side="right", fill="y")
-
-        tree.heading("date", text="Date")
-        tree.heading("description", text="Description")   
-        tree.heading("campers", text="Campers")
-
-        tree.column("date", width=90, anchor="w")
-        tree.column("description", width=240, anchor="w") 
-        tree.column("campers", width=180, anchor="w")
-
-        item_details = {}
+        columns = {"date": "Date", "description": "Description", "campers": "Campers"}
+        col_cfg = {
+            "date": {"width": 90, "anchor": "w"},
+            "description": {"width": 240, "anchor": "w"},
+            "campers": {"width": 180, "anchor": "w"},
+        }
+        tree, details_text, item_details = self._build_detail_table(frame, columns, col_cfg)
 
         for inc in camp.incidents:
             date = inc.get("date", "")
@@ -2870,12 +2741,6 @@ class ScoutWindow(ttk.Frame):
             item_details[item_id] = inc  
 
 
-
-        details_frame = ttk.LabelFrame(frame, text="Incident Details", padding=8, style="Card.TFrame")
-        details_frame.pack(fill="both", expand=True, pady=(4, 0))
-
-        details_text = tk.Text(details_frame, height=8, bg="#0b1729", fg=THEME_FG, wrap="word", highlightthickness=0, relief="flat",)
-        details_text.pack(fill="both", expand=True)
 
         def show_details(event=None):
             sel = tree.selection()
@@ -2947,6 +2812,31 @@ class ScoutWindow(ttk.Frame):
             show_details()
         center_in_place(top)
 
+    # --- Stats helpers ---
+    def _format_stats_for_camp(self, camp, scores_map, money_map):
+        lines = []
+        lines.append(f"{camp.name} ({camp.location}) {camp.start_date} -> {camp.end_date}")
+        lines.append(f"Type: {camp.camp_type} | Engagement: {scores_map.get(camp.name, 'N/A')}")
+        if camp.name in money_map:
+            lines.append(f"Money earned: ${money_map[camp.name]}")
+        stats = activity_stats_data(camp)
+        if stats["status"] == "ok":
+            food_used = stats['total_food_used'] if stats['total_food_used'] is not None else 0
+            lines.append(f"Activities: {stats['total_entries']} | Food used: {food_used}")
+        else:
+            lines.append("Activities: none")
+        return "\n".join(lines)
+
+    def _render_stats_window(self, parent, title, text_lines):
+        top = tk.Toplevel(parent)
+        top.title(title)
+        body = ttk.Frame(top, padding=8, style="Card.TFrame")
+        body.pack(fill="both", expand=True)
+        text = tk.Text(body, width=70, height=25)
+        text.pack(fill="both", expand=True, pady=(0, 8))
+        text.insert("end", "\n".join(text_lines))
+        center_in_place(top)
+        return top, body
 
 
     def stats_ui(self):
@@ -2958,33 +2848,14 @@ class ScoutWindow(ttk.Frame):
         scores = dict(engagement_scores_data())
         money_map = dict(money_earned_per_camp_data())
 
-        def render_all(parent):
-            lines_all = []
-            for camp in camps:
-                lines_all.append(f"{camp.name} ({camp.location}) {camp.start_date} -> {camp.end_date}")
-                lines_all.append(f"Type: {camp.camp_type} | Engagement: {scores.get(camp.name, 'N/A')}")
-                if camp.name in money_map:
-                    lines_all.append(f"Money earned: ${money_map[camp.name]}")
-                stats = activity_stats_data(camp)
-                if stats["status"] == "ok":
-                    food_used = stats['total_food_used'] if stats['total_food_used'] is not None else 0
-                    lines_all.append(f"Activities: {stats['total_entries']} | Food used: {food_used}")
-                else:
-                    lines_all.append("Activities: none")
-                lines_all.append("")
-            popup = tk.Toplevel(parent)
-            popup.title("All Camp Stats")
-            frame = ttk.Frame(popup, padding=8, style="Card.TFrame")
-            frame.pack(fill="both", expand=True)
-            txt = tk.Text(frame, width=80, height=30)
-            txt.pack(fill="both", expand=True)
-            txt.insert("end", "\n".join(lines_all))
-            center_in_place(popup)
-
         if indices is None:
             return
         if indices == "ALL":
-            render_all(self)
+            all_lines = []
+            for camp in camps:
+                all_lines.append(self._format_stats_for_camp(camp, scores, money_map))
+                all_lines.append("")  # spacer
+            self._render_stats_window(self, "All Camp Stats", all_lines)
             return
         if not indices:
             return
@@ -3006,16 +2877,17 @@ class ScoutWindow(ttk.Frame):
         else:
             lines.append(f"\nNo activities recorded for {camp_obj.name}.")
 
-        top = tk.Toplevel(self)
-        top.title("Scout Stats")
-        body = ttk.Frame(top, padding=8, style="Card.TFrame")
-        body.pack(fill="both", expand=True)
-        text = tk.Text(body, width=70, height=25)
-        text.pack(fill="both", expand=True, pady=(0, 8))
-        text.insert("end", "\n".join(lines))
-
-        ttk.Button(body, text="Show all camp stats", command=lambda: render_all(top), style="Primary.TButton").pack(fill="x", pady=(0, 4))
-        center_in_place(top)
+        top, body = self._render_stats_window(self, "Scout Stats", lines)
+        ttk.Button(
+            body,
+            text="Show all camp stats",
+            command=lambda: self._render_stats_window(
+                top,
+                "All Camp Stats",
+                [self._format_stats_for_camp(c, scores, money_map) + "\n" for c in camps],
+            ),
+            style="Primary.TButton",
+        ).pack(fill="x", pady=(0, 4))
 
     def messaging_ui(self):
         top = tk.Toplevel(self)
@@ -3051,35 +2923,42 @@ def simple_prompt_int(prompt):
 
 def select_camp_dialog(title, camps, allow_multiple=False, allow_cancel=False, allow_view_all=False):
     """Return list of selected indices from camps via a listbox dialog."""
-    top = tk.Toplevel()
-    top.title(title)
-    center_window(top, width=520, height=380)
-    top.minsize(400, 260)
-    top.configure(bg=THEME_BG)
-    wrapper = ttk.Frame(top, padding=12, style="Card.TFrame")
-    wrapper.pack(fill="both", expand=True)
+    def build_dialog():
+        top = tk.Toplevel()
+        top.title(title)
+        center_window(top, width=520, height=380)
+        top.minsize(400, 260)
+        top.configure(bg=THEME_BG)
+        wrapper = ttk.Frame(top, padding=12, style="Card.TFrame")
+        wrapper.pack(fill="both", expand=True)
 
-    selectmode = "extended" if allow_multiple else "browse"
-    lb_frame = ttk.Frame(wrapper, style="Card.TFrame")
-    lb_frame.pack(fill="both", expand=True, padx=6, pady=6)
-    listbox = tk.Listbox(
-        lb_frame,
-        selectmode=selectmode,
-        width=60,
-        bg="#0b1729",
-        fg=THEME_FG,
-        selectbackground=THEME_ACCENT,
-        highlightthickness=0,
-        relief="flat",
-    )
-    scrollbar = ttk.Scrollbar(lb_frame, orient="vertical", command=listbox.yview)
-    listbox.configure(yscrollcommand=scrollbar.set)
-    listbox.pack(side="left", fill="both", expand=True, padx=(4, 0), pady=4)
-    scrollbar.pack(side="right", fill="y", padx=(0, 4), pady=4)
-    for camp in camps:
-        leaders = ",".join(camp.scout_leaders) if camp.scout_leaders else "None"
-        listbox.insert("end", f"{camp.name} ({camp.location}) {camp.start_date}->{camp.end_date} | Leaders: {leaders}")
+        selectmode = "extended" if allow_multiple else "browse"
+        lb_frame = ttk.Frame(wrapper, style="Card.TFrame")
+        lb_frame.pack(fill="both", expand=True, padx=6, pady=6)
+        listbox = tk.Listbox(
+            lb_frame,
+            selectmode=selectmode,
+            width=60,
+            bg="#0b1729",
+            fg=THEME_FG,
+            selectbackground=THEME_ACCENT,
+            highlightthickness=0,
+            relief="flat",
+        )
+        scrollbar = ttk.Scrollbar(lb_frame, orient="vertical", command=listbox.yview)
+        listbox.configure(yscrollcommand=scrollbar.set)
+        listbox.pack(side="left", fill="both", expand=True, padx=(4, 0), pady=4)
+        scrollbar.pack(side="right", fill="y", padx=(0, 4), pady=4)
 
+        for camp in camps:
+            leaders = ",".join(camp.scout_leaders) if camp.scout_leaders else "None"
+            listbox.insert("end", f"{camp.name} ({camp.location}) {camp.start_date}->{camp.end_date} | Leaders: {leaders}")
+
+        btn_frame = tk.Frame(top)
+        btn_frame.pack(pady=5)
+        return top, listbox, btn_frame
+
+    top, listbox, btn_frame = build_dialog()
     result = {"indices": None}
 
     def on_ok():
@@ -3092,12 +2971,9 @@ def select_camp_dialog(title, camps, allow_multiple=False, allow_cancel=False, a
         top.destroy()
 
     def on_view_all():
-        # special sentinel to indicate view-all
         result["indices"] = "ALL"
         top.destroy()
 
-    btn_frame = tk.Frame(top)
-    btn_frame.pack(pady=5)
     tk.Button(btn_frame, text="OK", command=on_ok).pack(side="left", padx=5)
     tk.Button(btn_frame, text="Cancel", command=on_cancel).pack(side="left", padx=5)
     if allow_cancel:

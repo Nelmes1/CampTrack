@@ -1,1522 +1,2089 @@
 [
     {
         "message": "Food stock low at Camp Alpha",
-        "read": true
+        "timestamp": "",
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Food shortage at Rivendell! Only 2 units left but 800 needed.",
-        "read": true,
-        "timestamp": "2025-12-03 21:37"
+        "timestamp": "2025-12-03 21:37",
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "camp Rivendell edited",
-        "read": true,
-        "timestamp": "2025-12-03 21:55"
+        "timestamp": "2025-12-03 21:55",
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Pay rate set to: 100 at Pine Ridge",
-        "read": true,
         "timestamp": "2025-12-08T21:59:41.941659",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Pay rate set to: 25 at Cedar Grove",
-        "read": true,
         "timestamp": "2025-12-08T22:12:44.053307",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Incident recorded at Rivendell",
-        "read": true,
         "timestamp": "2025-12-08T22:20:07.939163",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Pay rate set to: 65 at Cedar Grove",
-        "read": true,
         "timestamp": "2025-12-08 22:29",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Campers assigned to Cedar Grove",
-        "read": true,
         "timestamp": "2025-12-09 19:57",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "[Admin: admin] Changed password for user 'joe'",
-        "read": true,
         "timestamp": "2025-12-10 08:11",
-        "level": "WARNING"
+        "level": "WARNING",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "[Admin: admin] Changed password for user 'joe'",
-        "read": true,
         "timestamp": "2025-12-10 08:12",
-        "level": "WARNING"
+        "level": "WARNING",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "[Admin: admin] Changed password for user 'joe'",
-        "read": true,
         "timestamp": "2025-12-10 08:12",
-        "level": "WARNING"
+        "level": "WARNING",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Camp pine created",
-        "read": true,
         "timestamp": "2025-12-10 16:07",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Camp Pine3 created",
-        "read": true,
         "timestamp": "2025-12-10 16:09",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Camp Pine3 deleted",
-        "read": true,
         "timestamp": "2025-12-10 16:09",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 16:58",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 16:58",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 16:58",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 16:58",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 16:58",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 16:58",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 16:58",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 16:58",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 16:58",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 16:58",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 16:58",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 16:58",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 16:58",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 16:58",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 16:58",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 16:58",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 16:58",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 16:58",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 16:58",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 16:58",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 16:58",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 16:58",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 16:58",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 16:58",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 16:58",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 17:07",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 17:07",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 17:07",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 17:07",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 17:07",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 17:07",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 17:07",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 17:07",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 17:07",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 17:07",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 17:12",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 17:12",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 17:12",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 17:12",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 17:12",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 17:12",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 17:12",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 17:12",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 17:12",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 17:12",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 17:14",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 17:14",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 17:14",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 17:14",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 17:14",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 17:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 17:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 17:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 17:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 17:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 17:16",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 17:16",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 17:16",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 17:16",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 17:16",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 17:18",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 17:18",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 17:18",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 17:18",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 17:18",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 17:20",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 17:20",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 17:20",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 17:20",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 17:20",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 17:21",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 17:21",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 17:21",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 17:21",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 17:21",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 17:22",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 17:22",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 17:22",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 17:22",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 17:22",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 17:23",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 17:23",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 17:23",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 17:23",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 17:23",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 17:23",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 17:23",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 17:23",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 17:23",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 17:23",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 17:25",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 17:25",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 17:25",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 17:25",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 17:25",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 17:26",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 17:26",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 17:26",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 17:26",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 17:26",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 17:26",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 17:26",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 17:26",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 17:26",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 17:26",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 17:26",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 17:26",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 17:26",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 17:26",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 17:26",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 17:27",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 17:27",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 17:27",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 17:27",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 17:27",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 17:47",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 17:47",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 17:47",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 17:47",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 17:47",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 17:51",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 17:51",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 17:51",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 17:51",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 17:51",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 17:53",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 17:53",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 17:53",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 17:53",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 17:53",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 17:53",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 17:53",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 17:53",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 17:53",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 17:53",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 17:54",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 17:54",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 17:54",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 17:54",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 17:54",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 18:03",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 18:03",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 18:03",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 18:03",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 18:03",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 18:04",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 18:04",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 18:04",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 18:04",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 18:04",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 18:10",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 18:10",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 18:10",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 18:10",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 18:10",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 18:10",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 18:10",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 18:10",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 18:10",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 18:10",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 18:10",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 18:10",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 18:10",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 18:10",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 18:10",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 18:10",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 18:10",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 18:10",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 18:10",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 18:10",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 18:15",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 18:17",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 18:17",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 18:17",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 18:17",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 18:17",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 18:17",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 18:17",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 18:17",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 18:17",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 18:17",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 18:34",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 18:34",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 18:34",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 18:34",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 18:34",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 18:34",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 18:34",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 18:34",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 18:34",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 18:34",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 18:34",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 18:34",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 18:34",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 18:34",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 18:34",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 18:34",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 18:34",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 18:34",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 18:34",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 18:34",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Pine Ridge Base",
-        "read": true,
         "timestamp": "2025-12-10 18:34",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Cedar Grove Overnight",
-        "read": true,
         "timestamp": "2025-12-10 18:34",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Summit Trail Expedition",
-        "read": true,
         "timestamp": "2025-12-10 18:34",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Lakeside Adventure",
-        "read": true,
         "timestamp": "2025-12-10 18:34",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
     },
     {
         "message": "Activity updated at Coastal Explorers",
-        "read": true,
         "timestamp": "2025-12-10 18:34",
-        "level": "INFO"
+        "level": "INFO",
+        "category": "GENERAL",
+        "context": {},
+        "read_by": []
+    },
+    {
+        "message": "Activity updated at Pine Ridge Base",
+        "timestamp": "2025-12-11 06:58",
+        "level": "INFO",
+        "category": "CAMP",
+        "context": {
+            "camp": "Pine Ridge Base",
+            "type": "camp"
+        },
+        "read_by": []
+    },
+    {
+        "message": "Activity updated at Cedar Grove Overnight",
+        "timestamp": "2025-12-11 06:58",
+        "level": "INFO",
+        "category": "CAMP",
+        "context": {
+            "camp": "Cedar Grove Overnight",
+            "type": "camp"
+        },
+        "read_by": []
+    },
+    {
+        "message": "Activity updated at Summit Trail Expedition",
+        "timestamp": "2025-12-11 06:58",
+        "level": "INFO",
+        "category": "CAMP",
+        "context": {
+            "camp": "Summit Trail Expedition",
+            "type": "camp"
+        },
+        "read_by": []
+    },
+    {
+        "message": "Activity updated at Lakeside Adventure",
+        "timestamp": "2025-12-11 06:58",
+        "level": "INFO",
+        "category": "CAMP",
+        "context": {
+            "camp": "Lakeside Adventure",
+            "type": "camp"
+        },
+        "read_by": []
+    },
+    {
+        "message": "Activity updated at Coastal Explorers",
+        "timestamp": "2025-12-11 06:58",
+        "level": "INFO",
+        "category": "CAMP",
+        "context": {
+            "camp": "Coastal Explorers",
+            "type": "camp"
+        },
+        "read_by": []
     }
 ]

@@ -2,7 +2,7 @@
 
 CLI tool to manage camps for Admin, Scout Leader, and Logistics Coordinator roles.
 
-## Setup
+# Setup
 
 1) Create/activate a virtualenv (optional but recommended):
 ```bash
@@ -15,7 +15,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Running
+# Running
 
 CLI:
 ```bash
@@ -32,7 +32,7 @@ Default accounts (empty passwords):
 - logistics coordinator: `coordinator`
 - scout leaders: `leader1`, `leader2`, `leader3`, `leader4`
 
-## Data files
+# Data files
 
 Runtime data is stored under `data/`:
 - `camp_data.json` – camps, leaders, campers, activities, records
@@ -44,6 +44,6 @@ User/login data remains in `logins.txt` and `disabled_logins.txt` at the project
 
 CSV bulk import expects `campers/` (sibling to `data/`) with CSV files containing `Name,Age,Activities` columns.
 
-## Date input flexibility
+# Date input flexibility
 
 Logistics camp creation accepts human-friendly dates (e.g., `2025-10-10`, `10 Oct 2025`, `Oct 10 2025`, `10/10/2025`). For the broadest parsing (e.g., fuzzy text), install `python-dateutil` (already listed in `requirements.txt`); otherwise, common formats work via the built-in fallback.
