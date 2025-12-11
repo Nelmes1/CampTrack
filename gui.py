@@ -565,7 +565,7 @@ class AdminWindow(ttk.Frame):
         main.columnconfigure(0, weight=1)
         main.columnconfigure(1, weight=1)
 
-        # --- USER MANAGEMENT CARD ---
+        # USER MANAGEMENT CARD
         user_frame = ttk.Frame(main, style="Card.TFrame", padding=SPACING["lg"])
         user_frame.grid(row=0,column=0,sticky="nsew",padx=(0, SPACING["md"]),pady=(0, SPACING["md"]))
         user_frame.columnconfigure(0, weight=1)
@@ -573,7 +573,7 @@ class AdminWindow(ttk.Frame):
         ttk.Label(user_frame,text="Manage user accounts, roles, and permissions.",style="Subtitle.TLabel").grid(row=1, column=0, sticky="w", pady=(0, SPACING["md"]))
         ttk.Button(user_frame,text="View All Users",command=self.list_users_ui,style="Primary.TButton").grid(row=2, column=0, sticky="ew")
         
-        # --- QUICK ACTIONS CARD ---
+        # QUICK ACTIONS CARD
         qa_frame = ttk.Frame(main, style="Card.TFrame", padding=SPACING["lg"])
         qa_frame.grid(row=0,column=1,sticky="nsew",pady=(0, SPACING["md"]))
         qa_frame.columnconfigure(0, weight=1)
@@ -1236,13 +1236,13 @@ class LogisticsWindow(ttk.Frame):
         _pill(summary, "Campers", str(campers_total), "Across all camps")
         _pill(summary, "Leaders", str(leaders_assigned), "Assigned to camps")
 
-        # === GRID ===
+        # GRID
         main = ttk.Frame(content, style="App.TFrame")
         main.grid(row=2, column=0, sticky="nsew")
         main.columnconfigure(0, weight=1)
         main.columnconfigure(1, weight=1)
 
-        # === CAMP MANAGEMENT CARD ===
+        # CAMP MANAGEMENT CARD
         camp_frame = ttk.Frame(main, style="Card.TFrame", padding=SPACING["lg"])
         camp_frame.grid(row=0, column=0, sticky="nsew",padx=(0, SPACING["md"]), pady=(0, SPACING["md"]))
         ttk.Label(camp_frame,text="Camp Management",style="Header.TLabel",).pack(anchor="w")
@@ -1251,7 +1251,7 @@ class LogisticsWindow(ttk.Frame):
         ttk.Button(camp_frame,text="Food Allocation",command=self.food_allocation_menu,style="TButton").pack(fill="x", pady=4)
         ttk.Button(camp_frame,text="Financial Settings",command=self.financial_settings_ui,style="TButton").pack(fill="x", pady=4)
 
-        # === INSIGHTS & NOTIFICATIONS CARD ===
+        # INSIGHTS & NOTIFICATIONS CARD
         viz_frame = ttk.Frame(main, style="Card.TFrame", padding=SPACING["lg"])
         viz_frame.grid(row=0, column=1, sticky="nsew",pady=(0, SPACING["md"]))
         ttk.Label(viz_frame,text="Insights & Notifications",style="Header.TLabel").pack(anchor="w")
@@ -1261,7 +1261,7 @@ class LogisticsWindow(ttk.Frame):
         ttk.Button(viz_frame,text="Notifications",command=self.notifications_ui,style="TButton").pack(fill="x", pady=4)
         ttk.Button(viz_frame,text="Messaging",command=self.messaging_ui,style="TButton").pack(fill="x", pady=4)
 
-        # === LOGOUT STRIP ===
+        # LOGOUT STRIP
         logout_frame = ttk.Frame(content, style="App.TFrame")
         logout_frame.grid(row=3, column=0, sticky="ew", pady=(SPACING["sm"], 0))
         ttk.Button(logout_frame,text="Logout",command=self.logout,style="Danger.TButton").pack(side="right")
