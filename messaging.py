@@ -139,6 +139,30 @@ def acknowledge_conversation(username: str, other: str) -> int:
     return updated
 
 
+def acknowledge_message(username: str, other: str, timestamp: str) -> bool:
+    """
+    Acknowledge a specific priority message by timestamp.
+    Returns True if a message was updated.
+    """
+    messages = load_messages()
+    updated = False
+    for msg in messages:
+        if (
+            msg.get("to") == username
+            and msg.get("from") == other
+            and msg.get("requires_ack")
+            and not msg.get("acked")
+            and msg.get("timestamp") == timestamp
+        ):
+            msg["acked"] = True
+            msg["acked_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            updated = True
+            break
+    if updated:
+        save_messages(messages)
+    return updated
+
+
 def pin_message(username: str, other: str, timestamp: Optional[str] = None, pinned: bool = True) -> bool:
     """
     Pin/unpin a message in the conversation. Default: pin latest message.
