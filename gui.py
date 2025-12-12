@@ -1,3 +1,6 @@
+from bootstrap import ensure_dependencies
+ensure_dependencies()
+
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog, simpledialog
 import os

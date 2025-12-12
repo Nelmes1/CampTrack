@@ -1,3 +1,6 @@
+from bootstrap import ensure_dependencies
+ensure_dependencies()
+
 from user_logins import load_logins
 from login_auth import login_loop
 
