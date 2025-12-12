@@ -26,6 +26,7 @@ from features.logistics import (
     plot_leaders_per_camp,
     plot_engagement_scores,
 )
+from features.calendar import generate_schedule_events, find_conflicts
 from features.notifications import (
     load_notifications,
     mark_all_as_read,
@@ -344,6 +345,156 @@ def _unread_count(filter_fn=None, username=None):
     if filter_fn:
         notes = [n for n in notes if filter_fn(n)]
     return len([n for n in notes if not n.get("read_by") or (username and username not in n.get("read_by"))])
+
+
+def open_schedule_window(master, username=None, restrict_to_user=False):
+    """Show camp dates first, with planned activities for the selected camp."""
+    events = generate_schedule_events(include_activities=True)
+    if restrict_to_user and username:
+        events = [e for e in events if username in (e.get("leaders") or [])]
+    if not events:
+        scope = "for you" if restrict_to_user else "in the system"
+        messagebox.showinfo("Schedule", f"No schedule data available {scope}.")
+        return
+
+    conflicts = find_conflicts(events)
+    camp_events = [e for e in events if e["type"] == "camp"]
+    activities_by_camp = {}
+    for ev in events:
+        if ev["type"] == "activity":
+            activities_by_camp.setdefault(ev.get("camp"), []).append(ev)
+    for acts in activities_by_camp.values():
+        acts.sort(key=lambda e: (e["start"], e.get("detail", "")))
+
+    win = tk.Toplevel(master)
+    win.title("Schedule")
+    win.configure(bg=THEME_BG)
+    center_window(win, width=1040, height=640)
+    frame = ttk.Frame(win, padding=14, style="Card.TFrame")
+    frame.pack(fill="both", expand=True, padx=12, pady=12)
+
+    header = ttk.Frame(frame, style="Card.TFrame")
+    header.pack(fill="x", pady=(0, 6))
+    ttk.Label(header, text="Schedule", style="Header.TLabel").pack(side="left")
+    if username and restrict_to_user:
+        ttk.Label(header, text=f"Showing events for {username}", style="Subtitle.TLabel").pack(side="left", padx=(8, 0))
+
+    controls = ttk.Frame(frame, style="Card.TFrame")
+    controls.pack(fill="x", pady=(0, 8))
+    search_var = tk.StringVar(value="")
+    ttk.Label(controls, text="Search camps", style="FieldLabel.TLabel").pack(side="left")
+    ttk.Entry(controls, textvariable=search_var, style="App.TEntry", width=26).pack(side="left", padx=(4, 8))
+    conflicts_only = tk.BooleanVar(value=False)
+    ttk.Checkbutton(controls, text="Conflicts only", variable=conflicts_only).pack(side="left")
+    summary_var = tk.StringVar(value="")
+    ttk.Label(controls, textvariable=summary_var, style="Subtitle.TLabel").pack(side="right")
+    ttk.Button(controls, text="Refresh", command=lambda: refresh_camps()).pack(side="left", padx=(8, 0))
+
+    layout = ttk.Frame(frame, style="App.TFrame")
+    layout.pack(fill="both", expand=True)
+    layout.columnconfigure(0, weight=1)
+    layout.columnconfigure(1, weight=1)
+
+    camp_cols = ("Camp", "Start", "End", "Leaders", "Location", "Conflicts")
+    camp_tree = ttk.Treeview(layout, columns=camp_cols, show="headings", height=12)
+    camp_tree.column("Camp", width=200, anchor="w")
+    camp_tree.column("Start", width=110, anchor="center")
+    camp_tree.column("End", width=110, anchor="center")
+    camp_tree.column("Leaders", width=200, anchor="w")
+    camp_tree.column("Location", width=160, anchor="w")
+    camp_tree.column("Conflicts", width=140, anchor="w")
+    for col in camp_cols:
+        camp_tree.heading(col, text=col)
+    camp_tree.grid(row=0, column=0, sticky="nsew", padx=(0, SPACING["md"]))
+    camp_tree.tag_configure("conflict", background="#2a1f2f")
+
+    activity_cols = ("Detail", "Date", "Leaders", "Conflicts")
+    activity_tree = ttk.Treeview(layout, columns=activity_cols, show="headings", height=12)
+    activity_tree.column("Detail", width=260, anchor="w")
+    activity_tree.column("Date", width=140, anchor="center")
+    activity_tree.column("Leaders", width=180, anchor="w")
+    activity_tree.column("Conflicts", width=140, anchor="w")
+    for col in activity_cols:
+        activity_tree.heading(col, text=col)
+    activity_tree.grid(row=0, column=1, sticky="nsew")
+    activity_tree.tag_configure("conflict", background="#2a1f2f")
+
+    row_meta = {}
+
+    def fmt_dates(ev):
+        s = ev["start"].strftime("%Y-%m-%d")
+        e = ev["end"].strftime("%Y-%m-%d")
+        return s if s == e else f"{s} -> {e}"
+
+    def refresh_camps():
+        row_meta.clear()
+        for child in camp_tree.get_children():
+            camp_tree.delete(child)
+        term = search_var.get().strip().lower()
+        show_conflicts = conflicts_only.get()
+        shown = 0
+        conflict_camps = 0
+        for idx, ev in enumerate(camp_events):
+            conflicts_here = conflicts.get(events.index(ev), [])
+            conflict_text = ", ".join(conflicts_here)
+            if show_conflicts and not conflict_text:
+                continue
+            leaders = ", ".join(ev.get("leaders") or [])
+            haystack = f"{ev.get('camp','')} {leaders} {ev.get('location','')}".lower()
+            if term and term not in haystack:
+                continue
+            item_id = camp_tree.insert(
+                "",
+                "end",
+                values=(
+                    ev.get("camp"),
+                    ev["start"].strftime("%Y-%m-%d"),
+                    ev["end"].strftime("%Y-%m-%d"),
+                    leaders,
+                    ev.get("location", ""),
+                    conflict_text,
+                ),
+                tags=("conflict",) if conflict_text else (),
+            )
+            row_meta[item_id] = ev
+            shown += 1
+            if conflict_text:
+                conflict_camps += 1
+        if shown == 0:
+            camp_tree.insert("", "end", values=("—", "No camps match filters.", "", "", ""))
+        summary_var.set(f"{shown} camp(s); conflicts in {conflict_camps}")
+        if camp_tree.get_children():
+            first = camp_tree.get_children()[0]
+            camp_tree.selection_set(first)
+            on_camp_select()
+
+    def on_camp_select(event=None):
+        for child in activity_tree.get_children():
+            activity_tree.delete(child)
+        sel = camp_tree.selection()
+        if not sel:
+            return
+        ev = row_meta.get(sel[0])
+        if not ev:
+            return
+        acts = activities_by_camp.get(ev.get("camp"), [])
+        if not acts:
+            activity_tree.insert("", "end", values=("No planned activities", "", "", ""))
+            return
+        for act in acts:
+            conflict_names = conflicts.get(events.index(act), [])
+            conflict_text = ", ".join(conflict_names)
+            tags = ("conflict",) if conflict_text else ()
+            activity_tree.insert(
+                "",
+                "end",
+                values=(act.get("detail"), fmt_dates(act), ", ".join(act.get("leaders") or []), conflict_text),
+                tags=tags,
+            )
+
+    camp_tree.bind("<<TreeviewSelect>>", on_camp_select)
+    refresh_camps()
+    center_in_place(win)
 
 
 def show_error_toast(master, title, message, duration=2000):
@@ -1201,6 +1352,7 @@ class LogisticsWindow(ttk.Frame):
             ("Food Allocation", self.food_allocation_menu),
             ("Financial Settings", self.financial_settings_ui),
             ("Visualise Data", self.visualise_menu),
+            ("Schedule", self.schedule_ui),
             ("Notifications", self.notifications_ui),
             ("Messaging", self.messaging_ui),
             ("Logout", self.logout),
@@ -1274,6 +1426,9 @@ class LogisticsWindow(ttk.Frame):
     def _focus_dashboard(self):
         # placeholder to match nav selection; content already visible
         pass
+
+    def schedule_ui(self):
+        open_schedule_window(self, username=self.username, restrict_to_user=False)
 
     def manage_camps_menu(self):
         top = tk.Toplevel(self)
@@ -1880,6 +2035,7 @@ class ScoutWindow(ttk.Frame):
                 ("View Stats", self.stats_ui),
                 ("View Activities", self.view_activities_ui),
                 ("View Incidents", self.view_incidents_ui),
+                ("Schedule", self.schedule_ui),
                 ("Notifications", self.notifications_ui),
                 ("Messaging", self.messaging_ui),
                 ("Logout", self.logout),
@@ -1956,6 +2112,9 @@ class ScoutWindow(ttk.Frame):
     def _focus_dashboard(self):
         # placeholder to align with nav; content already visible
         pass
+
+    def schedule_ui(self):
+        open_schedule_window(self, username=self.username, restrict_to_user=True)
 
     def notifications_ui(self):
         open_notifications_window(
